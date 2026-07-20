@@ -467,6 +467,134 @@
       box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent);
     }
 
+    .premium {
+      margin-top: 0.5rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--line);
+    }
+
+    .premium-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .premium-header h2 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-family: "Playfair Display", Georgia, serif;
+    }
+
+    .premium-lock {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .badge.unlocked {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .unlock-button {
+      border: 0;
+      border-radius: 999px;
+      padding: 0.55rem 0.95rem;
+      white-space: nowrap;
+      background: linear-gradient(135deg, var(--accent), #9a6b7a);
+      color: #fffafb;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .premium-copy {
+      margin: 0 0 1rem;
+      color: #7a6673;
+      line-height: 1.5;
+      font-size: 0.95rem;
+    }
+
+    .premium-fields {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .premium-fields.is-locked {
+      opacity: 0.55;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .payment-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      background: rgba(74, 63, 79, 0.45);
+      z-index: 1000;
+    }
+
+    .payment-modal.is-open {
+      display: flex;
+    }
+
+    .payment-dialog {
+      width: min(100%, 420px);
+      padding: 1.75rem;
+      border-radius: 24px;
+      background: #fffdfb;
+      box-shadow: 0 24px 60px rgba(74, 63, 79, 0.2);
+      text-align: center;
+    }
+
+    .payment-dialog h3 {
+      margin: 0 0 0.75rem;
+      font-size: 1.6rem;
+      font-family: "Playfair Display", Georgia, serif;
+    }
+
+    .payment-dialog p {
+      margin: 0 0 1.25rem;
+      color: #7a6673;
+      line-height: 1.6;
+    }
+
+    .payment-amount {
+      margin: 0 0 1.25rem;
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .payment-actions {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .payment-test-note {
+      margin: 1rem 0 0;
+      font-size: 0.85rem;
+      color: #8a7480;
+    }
+
     .actions {
       display: flex;
       flex-wrap: wrap;
@@ -794,19 +922,32 @@
           <div class="font-list" id="fontList" role="listbox" aria-label="Font style"></div>
         </label>
 
-        <div class="form-grid" style="gap: 0.55rem;">
-          <span style="font-size: 0.95rem; font-weight: 700;">Stickers</span>
-          <p class="sticker-hint">Choose a sticker and drag it onto the invitation.</p>
-          <div class="sticker-tray" id="stickerTray" aria-label="Theme stickers"></div>
-          <div class="sticker-actions">
-            <button class="secondary" type="button" id="clearStickers">Clear stickers</button>
+        <section class="premium" id="premiumSection">
+          <div class="premium-header">
+            <h2>Premium extras</h2>
+            <div class="premium-lock">
+              <span class="badge" id="premiumBadge">Locked · €1</span>
+              <button class="unlock-button" type="button" id="unlockPremium">Unlock for €1 (Test)</button>
+            </div>
           </div>
-        </div>
+          <p class="premium-copy">Unlock stickers and place them on your invitation. This is a test flow with no real payment.</p>
 
-        <div class="actions">
-          <button class="primary" type="button" id="downloadPdf">Download PDF</button>
-          <button class="secondary" type="reset">Reset</button>
-        </div>
+          <div class="premium-fields is-locked" id="premiumFields">
+            <div class="form-grid" style="gap: 0.55rem;">
+              <span style="font-size: 0.95rem; font-weight: 700;">Stickers</span>
+              <p class="sticker-hint">Unlock to use stickers. Click to add, or drag onto the invitation. Tap to resize, double-click to remove.</p>
+              <div class="sticker-tray" id="stickerTray" aria-label="Theme stickers"></div>
+              <div class="sticker-actions">
+                <button class="secondary" type="button" id="clearStickers">Clear stickers</button>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="primary" type="button" id="downloadPdf">Download PDF</button>
+              <button class="secondary" type="reset">Reset</button>
+            </div>
+          </div>
+        </section>
       </form>
     </section>
 
@@ -845,6 +986,19 @@
   </div>
 
   <div class="pdf-stage" id="pdfStage" aria-hidden="true"></div>
+
+  <div class="payment-modal" id="paymentModal" aria-hidden="true">
+    <div class="payment-dialog" role="dialog" aria-labelledby="paymentTitle" aria-modal="true">
+      <h3 id="paymentTitle">Unlock premium extras</h3>
+      <p>Get access to stickers and PDF download for your baby shower invitation.</p>
+      <div class="payment-amount">€1.00</div>
+      <div class="payment-actions">
+        <button class="primary" type="button" id="confirmPayment">Pay €1 (Test)</button>
+        <button class="secondary" type="button" id="cancelPayment">Cancel</button>
+      </div>
+      <p class="payment-test-note">Test mode only. No real payment will be processed.</p>
+    </div>
+  </div>
 
   <script>
     const sharedStickers = [
@@ -1006,7 +1160,16 @@
     const stickerSizeBar = document.getElementById("stickerSizeBar");
     const stickerSizeRange = document.getElementById("stickerSizeRange");
     const stickerSizeValue = document.getElementById("stickerSizeValue");
+    const premiumFields = document.getElementById("premiumFields");
+    const premiumBadge = document.getElementById("premiumBadge");
+    const unlockPremiumButton = document.getElementById("unlockPremium");
+    const paymentModal = document.getElementById("paymentModal");
+    const confirmPaymentButton = document.getElementById("confirmPayment");
+    const cancelPaymentButton = document.getElementById("cancelPayment");
     let selectedSticker = null;
+
+    const PREMIUM_STORAGE_KEY = "baby-shower-premium-unlocked";
+    let premiumUnlocked = localStorage.getItem(PREMIUM_STORAGE_KEY) === "true";
     const dayColumn = document.getElementById("dayColumn");
     const monthColumn = document.getElementById("monthColumn");
     const yearColumn = document.getElementById("yearColumn");
@@ -1089,6 +1252,12 @@
 
       stickerTray.querySelectorAll(".sticker-item").forEach((item) => {
         item.addEventListener("dragstart", (event) => {
+          if (!premiumUnlocked) {
+            event.preventDefault();
+            openPaymentModal();
+            return;
+          }
+
           event.dataTransfer.setData("text/plain", item.dataset.stickerHtml);
           event.dataTransfer.effectAllowed = "copy";
           invitationCard.classList.add("drop-ready");
@@ -1096,6 +1265,15 @@
 
         item.addEventListener("dragend", () => {
           invitationCard.classList.remove("drop-ready");
+        });
+
+        item.addEventListener("click", () => {
+          if (!premiumUnlocked) {
+            openPaymentModal();
+            return;
+          }
+
+          placeSticker(item.dataset.stickerHtml, 50, 42);
         });
       });
     }
@@ -1137,6 +1315,11 @@
     }
 
     function placeSticker(stickerHtml, xPercent, yPercent) {
+      if (!premiumUnlocked) {
+        openPaymentModal();
+        return;
+      }
+
       const sticker = document.createElement("button");
       sticker.type = "button";
       sticker.className = "placed-sticker";
@@ -1209,6 +1392,10 @@
 
     function setupStickerDropTarget() {
       invitationCard.addEventListener("dragover", (event) => {
+        if (!premiumUnlocked) {
+          return;
+        }
+
         event.preventDefault();
         event.dataTransfer.dropEffect = "copy";
         invitationCard.classList.add("drop-ready");
@@ -1221,6 +1408,12 @@
       invitationCard.addEventListener("drop", (event) => {
         event.preventDefault();
         invitationCard.classList.remove("drop-ready");
+
+        if (!premiumUnlocked) {
+          openPaymentModal();
+          return;
+        }
+
         const stickerHtml = event.dataTransfer.getData("text/plain");
         if (!stickerHtml) {
           return;
@@ -1231,6 +1424,29 @@
         const yPercent = ((event.clientY - rect.top) / rect.height) * 100;
         placeSticker(stickerHtml, xPercent, yPercent);
       });
+    }
+
+    function setPremiumUnlocked(unlocked) {
+      premiumUnlocked = unlocked;
+      localStorage.setItem(PREMIUM_STORAGE_KEY, unlocked ? "true" : "false");
+      premiumFields.classList.toggle("is-locked", !unlocked);
+      unlockPremiumButton.hidden = unlocked;
+      premiumBadge.textContent = unlocked ? "Unlocked" : "Locked · €1";
+      premiumBadge.classList.toggle("unlocked", unlocked);
+
+      if (!unlocked) {
+        clearStickers();
+      }
+    }
+
+    function openPaymentModal() {
+      paymentModal.classList.add("is-open");
+      paymentModal.setAttribute("aria-hidden", "false");
+    }
+
+    function closePaymentModal() {
+      paymentModal.classList.remove("is-open");
+      paymentModal.setAttribute("aria-hidden", "true");
     }
 
     function formatSelectedDate() {
@@ -1446,6 +1662,26 @@
 
     clearStickersButton.addEventListener("click", clearStickers);
 
+    unlockPremiumButton.addEventListener("click", openPaymentModal);
+    cancelPaymentButton.addEventListener("click", closePaymentModal);
+    paymentModal.addEventListener("click", (event) => {
+      if (event.target === paymentModal) {
+        closePaymentModal();
+      }
+    });
+
+    confirmPaymentButton.addEventListener("click", () => {
+      confirmPaymentButton.disabled = true;
+      confirmPaymentButton.textContent = "Processing...";
+
+      window.setTimeout(() => {
+        setPremiumUnlocked(true);
+        closePaymentModal();
+        confirmPaymentButton.disabled = false;
+        confirmPaymentButton.textContent = "Pay €1 (Test)";
+      }, 900);
+    });
+
     stickerSizeRange.addEventListener("input", () => {
       if (!selectedSticker) {
         return;
@@ -1532,6 +1768,11 @@
     }
 
     downloadButton.addEventListener("click", async () => {
+      if (!premiumUnlocked) {
+        openPaymentModal();
+        return;
+      }
+
       const originalLabel = downloadButton.textContent;
       downloadButton.disabled = true;
       downloadButton.textContent = "Generating PDF...";
@@ -1564,6 +1805,7 @@
     renderFontList();
     renderStickerTray();
     setupStickerDropTarget();
+    setPremiumUnlocked(premiumUnlocked);
     syncPreview();
   </script>
 </body>
