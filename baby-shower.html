@@ -146,6 +146,82 @@
       box-shadow: 0 0 0 4px rgba(196, 138, 156, 0.15);
     }
 
+    .date-picker {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr 1fr;
+      gap: 0.45rem;
+      padding: 0.55rem;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fffdfd;
+      position: relative;
+    }
+
+    .date-picker.time-picker {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .date-picker::before {
+      content: "";
+      position: absolute;
+      left: 0.55rem;
+      right: 0.55rem;
+      top: 50%;
+      height: 36px;
+      transform: translateY(-50%);
+      border-radius: 10px;
+      background: rgba(196, 138, 156, 0.12);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .date-column {
+      position: relative;
+      z-index: 1;
+      height: 140px;
+      overflow-y: auto;
+      scroll-snap-type: y mandatory;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      text-align: center;
+    }
+
+    .date-column::-webkit-scrollbar {
+      display: none;
+    }
+
+    .date-option {
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      scroll-snap-align: center;
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: #9a7f8b;
+      opacity: 0.55;
+      transition: color 0.15s ease, opacity 0.15s ease, transform 0.15s ease;
+    }
+
+    .date-option.is-active {
+      color: var(--ink);
+      opacity: 1;
+      transform: scale(1.05);
+    }
+
+    .date-spacer {
+      height: 52px;
+      flex-shrink: 0;
+    }
+
+    .date-display {
+      margin-top: 0.55rem;
+      text-align: center;
+      font-size: 0.95rem;
+      color: #7a6673;
+      font-weight: 700;
+    }
+
     .actions {
       display: flex;
       flex-wrap: wrap;
@@ -386,12 +462,22 @@
 
         <label>
           Date
-          <input id="eventDate" type="text" value="Sunday, 12 September 2027" autocomplete="off">
+          <div class="date-picker" id="datePicker" aria-label="Event date picker">
+            <div class="date-column" id="dayColumn" data-type="day"></div>
+            <div class="date-column" id="monthColumn" data-type="month"></div>
+            <div class="date-column" id="yearColumn" data-type="year"></div>
+          </div>
+          <div class="date-display" id="dateDisplay">Sunday, 12 September 2027</div>
         </label>
 
         <label>
           Time
-          <input id="eventTime" type="text" value="2:00 PM" autocomplete="off">
+          <div class="date-picker time-picker" id="timePicker" aria-label="Event time picker">
+            <div class="date-column" id="hourColumn" data-type="hour"></div>
+            <div class="date-column" id="minuteColumn" data-type="minute"></div>
+            <div class="date-column" id="periodColumn" data-type="period"></div>
+          </div>
+          <div class="date-display" id="timeDisplay">2:00 PM</div>
         </label>
 
         <label>
@@ -486,8 +572,6 @@
       inviteTitle: document.getElementById("inviteTitle"),
       honoree: document.getElementById("honoree"),
       babyName: document.getElementById("babyName"),
-      eventDate: document.getElementById("eventDate"),
-      eventTime: document.getElementById("eventTime"),
       venue: document.getElementById("venue"),
       location: document.getElementById("location"),
       note: document.getElementById("note")
@@ -509,6 +593,25 @@
     const downloadButton = document.getElementById("downloadPdf");
     const pdfStage = document.getElementById("pdfStage");
     const colorMood = document.getElementById("colorMood");
+    const dayColumn = document.getElementById("dayColumn");
+    const monthColumn = document.getElementById("monthColumn");
+    const yearColumn = document.getElementById("yearColumn");
+    const dateDisplay = document.getElementById("dateDisplay");
+    const hourColumn = document.getElementById("hourColumn");
+    const minuteColumn = document.getElementById("minuteColumn");
+    const periodColumn = document.getElementById("periodColumn");
+    const timeDisplay = document.getElementById("timeDisplay");
+
+    const monthNames = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+    const weekdayNames = [
+      "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
+    ];
+
+    let selectedDate = { day: 12, month: 8, year: 2027 };
+    let selectedTime = { hour: 2, minute: 0, period: "PM" };
 
     const PDF_WIDTH = 794;
     const PDF_HEIGHT = 1123;
@@ -523,10 +626,201 @@
       return mood;
     }
 
+    function formatSelectedDate() {
+      const date = new Date(selectedDate.year, selectedDate.month, selectedDate.day);
+      return `${weekdayNames[date.getDay()]}, ${selectedDate.day} ${monthNames[selectedDate.month]} ${selectedDate.year}`;
+    }
+
+    function formatSelectedTime() {
+      return `${selectedTime.hour}:${String(selectedTime.minute).padStart(2, "0")} ${selectedTime.period}`;
+    }
+
+    function daysInMonth(year, monthIndex) {
+      return new Date(year, monthIndex + 1, 0).getDate();
+    }
+
+    function createDateOptions(column, values, formatter = (value) => String(value)) {
+      column.innerHTML = "";
+      const topSpacer = document.createElement("div");
+      topSpacer.className = "date-spacer";
+      column.appendChild(topSpacer);
+
+      values.forEach((value) => {
+        const option = document.createElement("div");
+        option.className = "date-option";
+        option.dataset.value = String(value);
+        option.textContent = formatter(value);
+        column.appendChild(option);
+      });
+
+      const bottomSpacer = document.createElement("div");
+      bottomSpacer.className = "date-spacer";
+      column.appendChild(bottomSpacer);
+    }
+
+    function scrollColumnToValue(column, value, smooth = false) {
+      const option = column.querySelector(`[data-value="${value}"]`);
+      if (!option) {
+        return;
+      }
+
+      column.scrollTo({
+        top: option.offsetTop - column.clientHeight / 2 + option.clientHeight / 2,
+        behavior: smooth ? "smooth" : "auto"
+      });
+    }
+
+    function updateActiveOptions(column, value) {
+      column.querySelectorAll(".date-option").forEach((option) => {
+        option.classList.toggle("is-active", option.dataset.value === String(value));
+      });
+    }
+
+    function rebuildDayOptions() {
+      const maxDay = daysInMonth(selectedDate.year, selectedDate.month);
+      if (selectedDate.day > maxDay) {
+        selectedDate.day = maxDay;
+      }
+
+      const days = Array.from({ length: maxDay }, (_, index) => index + 1);
+      createDateOptions(dayColumn, days);
+      updateActiveOptions(dayColumn, selectedDate.day);
+      scrollColumnToValue(dayColumn, selectedDate.day);
+    }
+
+    function getCenteredValue(column) {
+      const center = column.scrollTop + column.clientHeight / 2;
+      const options = Array.from(column.querySelectorAll(".date-option"));
+      let closest = options[0];
+      let closestDistance = Infinity;
+
+      options.forEach((option) => {
+        const optionCenter = option.offsetTop + option.clientHeight / 2;
+        const distance = Math.abs(optionCenter - center);
+        if (distance < closestDistance) {
+          closest = option;
+          closestDistance = distance;
+        }
+      });
+
+      return closest ? closest.dataset.value : null;
+    }
+
+    function bindDateColumn(column, onChange) {
+      let scrollTimeout;
+
+      column.addEventListener("scroll", () => {
+        const value = getCenteredValue(column);
+        if (value == null) {
+          return;
+        }
+
+        onChange(value, false);
+        window.clearTimeout(scrollTimeout);
+        scrollTimeout = window.setTimeout(() => {
+          scrollColumnToValue(column, value, true);
+          onChange(value, true);
+        }, 80);
+      });
+    }
+
+    function initDatePicker() {
+      createDateOptions(monthColumn, monthNames.map((_, index) => index), (value) => monthNames[value]);
+      createDateOptions(yearColumn, Array.from({ length: 31 }, (_, index) => 2020 + index));
+      rebuildDayOptions();
+
+      updateActiveOptions(monthColumn, selectedDate.month);
+      updateActiveOptions(yearColumn, selectedDate.year);
+      scrollColumnToValue(monthColumn, selectedDate.month);
+      scrollColumnToValue(yearColumn, selectedDate.year);
+
+      bindDateColumn(dayColumn, (value) => {
+        selectedDate.day = Number(value);
+        updateActiveOptions(dayColumn, selectedDate.day);
+        syncPreview();
+      });
+
+      bindDateColumn(monthColumn, (value) => {
+        selectedDate.month = Number(value);
+        updateActiveOptions(monthColumn, selectedDate.month);
+        rebuildDayOptions();
+        syncPreview();
+      });
+
+      bindDateColumn(yearColumn, (value) => {
+        selectedDate.year = Number(value);
+        updateActiveOptions(yearColumn, selectedDate.year);
+        rebuildDayOptions();
+        syncPreview();
+      });
+    }
+
+    function initTimePicker() {
+      createDateOptions(hourColumn, Array.from({ length: 12 }, (_, index) => index + 1));
+      createDateOptions(
+        minuteColumn,
+        Array.from({ length: 60 }, (_, index) => index),
+        (value) => String(value).padStart(2, "0")
+      );
+      createDateOptions(periodColumn, ["AM", "PM"]);
+
+      updateActiveOptions(hourColumn, selectedTime.hour);
+      updateActiveOptions(minuteColumn, selectedTime.minute);
+      updateActiveOptions(periodColumn, selectedTime.period);
+      scrollColumnToValue(hourColumn, selectedTime.hour);
+      scrollColumnToValue(minuteColumn, selectedTime.minute);
+      scrollColumnToValue(periodColumn, selectedTime.period);
+
+      bindDateColumn(hourColumn, (value) => {
+        selectedTime.hour = Number(value);
+        updateActiveOptions(hourColumn, selectedTime.hour);
+        syncPreview();
+      });
+
+      bindDateColumn(minuteColumn, (value) => {
+        selectedTime.minute = Number(value);
+        updateActiveOptions(minuteColumn, selectedTime.minute);
+        syncPreview();
+      });
+
+      bindDateColumn(periodColumn, (value) => {
+        selectedTime.period = value;
+        updateActiveOptions(periodColumn, selectedTime.period);
+        syncPreview();
+      });
+    }
+
+    function resetDatePicker() {
+      selectedDate = { day: 12, month: 8, year: 2027 };
+      rebuildDayOptions();
+      updateActiveOptions(monthColumn, selectedDate.month);
+      updateActiveOptions(yearColumn, selectedDate.year);
+      scrollColumnToValue(dayColumn, selectedDate.day);
+      scrollColumnToValue(monthColumn, selectedDate.month);
+      scrollColumnToValue(yearColumn, selectedDate.year);
+    }
+
+    function resetTimePicker() {
+      selectedTime = { hour: 2, minute: 0, period: "PM" };
+      updateActiveOptions(hourColumn, selectedTime.hour);
+      updateActiveOptions(minuteColumn, selectedTime.minute);
+      updateActiveOptions(periodColumn, selectedTime.period);
+      scrollColumnToValue(hourColumn, selectedTime.hour);
+      scrollColumnToValue(minuteColumn, selectedTime.minute);
+      scrollColumnToValue(periodColumn, selectedTime.period);
+    }
+
     function syncPreview() {
       Object.entries(fields).forEach(([key, input]) => {
         preview[key].textContent = input.value.trim() || " ";
       });
+
+      const formattedDate = formatSelectedDate();
+      const formattedTime = formatSelectedTime();
+      preview.eventDate.textContent = formattedDate;
+      preview.eventTime.textContent = formattedTime;
+      dateDisplay.textContent = formattedDate;
+      timeDisplay.textContent = formattedTime;
       applyMood(colorMood.value);
     }
 
@@ -537,7 +831,11 @@
     colorMood.addEventListener("change", syncPreview);
 
     form.addEventListener("reset", () => {
-      window.requestAnimationFrame(syncPreview);
+      window.requestAnimationFrame(() => {
+        resetDatePicker();
+        resetTimePicker();
+        syncPreview();
+      });
     });
 
     async function downloadInvitationPdf() {
@@ -600,6 +898,8 @@
       }
     });
 
+    initDatePicker();
+    initTimePicker();
     syncPreview();
   </script>
 </body>
