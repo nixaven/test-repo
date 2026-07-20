@@ -20,6 +20,8 @@
       --invite-border: #efe2c4;
       --invite-outline: #d8c295;
       --invite-accent: #b89a55;
+      --invite-pink: #b89a55;
+      --invite-blue: #b89a55;
       --invite-text: #5c5138;
       --invite-font: "Cormorant Garamond", Georgia, serif;
     }
@@ -352,7 +354,7 @@
     }
 
     .invite-top {
-      color: var(--invite-accent);
+      color: var(--invite-pink);
       font-size: 0.95rem;
       letter-spacing: 0.28em;
       text-transform: uppercase;
@@ -364,7 +366,11 @@
       width: 90px;
       height: 1px;
       margin: 1.35rem auto;
-      background: linear-gradient(90deg, transparent, var(--invite-accent), transparent);
+      background: linear-gradient(90deg, transparent, var(--invite-pink), var(--invite-blue), transparent);
+    }
+
+    .divider.blue {
+      background: linear-gradient(90deg, transparent, var(--invite-blue), transparent);
     }
 
     .invite-text,
@@ -380,7 +386,7 @@
       font-family: "Playfair Display", Georgia, serif;
       font-size: clamp(2.4rem, 6vw, 3.8rem);
       line-height: 1.05;
-      color: var(--invite-accent);
+      color: var(--invite-blue);
       font-weight: 600;
     }
 
@@ -388,6 +394,7 @@
       margin: 0.35rem 0 0;
       font-size: clamp(1.35rem, 3vw, 1.8rem);
       font-style: italic;
+      color: var(--invite-pink);
     }
 
     .details {
@@ -404,8 +411,12 @@
       margin: 0.85rem 0 0;
       font-size: 1.4rem;
       letter-spacing: 0.35em;
-      color: var(--invite-accent);
-      opacity: 0.75;
+      color: var(--invite-pink);
+      opacity: 0.9;
+    }
+
+    .motif .blue-part {
+      color: var(--invite-blue);
     }
 
     @media (max-width: 900px) {
@@ -535,8 +546,7 @@
             <option value="butter">Butter yellow</option>
             <option value="sage">Sage green</option>
             <option value="peach">Warm peach</option>
-            <option value="pink">Pink</option>
-            <option value="blue">Blue</option>
+            <option value="bluePink">Blue and pink</option>
           </select>
         </label>
 
@@ -553,7 +563,7 @@
         <div class="divider"></div>
         <div class="invite-text">Please celebrate with us as we welcome</div>
         <div class="baby-name" id="previewBabyName">Little One</div>
-        <div class="motif">✿ ✿ ✿</div>
+        <div class="motif"><span>✿</span> <span class="blue-part">✿</span> <span>✿</span></div>
         <div class="honoree">in honor of <span id="previewHonoree">Emma &amp; James</span></div>
         <div class="invite-text" style="margin-top: 1.4rem;">
           <span id="previewDate">Sunday, 12 September 2027</span><br>
@@ -563,7 +573,7 @@
           <strong id="previewVenue">Willow Garden House</strong><br>
           <span id="previewLocation">12 Meadow Lane, Florence</span>
         </div>
-        <div class="divider"></div>
+        <div class="divider blue"></div>
         <div class="footer-note" id="previewNote">Please join us for cake, gifts, and celebration. RSVP by 1 September.</div>
       </article>
     </section>
@@ -578,6 +588,8 @@
         border: "#eadfce",
         outline: "#d2c1a8",
         accent: "#9c8868",
+        pink: "#9c8868",
+        blue: "#9c8868",
         text: "#5a4e3d"
       },
       butter: {
@@ -585,6 +597,8 @@
         border: "#efe2c0",
         outline: "#d8c18e",
         accent: "#b89a4d",
+        pink: "#b89a4d",
+        blue: "#b89a4d",
         text: "#5c5130"
       },
       sage: {
@@ -592,6 +606,8 @@
         border: "#d5e2d2",
         outline: "#b3c6ae",
         accent: "#6f8a68",
+        pink: "#6f8a68",
+        blue: "#6f8a68",
         text: "#425240"
       },
       peach: {
@@ -599,21 +615,18 @@
         border: "#efd5c4",
         outline: "#d8b19a",
         accent: "#c48a68",
+        pink: "#c48a68",
+        blue: "#c48a68",
         text: "#644836"
       },
-      pink: {
-        bg: "#fffafb",
+      bluePink: {
+        bg: "#fbf9ff",
         border: "#f1dce3",
-        outline: "#dfb8c5",
-        accent: "#c48a9c",
-        text: "#5a4a55"
-      },
-      blue: {
-        bg: "#f7fbff",
-        border: "#d7e6f5",
         outline: "#b2c9e2",
-        accent: "#6f90b8",
-        text: "#42566f"
+        accent: "#c48a9c",
+        pink: "#c48a9c",
+        blue: "#6f90b8",
+        text: "#4f4a58"
       }
     };
 
@@ -671,6 +684,8 @@
       invitationCard.style.setProperty("--invite-border", mood.border);
       invitationCard.style.setProperty("--invite-outline", mood.outline);
       invitationCard.style.setProperty("--invite-accent", mood.accent);
+      invitationCard.style.setProperty("--invite-pink", mood.pink);
+      invitationCard.style.setProperty("--invite-blue", mood.blue);
       invitationCard.style.setProperty("--invite-text", mood.text);
       return mood;
     }
