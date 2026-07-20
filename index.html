@@ -145,6 +145,15 @@
       justify-content: center;
     }
 
+    .pdf-stage {
+      position: fixed;
+      left: -99999px;
+      top: 0;
+      width: 794px;
+      pointer-events: none;
+      opacity: 0;
+    }
+
     .invitation {
       width: min(100%, 760px);
       aspect-ratio: 1 / 1.414;
@@ -159,6 +168,15 @@
       text-align: center;
       position: relative;
       overflow: hidden;
+    }
+
+    .pdf-stage .invitation {
+      width: 794px;
+      min-height: 1123px;
+      aspect-ratio: auto;
+      margin: 0;
+      padding: 96px 72px;
+      box-shadow: none;
     }
 
     .invitation::before,
@@ -342,6 +360,8 @@
     </section>
   </div>
 
+  <div class="pdf-stage" id="pdfStage" aria-hidden="true"></div>
+
   <script>
     const fields = {
       partnerOne: document.getElementById("partnerOne"),
@@ -366,6 +386,7 @@
     const form = document.getElementById("invitationForm");
     const invitationCard = document.getElementById("invitationCard");
     const downloadButton = document.getElementById("downloadPdf");
+    const pdfStage = document.getElementById("pdfStage");
 
     function syncPreview() {
       Object.entries(fields).forEach(([key, input]) => {
@@ -388,13 +409,26 @@
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-|-$/g, "") || "wedding-invitation";
 
+      const exportCard = invitationCard.cloneNode(true);
+      pdfStage.replaceChildren(exportCard);
+
       html2pdf().set({
         margin: 0,
         filename: `${fileName}.pdf`,
         image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: "in", format: "a4", orientation: "portrait" }
-      }).from(invitationCard).save();
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          windowWidth: 794,
+          windowHeight: 1123
+        },
+        jsPDF: { unit: "px", format: [794, 1123], orientation: "portrait" },
+        pagebreak: { mode: ["avoid-all"] }
+      }).from(exportCard).save().then(() => {
+        pdfStage.replaceChildren();
+      }).catch(() => {
+        pdfStage.replaceChildren();
+      });
     });
 
     syncPreview();
