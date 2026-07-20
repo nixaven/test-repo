@@ -320,11 +320,49 @@
     }
 
     .sticker-item.tone-a {
-      background: color-mix(in srgb, var(--invite-pink) 18%, white);
+      background: color-mix(in srgb, var(--invite-pink, #e8b7c6) 22%, white);
     }
 
     .sticker-item.tone-b {
-      background: color-mix(in srgb, var(--invite-blue) 18%, white);
+      background: color-mix(in srgb, var(--invite-blue, #9fc0d8) 22%, white);
+    }
+
+    .sticker-balloon {
+      width: 1.55rem;
+      height: 1.9rem;
+      border-radius: 50% 50% 50% 50% / 42% 42% 58% 58%;
+      display: inline-block;
+      position: relative;
+      box-shadow: inset -4px -6px 0 rgba(255, 255, 255, 0.25);
+    }
+
+    .sticker-balloon::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: -0.45rem;
+      width: 1px;
+      height: 0.55rem;
+      background: #7a6673;
+      transform: translateX(-50%);
+    }
+
+    .sticker-balloon.pink {
+      background: #e3a4b7;
+    }
+
+    .sticker-balloon.blue {
+      background: #7fadd0;
+    }
+
+    .sticker-pushchair {
+      font-size: 1.45rem;
+      line-height: 1;
+    }
+
+    .placed-sticker .sticker-balloon {
+      width: 1.8rem;
+      height: 2.2rem;
     }
 
     .sticker-actions {
@@ -736,68 +774,54 @@
   <div class="pdf-stage" id="pdfStage" aria-hidden="true"></div>
 
   <script>
+    const sharedStickers = [
+      { id: "blue-balloon", html: '<span class="sticker-balloon blue"></span>', tone: "b", label: "Blue balloon" },
+      { id: "pink-balloon", html: '<span class="sticker-balloon pink"></span>', tone: "a", label: "Pink balloon" },
+      { id: "pushchair", html: '<span class="sticker-pushchair">🚼</span>', tone: "a", label: "Pushchair" },
+      { id: "teddy", html: "🧸", tone: "b", label: "Teddy" },
+      { id: "bottle", html: "🍼", tone: "a", label: "Bottle" },
+      { id: "star", html: "⭐", tone: "b", label: "Star" },
+      { id: "cloud", html: "☁️", tone: "a", label: "Cloud" },
+      { id: "sparkle", html: "✨", tone: "b", label: "Sparkle" }
+    ];
+
     const stickerPacks = {
       cream: [
-        { emoji: "⭐", tone: "a" },
-        { emoji: "🌙", tone: "b" },
-        { emoji: "☁️", tone: "a" },
-        { emoji: "✨", tone: "b" },
-        { emoji: "🧸", tone: "a" },
-        { emoji: "🍼", tone: "b" },
-        { emoji: "🎈", tone: "a" },
-        { emoji: "💛", tone: "b" }
+        ...sharedStickers,
+        { id: "moon", html: "🌙", tone: "a", label: "Moon" },
+        { id: "heart", html: "💛", tone: "b", label: "Heart" }
       ],
       butter: [
-        { emoji: "☀️", tone: "a" },
-        { emoji: "🐝", tone: "b" },
-        { emoji: "🌼", tone: "a" },
-        { emoji: "🍋", tone: "b" },
-        { emoji: "🐥", tone: "a" },
-        { emoji: "⭐", tone: "b" },
-        { emoji: "🍼", tone: "a" },
-        { emoji: "🎈", tone: "b" }
+        ...sharedStickers,
+        { id: "sun", html: "☀️", tone: "a", label: "Sun" },
+        { id: "bee", html: "🐝", tone: "b", label: "Bee" },
+        { id: "flower", html: "🌼", tone: "a", label: "Flower" }
       ],
       sage: [
-        { emoji: "🍃", tone: "a" },
-        { emoji: "🌿", tone: "b" },
-        { emoji: "🌱", tone: "a" },
-        { emoji: "🍐", tone: "b" },
-        { emoji: "🐸", tone: "a" },
-        { emoji: "⭐", tone: "b" },
-        { emoji: "🍼", tone: "a" },
-        { emoji: "🎈", tone: "b" }
+        ...sharedStickers,
+        { id: "leaf", html: "🍃", tone: "a", label: "Leaf" },
+        { id: "plant", html: "🌿", tone: "b", label: "Plant" },
+        { id: "seedling", html: "🌱", tone: "a", label: "Seedling" }
       ],
       peach: [
-        { emoji: "🍑", tone: "a" },
-        { emoji: "🦋", tone: "b" },
-        { emoji: "🍊", tone: "a" },
-        { emoji: "🐦", tone: "b" },
-        { emoji: "🌼", tone: "a" },
-        { emoji: "⭐", tone: "b" },
-        { emoji: "🍼", tone: "a" },
-        { emoji: "🎈", tone: "b" }
+        ...sharedStickers,
+        { id: "peach", html: "🍑", tone: "a", label: "Peach" },
+        { id: "butterfly", html: "🦋", tone: "b", label: "Butterfly" },
+        { id: "bird", html: "🐦", tone: "a", label: "Bird" }
       ],
       bluePink: [
-        { emoji: "🎈", tone: "a" },
-        { emoji: "⭐", tone: "b" },
-        { emoji: "☁️", tone: "a" },
-        { emoji: "🍼", tone: "b" },
-        { emoji: "🧸", tone: "a" },
-        { emoji: "✨", tone: "b" },
-        { emoji: "🌙", tone: "a" },
-        { emoji: "💛", tone: "b" }
+        ...sharedStickers,
+        { id: "moon-bp", html: "🌙", tone: "b", label: "Moon" },
+        { id: "heart-bp", html: "💛", tone: "a", label: "Heart" }
       ],
       pinkBlue: [
-        { emoji: "🎈", tone: "b" },
-        { emoji: "⭐", tone: "a" },
-        { emoji: "☁️", tone: "b" },
-        { emoji: "🍼", tone: "a" },
-        { emoji: "🧸", tone: "b" },
-        { emoji: "✨", tone: "a" },
-        { emoji: "🌙", tone: "b" },
-        { emoji: "💛", tone: "a" }
+        ...sharedStickers,
+        { id: "moon-pb", html: "🌙", tone: "a", label: "Moon" },
+        { id: "heart-pb", html: "💛", tone: "b", label: "Heart" }
       ]
     };
+
+    const fonts = [
       { id: "caveat", name: "Caveat", stack: '"Caveat", cursive' },
       { id: "comfortaa", name: "Comfortaa", stack: '"Comfortaa", sans-serif' },
       { id: "comic-sans", name: "Comic Sans MS", stack: '"Comic Sans MS", "Comic Sans", cursive' },
@@ -974,20 +998,21 @@
 
     function renderStickerTray() {
       const pack = stickerPacks[colorMood.value] || stickerPacks.cream;
-      stickerTray.innerHTML = pack.map((sticker, index) => `
+      stickerTray.innerHTML = pack.map((sticker) => `
         <button
           class="sticker-item tone-${sticker.tone}"
           type="button"
           draggable="true"
-          data-emoji="${sticker.emoji}"
-          data-sticker-index="${index}"
-          aria-label="Sticker ${sticker.emoji}"
-        >${sticker.emoji}</button>
+          data-sticker-id="${sticker.id}"
+          data-sticker-html="${encodeURIComponent(sticker.html)}"
+          aria-label="${sticker.label}"
+          title="${sticker.label}"
+        >${sticker.html}</button>
       `).join("");
 
       stickerTray.querySelectorAll(".sticker-item").forEach((item) => {
         item.addEventListener("dragstart", (event) => {
-          event.dataTransfer.setData("text/plain", item.dataset.emoji);
+          event.dataTransfer.setData("text/plain", item.dataset.stickerHtml);
           event.dataTransfer.effectAllowed = "copy";
           invitationCard.classList.add("drop-ready");
         });
@@ -998,11 +1023,11 @@
       });
     }
 
-    function placeSticker(emoji, xPercent, yPercent) {
+    function placeSticker(stickerHtml, xPercent, yPercent) {
       const sticker = document.createElement("button");
       sticker.type = "button";
       sticker.className = "placed-sticker";
-      sticker.textContent = emoji;
+      sticker.innerHTML = decodeURIComponent(stickerHtml);
       sticker.style.left = `${xPercent}%`;
       sticker.style.top = `${yPercent}%`;
       sticker.title = "Drag to move · Double-click to remove";
@@ -1056,15 +1081,15 @@
       invitationCard.addEventListener("drop", (event) => {
         event.preventDefault();
         invitationCard.classList.remove("drop-ready");
-        const emoji = event.dataTransfer.getData("text/plain");
-        if (!emoji) {
+        const stickerHtml = event.dataTransfer.getData("text/plain");
+        if (!stickerHtml) {
           return;
         }
 
         const rect = invitationCard.getBoundingClientRect();
         const xPercent = ((event.clientX - rect.left) / rect.width) * 100;
         const yPercent = ((event.clientY - rect.top) / rect.height) * 100;
-        placeSticker(emoji, xPercent, yPercent);
+        placeSticker(stickerHtml, xPercent, yPercent);
       });
     }
 
