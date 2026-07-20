@@ -147,10 +147,13 @@
 
     .pdf-stage {
       position: fixed;
-      left: -99999px;
       top: 0;
+      left: 0;
       width: 794px;
+      height: 1123px;
+      overflow: hidden;
       pointer-events: none;
+      z-index: -1;
       opacity: 0;
     }
 
@@ -172,11 +175,18 @@
 
     .pdf-stage .invitation {
       width: 794px;
+      height: 1123px;
       min-height: 1123px;
+      max-height: 1123px;
       aspect-ratio: auto;
       margin: 0;
       padding: 96px 72px;
       box-shadow: none;
+      box-sizing: border-box;
+    }
+
+    .pdf-stage .names {
+      font-size: 3.2rem;
     }
 
     .invitation::before,
@@ -403,7 +413,10 @@
       window.requestAnimationFrame(syncPreview);
     });
 
-    downloadButton.addEventListener("click", () => {
+    const PDF_WIDTH = 794;
+    const PDF_HEIGHT = 1123;
+
+    async function downloadInvitationPdf() {
       const fileName = `${fields.partnerOne.value.trim() || "wedding"}-${fields.partnerTwo.value.trim() || "invitation"}`
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
@@ -412,21 +425,47 @@
       const exportCard = invitationCard.cloneNode(true);
       pdfStage.replaceChildren(exportCard);
 
-      html2pdf().set({
-        margin: 0,
-        filename: `${fileName}.pdf`,
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: {
+      await document.fonts.ready;
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+      try {
+        const canvas = await html2canvas(exportCard, {
           scale: 2,
           useCORS: true,
-          windowWidth: 794,
-          windowHeight: 1123
-        },
-        jsPDF: { unit: "px", format: [794, 1123], orientation: "portrait" },
-        pagebreak: { mode: ["avoid-all"] }
-      }).from(exportCard).save().then(() => {
+          backgroundColor: "#fffdf9",
+          width: PDF_WIDTH,
+          height: PDF_HEIGHT,
+          windowWidth: PDF_WIDTH,
+          windowHeight: PDF_HEIGHT,
+          scrollX: 0,
+          scrollY: 0,
+          x: 0,
+          y: 0
+        });
+
+        const pdf = new jspdf.jsPDF({
+          orientation: "portrait",
+          unit: "px",
+          format: [PDF_WIDTH, PDF_HEIGHT],
+          compress: true
+        });
+
+        pdf.addImage(
+          canvas.toDataURL("image/jpeg", 0.98),
+          "JPEG",
+          0,
+          0,
+          PDF_WIDTH,
+          PDF_HEIGHT
+        );
+        pdf.save(`${fileName}.pdf`);
+      } finally {
         pdfStage.replaceChildren();
-      }).catch(() => {
+      }
+    }
+
+    downloadButton.addEventListener("click", () => {
+      downloadInvitationPdf().catch(() => {
         pdfStage.replaceChildren();
       });
     });
