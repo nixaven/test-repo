@@ -153,11 +153,19 @@
       justify-content: space-between;
       gap: 0.75rem;
       margin-bottom: 0.5rem;
+      flex-wrap: wrap;
     }
 
     .premium-header h2 {
       margin: 0;
       font-size: 1.35rem;
+    }
+
+    .premium-lock {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      flex-wrap: wrap;
     }
 
     .badge {
@@ -457,10 +465,12 @@
     }
 
     .unlock-button {
-      width: 100%;
-      margin-top: 1rem;
+      margin: 0;
+      padding: 0.55rem 0.95rem;
+      white-space: nowrap;
       background: linear-gradient(135deg, #9d6b53, #7a4f3d);
       color: #fffaf7;
+      font-size: 0.85rem;
     }
 
     .premium-download {
@@ -760,7 +770,10 @@
         <section class="premium" id="premiumSection">
           <div class="premium-header">
             <h2>Premium customization</h2>
-            <span class="badge" id="premiumBadge">Locked · €1</span>
+            <div class="premium-lock">
+              <span class="badge" id="premiumBadge">Locked · €1</span>
+              <button class="unlock-button" type="button" id="unlockPremium">Unlock for €1 (Test)</button>
+            </div>
           </div>
           <p class="premium-copy">Unlock extra styling options and download a fully customized invitation. This is a test flow with no real payment.</p>
 
@@ -851,8 +864,6 @@
               <textarea id="inviteMessage">Request the honor of your presence at the celebration of their marriage</textarea>
             </label>
           </div>
-
-          <button class="unlock-button" type="button" id="unlockPremium">Unlock for €1 (Test)</button>
         </section>
       </form>
     </section>
