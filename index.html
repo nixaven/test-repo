@@ -6,7 +6,7 @@
   <title>Wedding Invitation Generator</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@400;600&family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Crimson+Text:wght@400;600&family=Dancing+Script:wght@400;600&family=EB+Garamond:wght@400;600&family=Great+Vibes&family=Italiana&family=Josefin+Sans:wght@400;600&family=Libre+Baskerville:wght@400;700&family=Lora:wght@400;600&family=Montserrat:wght@400;600&family=Parisienne&family=Pinyon+Script&family=Playfair+Display:wght@400;600&family=Prata&family=Raleway:wght@400;600&family=Spectral:wght@400;600&family=Tangerine:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     :root {
@@ -332,6 +332,32 @@
       height: 12px;
       border-radius: 999px;
       border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    .font-list {
+      display: grid;
+      gap: 0.45rem;
+      max-height: 260px;
+      overflow: auto;
+      padding: 0.15rem;
+    }
+
+    .font-option {
+      width: 100%;
+      padding: 0.8rem 0.9rem;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fffdfb;
+      color: var(--ink);
+      cursor: pointer;
+      text-align: left;
+      font-size: 1.05rem;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .font-option.is-active {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(157, 107, 83, 0.14);
     }
 
     select {
@@ -722,11 +748,7 @@
 
             <label>
               Font style
-              <select id="fontSelect">
-                <option value="georgia">Georgia serif</option>
-                <option value="playfair">Playfair Display</option>
-                <option value="cormorant">Cormorant Garamond</option>
-              </select>
+              <div class="font-list" id="fontList" role="listbox" aria-label="Font style"></div>
             </label>
 
             <label>
@@ -787,11 +809,28 @@
   <script>
     const PREMIUM_STORAGE_KEY = "wedding-invite-premium-unlocked";
 
-    const fonts = {
-      georgia: 'Georgia, "Times New Roman", serif',
-      playfair: '"Playfair Display", Georgia, serif',
-      cormorant: '"Cormorant Garamond", Georgia, serif'
-    };
+    const fonts = [
+      { id: "georgia", name: "Georgia", stack: 'Georgia, "Times New Roman", serif' },
+      { id: "playfair", name: "Playfair Display", stack: '"Playfair Display", Georgia, serif' },
+      { id: "cormorant", name: "Cormorant Garamond", stack: '"Cormorant Garamond", Georgia, serif' },
+      { id: "great-vibes", name: "Great Vibes", stack: '"Great Vibes", cursive' },
+      { id: "parisienne", name: "Parisienne", stack: '"Parisienne", cursive' },
+      { id: "pinyon", name: "Pinyon Script", stack: '"Pinyon Script", cursive' },
+      { id: "tangerine", name: "Tangerine", stack: '"Tangerine", cursive' },
+      { id: "dancing", name: "Dancing Script", stack: '"Dancing Script", cursive' },
+      { id: "libre", name: "Libre Baskerville", stack: '"Libre Baskerville", Georgia, serif' },
+      { id: "lora", name: "Lora", stack: '"Lora", Georgia, serif' },
+      { id: "eb-garamond", name: "EB Garamond", stack: '"EB Garamond", Georgia, serif' },
+      { id: "cinzel", name: "Cinzel", stack: '"Cinzel", Georgia, serif' },
+      { id: "josefin", name: "Josefin Sans", stack: '"Josefin Sans", sans-serif' },
+      { id: "montserrat", name: "Montserrat", stack: '"Montserrat", sans-serif' },
+      { id: "raleway", name: "Raleway", stack: '"Raleway", sans-serif' },
+      { id: "crimson", name: "Crimson Text", stack: '"Crimson Text", Georgia, serif' },
+      { id: "italiana", name: "Italiana", stack: '"Italiana", Georgia, serif' },
+      { id: "prata", name: "Prata", stack: '"Prata", Georgia, serif' },
+      { id: "bodoni", name: "Bodoni Moda", stack: '"Bodoni Moda", Georgia, serif' },
+      { id: "spectral", name: "Spectral", stack: '"Spectral", Georgia, serif' }
+    ];
     const fields = {
       partnerOne: document.getElementById("partnerOne"),
       partnerTwo: document.getElementById("partnerTwo"),
@@ -824,7 +863,7 @@
     const confirmPaymentButton = document.getElementById("confirmPayment");
     const cancelPaymentButton = document.getElementById("cancelPayment");
     const themeList = document.getElementById("themeList");
-    const fontSelect = document.getElementById("fontSelect");
+    const fontList = document.getElementById("fontList");
     const headerLine = document.getElementById("headerLine");
     const inviteMessage = document.getElementById("inviteMessage");
     const previewHeader = document.getElementById("previewHeader");
@@ -855,6 +894,7 @@
 
     let premiumUnlocked = localStorage.getItem(PREMIUM_STORAGE_KEY) === "true";
     let selectedThemeId = "classic-blush";
+    let selectedFontId = "georgia";
     let customColors = {
       text: "#5d473d",
       background: "#fffdf9",
@@ -936,6 +976,34 @@
       });
 
       updateThemeOptionStates();
+    }
+
+    function getActiveFont() {
+      return fonts.find((font) => font.id === selectedFontId) || fonts[0];
+    }
+
+    function updateFontOptionStates() {
+      fontList.querySelectorAll("[data-font-id]").forEach((button) => {
+        button.classList.toggle("is-active", button.dataset.fontId === selectedFontId);
+      });
+    }
+
+    function renderFontList() {
+      fontList.innerHTML = fonts.map((font) => `
+        <button class="font-option" type="button" role="option" data-font-id="${font.id}" style="font-family: ${font.stack}">
+          ${font.name}
+        </button>
+      `).join("");
+
+      fontList.querySelectorAll("[data-font-id]").forEach((button) => {
+        button.addEventListener("click", () => {
+          selectedFontId = button.dataset.fontId;
+          updateFontOptionStates();
+          syncPreview();
+        });
+      });
+
+      updateFontOptionStates();
     }
 
     function drawColorCanvas(canvas) {
@@ -1046,7 +1114,7 @@
       invitationCard.style.setProperty("--invite-accent", customColors.accent);
       invitationCard.style.setProperty("--invite-accent-soft", toRgba(customColors.accent, 0.18));
       invitationCard.style.setProperty("--invite-text", customColors.text);
-      invitationCard.style.setProperty("--invite-font", fonts[fontSelect.value] || fonts.georgia);
+      invitationCard.style.setProperty("--invite-font", getActiveFont().stack);
     }
 
     function resetPremiumStyles() {
@@ -1101,7 +1169,7 @@
       });
     });
 
-    [fontSelect, headerLine, inviteMessage].forEach((input) => {
+    [headerLine, inviteMessage].forEach((input) => {
       input.addEventListener("input", syncPreview);
       input.addEventListener("change", syncPreview);
     });
@@ -1214,6 +1282,7 @@
     });
 
     renderThemeList();
+    renderFontList();
     applyThemeSelection(getActiveTheme());
     setPremiumUnlocked(premiumUnlocked);
     syncPreview();
