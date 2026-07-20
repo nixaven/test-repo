@@ -542,6 +542,17 @@
       user-select: none;
     }
 
+    .premium-download {
+      background: #2e7d32;
+      color: #ffffff;
+    }
+
+    .premium-download:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
     .payment-modal {
       position: fixed;
       inset: 0;
@@ -906,6 +917,12 @@
           <textarea id="note">Please join us for cake, gifts, and celebration. RSVP by 1 September.</textarea>
         </label>
 
+        <div class="actions">
+          <button class="primary" type="button" id="downloadPdf">Download Basic PDF</button>
+          <button class="premium-download" type="button" id="downloadPremiumPdf" disabled>Download Premium PDF</button>
+          <button class="secondary" type="reset">Reset</button>
+        </div>
+
         <section class="premium" id="premiumSection">
           <div class="premium-header">
             <h2>Premium extras</h2>
@@ -914,7 +931,7 @@
               <button class="unlock-button" type="button" id="unlockPremium">Unlock for €1 (Test)</button>
             </div>
           </div>
-          <p class="premium-copy">Unlock color moods, fonts, stickers, and PDF download. This is a test flow with no real payment.</p>
+          <p class="premium-copy">Unlock color moods, fonts, stickers, and premium PDF download. This is a test flow with no real payment.</p>
 
           <div class="premium-fields is-locked" id="premiumFields">
             <label>
@@ -941,11 +958,6 @@
               <div class="sticker-actions">
                 <button class="secondary" type="button" id="clearStickers">Clear stickers</button>
               </div>
-            </div>
-
-            <div class="actions">
-              <button class="primary" type="button" id="downloadPdf">Download PDF</button>
-              <button class="secondary" type="reset">Reset</button>
             </div>
           </div>
         </section>
@@ -991,7 +1003,7 @@
   <div class="payment-modal" id="paymentModal" aria-hidden="true">
     <div class="payment-dialog" role="dialog" aria-labelledby="paymentTitle" aria-modal="true">
       <h3 id="paymentTitle">Unlock premium extras</h3>
-      <p>Get access to color moods, fonts, stickers, and PDF download for your baby shower invitation.</p>
+      <p>Get access to color moods, fonts, stickers, and premium PDF download for your baby shower invitation.</p>
       <div class="payment-amount">€1.00</div>
       <div class="payment-actions">
         <button class="primary" type="button" id="confirmPayment">Pay €1 (Test)</button>
@@ -1152,6 +1164,7 @@
     const form = document.getElementById("invitationForm");
     const invitationCard = document.getElementById("invitationCard");
     const downloadButton = document.getElementById("downloadPdf");
+    const downloadPremiumButton = document.getElementById("downloadPremiumPdf");
     const pdfStage = document.getElementById("pdfStage");
     const colorMood = document.getElementById("colorMood");
     const fontList = document.getElementById("fontList");
@@ -1437,6 +1450,7 @@
       localStorage.setItem(PREMIUM_STORAGE_KEY, unlocked ? "true" : "false");
       premiumFields.classList.toggle("is-locked", !unlocked);
       unlockPremiumButton.hidden = unlocked;
+      downloadPremiumButton.disabled = !unlocked;
       premiumBadge.textContent = unlocked ? "Unlocked" : "Locked · €1";
       premiumBadge.classList.toggle("unlocked", unlocked);
 
@@ -1737,23 +1751,43 @@
       });
     });
 
-    async function downloadInvitationPdf() {
-      const fileName = `baby-shower-${fields.babyName.value.trim() || "invitation"}`
+    async function downloadInvitationPdf({ premium = false } = {}) {
+      const prefix = premium ? "premium" : "basic";
+      const fileName = `${prefix}-baby-shower-${fields.babyName.value.trim() || "invitation"}`
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "") || "baby-shower-invitation";
+        .replace(/^-|-$/g, "") || `${prefix}-baby-shower-invitation`;
 
       deselectSticker();
       const exportCard = invitationCard.cloneNode(true);
       exportCard.querySelectorAll(".placed-sticker.is-selected").forEach((sticker) => {
         sticker.classList.remove("is-selected");
       });
+
+      if (!premium) {
+        exportCard.style.removeProperty("--invite-bg");
+        exportCard.style.removeProperty("--invite-border");
+        exportCard.style.removeProperty("--invite-outline");
+        exportCard.style.removeProperty("--invite-accent");
+        exportCard.style.removeProperty("--invite-pink");
+        exportCard.style.removeProperty("--invite-blue");
+        exportCard.style.removeProperty("--invite-text");
+        exportCard.style.removeProperty("--invite-font");
+        exportCard.classList.remove("is-dual");
+        const stickerLayerClone = exportCard.querySelector("#stickerLayer");
+        if (stickerLayerClone) {
+          stickerLayerClone.replaceChildren();
+        }
+      }
+
       pdfStage.replaceChildren(exportCard);
 
       await document.fonts.ready;
       await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
-      const mood = moods[colorMood.value] || moods.cream;
+      const mood = premium
+        ? (moods[colorMood.value] || moods.cream)
+        : moods.cream;
 
       await html2pdf()
         .set({
@@ -1784,26 +1818,34 @@
         .save();
     }
 
-    downloadButton.addEventListener("click", async () => {
+    async function handleDownload(button, options) {
+      const originalLabel = button.textContent;
+      button.disabled = true;
+      button.textContent = "Generating PDF...";
+
+      try {
+        await downloadInvitationPdf(options);
+      } catch (error) {
+        console.error(error);
+        window.alert("Sorry, the PDF could not be generated. Please try again.");
+      } finally {
+        button.disabled = options.premium ? !premiumUnlocked : false;
+        button.textContent = originalLabel;
+        pdfStage.replaceChildren();
+      }
+    }
+
+    downloadButton.addEventListener("click", () => {
+      handleDownload(downloadButton, { premium: false });
+    });
+
+    downloadPremiumButton.addEventListener("click", () => {
       if (!premiumUnlocked) {
         openPaymentModal();
         return;
       }
 
-      const originalLabel = downloadButton.textContent;
-      downloadButton.disabled = true;
-      downloadButton.textContent = "Generating PDF...";
-
-      try {
-        await downloadInvitationPdf();
-      } catch (error) {
-        console.error(error);
-        window.alert("Sorry, the PDF could not be generated. Please try again.");
-      } finally {
-        downloadButton.disabled = false;
-        downloadButton.textContent = originalLabel;
-        pdfStage.replaceChildren();
-      }
+      handleDownload(downloadPremiumButton, { premium: true });
     });
 
     // Ensure the time wheels always initialize, even if date setup fails.
