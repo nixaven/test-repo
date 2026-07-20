@@ -278,6 +278,92 @@
       background: #ececec;
     }
 
+    .sticker-hint {
+      margin: 0;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #7a6673;
+    }
+
+    .sticker-tray {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.55rem;
+      padding: 0.75rem;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #ffffff;
+    }
+
+    .sticker-item {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px dashed var(--line);
+      border-radius: 14px;
+      background: #fffdfb;
+      font-size: 1.6rem;
+      cursor: grab;
+      user-select: none;
+      transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .sticker-item:hover {
+      transform: translateY(-1px);
+      border-color: var(--accent);
+      background: #fff8f4;
+    }
+
+    .sticker-item:active {
+      cursor: grabbing;
+    }
+
+    .sticker-item.tone-a {
+      background: color-mix(in srgb, var(--invite-pink) 18%, white);
+    }
+
+    .sticker-item.tone-b {
+      background: color-mix(in srgb, var(--invite-blue) 18%, white);
+    }
+
+    .sticker-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .sticker-actions button {
+      padding: 0.65rem 1rem;
+      font-size: 0.85rem;
+    }
+
+    .sticker-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    .placed-sticker {
+      position: absolute;
+      font-size: 1.8rem;
+      line-height: 1;
+      transform: translate(-50%, -50%);
+      cursor: grab;
+      pointer-events: auto;
+      user-select: none;
+      filter: drop-shadow(0 4px 8px rgba(74, 63, 79, 0.12));
+      z-index: 6;
+    }
+
+    .placed-sticker:active {
+      cursor: grabbing;
+    }
+
+    .invitation.drop-ready {
+      box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent);
+    }
+
     .actions {
       display: flex;
       flex-wrap: wrap;
@@ -603,6 +689,15 @@
           <div class="font-list" id="fontList" role="listbox" aria-label="Font style"></div>
         </label>
 
+        <div class="form-grid" style="gap: 0.55rem;">
+          <span style="font-size: 0.95rem; font-weight: 700;">Stickers</span>
+          <p class="sticker-hint">Choose a sticker and drag it onto the invitation.</p>
+          <div class="sticker-tray" id="stickerTray" aria-label="Theme stickers"></div>
+          <div class="sticker-actions">
+            <button class="secondary" type="button" id="clearStickers">Clear stickers</button>
+          </div>
+        </div>
+
         <div class="actions">
           <button class="primary" type="button" id="downloadPdf">Download PDF</button>
           <button class="secondary" type="reset">Reset</button>
@@ -612,6 +707,7 @@
 
     <section class="preview-shell">
       <article class="invitation" id="invitationCard">
+        <div class="sticker-layer" id="stickerLayer"></div>
         <div class="invite-top" id="previewTitle">Baby Shower</div>
         <div class="divider"></div>
         <div class="invite-text">Please celebrate with us as we welcome</div>
@@ -640,7 +736,68 @@
   <div class="pdf-stage" id="pdfStage" aria-hidden="true"></div>
 
   <script>
-    const fonts = [
+    const stickerPacks = {
+      cream: [
+        { emoji: "⭐", tone: "a" },
+        { emoji: "🌙", tone: "b" },
+        { emoji: "☁️", tone: "a" },
+        { emoji: "✨", tone: "b" },
+        { emoji: "🧸", tone: "a" },
+        { emoji: "🍼", tone: "b" },
+        { emoji: "🎈", tone: "a" },
+        { emoji: "💛", tone: "b" }
+      ],
+      butter: [
+        { emoji: "☀️", tone: "a" },
+        { emoji: "🐝", tone: "b" },
+        { emoji: "🌼", tone: "a" },
+        { emoji: "🍋", tone: "b" },
+        { emoji: "🐥", tone: "a" },
+        { emoji: "⭐", tone: "b" },
+        { emoji: "🍼", tone: "a" },
+        { emoji: "🎈", tone: "b" }
+      ],
+      sage: [
+        { emoji: "🍃", tone: "a" },
+        { emoji: "🌿", tone: "b" },
+        { emoji: "🌱", tone: "a" },
+        { emoji: "🍐", tone: "b" },
+        { emoji: "🐸", tone: "a" },
+        { emoji: "⭐", tone: "b" },
+        { emoji: "🍼", tone: "a" },
+        { emoji: "🎈", tone: "b" }
+      ],
+      peach: [
+        { emoji: "🍑", tone: "a" },
+        { emoji: "🦋", tone: "b" },
+        { emoji: "🍊", tone: "a" },
+        { emoji: "🐦", tone: "b" },
+        { emoji: "🌼", tone: "a" },
+        { emoji: "⭐", tone: "b" },
+        { emoji: "🍼", tone: "a" },
+        { emoji: "🎈", tone: "b" }
+      ],
+      bluePink: [
+        { emoji: "🎈", tone: "a" },
+        { emoji: "⭐", tone: "b" },
+        { emoji: "☁️", tone: "a" },
+        { emoji: "🍼", tone: "b" },
+        { emoji: "🧸", tone: "a" },
+        { emoji: "✨", tone: "b" },
+        { emoji: "🌙", tone: "a" },
+        { emoji: "💛", tone: "b" }
+      ],
+      pinkBlue: [
+        { emoji: "🎈", tone: "b" },
+        { emoji: "⭐", tone: "a" },
+        { emoji: "☁️", tone: "b" },
+        { emoji: "🍼", tone: "a" },
+        { emoji: "🧸", tone: "b" },
+        { emoji: "✨", tone: "a" },
+        { emoji: "🌙", tone: "b" },
+        { emoji: "💛", tone: "a" }
+      ]
+    };
       { id: "caveat", name: "Caveat", stack: '"Caveat", cursive' },
       { id: "comfortaa", name: "Comfortaa", stack: '"Comfortaa", sans-serif' },
       { id: "comic-sans", name: "Comic Sans MS", stack: '"Comic Sans MS", "Comic Sans", cursive' },
@@ -746,6 +903,9 @@
     const pdfStage = document.getElementById("pdfStage");
     const colorMood = document.getElementById("colorMood");
     const fontList = document.getElementById("fontList");
+    const stickerTray = document.getElementById("stickerTray");
+    const stickerLayer = document.getElementById("stickerLayer");
+    const clearStickersButton = document.getElementById("clearStickers");
     const dayColumn = document.getElementById("dayColumn");
     const monthColumn = document.getElementById("monthColumn");
     const yearColumn = document.getElementById("yearColumn");
@@ -810,6 +970,102 @@
       });
 
       updateFontOptionStates();
+    }
+
+    function renderStickerTray() {
+      const pack = stickerPacks[colorMood.value] || stickerPacks.cream;
+      stickerTray.innerHTML = pack.map((sticker, index) => `
+        <button
+          class="sticker-item tone-${sticker.tone}"
+          type="button"
+          draggable="true"
+          data-emoji="${sticker.emoji}"
+          data-sticker-index="${index}"
+          aria-label="Sticker ${sticker.emoji}"
+        >${sticker.emoji}</button>
+      `).join("");
+
+      stickerTray.querySelectorAll(".sticker-item").forEach((item) => {
+        item.addEventListener("dragstart", (event) => {
+          event.dataTransfer.setData("text/plain", item.dataset.emoji);
+          event.dataTransfer.effectAllowed = "copy";
+          invitationCard.classList.add("drop-ready");
+        });
+
+        item.addEventListener("dragend", () => {
+          invitationCard.classList.remove("drop-ready");
+        });
+      });
+    }
+
+    function placeSticker(emoji, xPercent, yPercent) {
+      const sticker = document.createElement("button");
+      sticker.type = "button";
+      sticker.className = "placed-sticker";
+      sticker.textContent = emoji;
+      sticker.style.left = `${xPercent}%`;
+      sticker.style.top = `${yPercent}%`;
+      sticker.title = "Drag to move · Double-click to remove";
+      stickerLayer.appendChild(sticker);
+      enablePlacedSticker(sticker);
+    }
+
+    function enablePlacedSticker(sticker) {
+      sticker.addEventListener("dblclick", () => {
+        sticker.remove();
+      });
+
+      sticker.addEventListener("pointerdown", (event) => {
+        event.preventDefault();
+        sticker.setPointerCapture(event.pointerId);
+
+        const onMove = (moveEvent) => {
+          const rect = invitationCard.getBoundingClientRect();
+          const xPercent = ((moveEvent.clientX - rect.left) / rect.width) * 100;
+          const yPercent = ((moveEvent.clientY - rect.top) / rect.height) * 100;
+          sticker.style.left = `${Math.min(95, Math.max(5, xPercent))}%`;
+          sticker.style.top = `${Math.min(95, Math.max(5, yPercent))}%`;
+        };
+
+        const onUp = () => {
+          sticker.releasePointerCapture(event.pointerId);
+          sticker.removeEventListener("pointermove", onMove);
+          sticker.removeEventListener("pointerup", onUp);
+        };
+
+        sticker.addEventListener("pointermove", onMove);
+        sticker.addEventListener("pointerup", onUp);
+      });
+    }
+
+    function clearStickers() {
+      stickerLayer.replaceChildren();
+    }
+
+    function setupStickerDropTarget() {
+      invitationCard.addEventListener("dragover", (event) => {
+        event.preventDefault();
+        event.dataTransfer.dropEffect = "copy";
+        invitationCard.classList.add("drop-ready");
+      });
+
+      invitationCard.addEventListener("dragleave", () => {
+        invitationCard.classList.remove("drop-ready");
+      });
+
+      invitationCard.addEventListener("drop", (event) => {
+        event.preventDefault();
+        invitationCard.classList.remove("drop-ready");
+        const emoji = event.dataTransfer.getData("text/plain");
+        if (!emoji) {
+          return;
+        }
+
+        const rect = invitationCard.getBoundingClientRect();
+        const xPercent = ((event.clientX - rect.left) / rect.width) * 100;
+        const yPercent = ((event.clientY - rect.top) / rect.height) * 100;
+        placeSticker(emoji, xPercent, yPercent);
+      });
     }
 
     function formatSelectedDate() {
@@ -1018,12 +1274,18 @@
       input.addEventListener("input", syncPreview);
     });
 
-    colorMood.addEventListener("change", syncPreview);
+    colorMood.addEventListener("change", () => {
+      renderStickerTray();
+      syncPreview();
+    });
+
+    clearStickersButton.addEventListener("click", clearStickers);
 
     form.addEventListener("reset", () => {
       window.requestAnimationFrame(() => {
         resetDatePicker();
         resetTimePicker();
+        clearStickers();
         syncPreview();
       });
     });
@@ -1102,6 +1364,8 @@
     }
 
     renderFontList();
+    renderStickerTray();
+    setupStickerDropTarget();
     syncPreview();
   </script>
 </body>
