@@ -194,6 +194,102 @@
       user-select: none;
     }
 
+    .theme-picker {
+      position: relative;
+    }
+
+    .theme-trigger {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.85rem 1rem;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fffdfb;
+      color: var(--ink);
+      cursor: pointer;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .theme-trigger:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(157, 107, 83, 0.15);
+    }
+
+    .theme-trigger-preview {
+      display: flex;
+      gap: 0.35rem;
+      align-items: center;
+    }
+
+    .theme-trigger-preview span {
+      display: block;
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    .theme-trigger-label {
+      flex: 1;
+      text-align: left;
+      font-weight: 700;
+    }
+
+    .theme-popup {
+      position: absolute;
+      top: calc(100% + 0.5rem);
+      left: 0;
+      z-index: 20;
+      display: none;
+      gap: 0.75rem;
+      width: 100%;
+      padding: 0.9rem;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: #fffdfb;
+      box-shadow: 0 18px 40px rgba(67, 49, 40, 0.14);
+    }
+
+    .theme-popup.is-open {
+      display: grid;
+    }
+
+    .theme-canvas {
+      display: block;
+      width: 100%;
+      height: 180px;
+      border-radius: 14px;
+      cursor: crosshair;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    .theme-popup-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+
+    .theme-selected {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.88rem;
+      color: #6b5144;
+      font-weight: 700;
+    }
+
+    .theme-selected-swatch {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      background: #9d6b53;
+    }
+
     select {
       width: 100%;
       padding: 0.9rem 1rem;
@@ -500,12 +596,24 @@
           <div class="premium-fields is-locked" id="premiumFields">
             <label>
               Color theme
-              <select id="themeSelect">
-                <option value="classic">Classic blush</option>
-                <option value="sage">Sage garden</option>
-                <option value="midnight">Midnight gold</option>
-                <option value="lavender">Soft lavender</option>
-              </select>
+              <div class="theme-picker" id="themePicker">
+                <button class="theme-trigger" type="button" id="themeTrigger" aria-expanded="false" aria-controls="themePopup">
+                  <span class="theme-trigger-preview" id="themeTriggerPreview" aria-hidden="true">
+                    <span style="background:#9d6b53"></span>
+                  </span>
+                  <span class="theme-trigger-label">Color grid</span>
+                </button>
+                <div class="theme-popup" id="themePopup">
+                  <canvas class="theme-canvas" id="themeCanvas" width="320" height="180" aria-label="Color grid"></canvas>
+                  <div class="theme-popup-footer">
+                    <div class="theme-selected">
+                      <span class="theme-selected-swatch" id="themeSelectedSwatch"></span>
+                      <span id="themeSelectedValue">#9D6B53</span>
+                    </div>
+                    <button class="secondary" type="button" id="themeDone">Done</button>
+                  </div>
+                </div>
+              </div>
             </label>
 
             <label>
@@ -575,41 +683,6 @@
   <script>
     const PREMIUM_STORAGE_KEY = "wedding-invite-premium-unlocked";
 
-    const themes = {
-      classic: {
-        bg: "#fffdf9",
-        border: "#f3e6db",
-        outline: "#d8bbaa",
-        accent: "#9d6b53",
-        accentSoft: "rgba(157, 107, 83, 0.18)",
-        text: "#5d473d"
-      },
-      sage: {
-        bg: "#f7faf4",
-        border: "#d9e5d1",
-        outline: "#b8c9ae",
-        accent: "#5f7a57",
-        accentSoft: "rgba(95, 122, 87, 0.18)",
-        text: "#425241"
-      },
-      midnight: {
-        bg: "#f8f4ec",
-        border: "#d8c7a0",
-        outline: "#b79b63",
-        accent: "#6d4f2b",
-        accentSoft: "rgba(109, 79, 43, 0.18)",
-        text: "#3f3428"
-      },
-      lavender: {
-        bg: "#fbf8ff",
-        border: "#e4d9f2",
-        outline: "#c9b4df",
-        accent: "#7d5f9a",
-        accentSoft: "rgba(125, 95, 154, 0.18)",
-        text: "#4f3f61"
-      }
-    };
-
     const fonts = {
       georgia: 'Georgia, "Times New Roman", serif',
       playfair: '"Playfair Display", Georgia, serif',
@@ -646,7 +719,14 @@
     const paymentModal = document.getElementById("paymentModal");
     const confirmPaymentButton = document.getElementById("confirmPayment");
     const cancelPaymentButton = document.getElementById("cancelPayment");
-    const themeSelect = document.getElementById("themeSelect");
+    const themePicker = document.getElementById("themePicker");
+    const themeTrigger = document.getElementById("themeTrigger");
+    const themeTriggerPreview = document.getElementById("themeTriggerPreview");
+    const themePopup = document.getElementById("themePopup");
+    const themeCanvas = document.getElementById("themeCanvas");
+    const themeDone = document.getElementById("themeDone");
+    const themeSelectedSwatch = document.getElementById("themeSelectedSwatch");
+    const themeSelectedValue = document.getElementById("themeSelectedValue");
     const fontSelect = document.getElementById("fontSelect");
     const headerLine = document.getElementById("headerLine");
     const inviteMessage = document.getElementById("inviteMessage");
@@ -654,6 +734,145 @@
     const previewMessage = document.getElementById("previewMessage");
 
     let premiumUnlocked = localStorage.getItem(PREMIUM_STORAGE_KEY) === "true";
+    let selectedAccent = "#9d6b53";
+
+    function clamp(value, min, max) {
+      return Math.min(Math.max(value, min), max);
+    }
+
+    function hexToRgb(hex) {
+      const value = hex.replace("#", "");
+      const normalized = value.length === 3
+        ? value.split("").map((char) => char + char).join("")
+        : value;
+      const int = Number.parseInt(normalized, 16);
+      return {
+        r: (int >> 16) & 255,
+        g: (int >> 8) & 255,
+        b: int & 255
+      };
+    }
+
+    function rgbToHex(r, g, b) {
+      return `#${[r, g, b].map((value) => clamp(Math.round(value), 0, 255).toString(16).padStart(2, "0")).join("")}`;
+    }
+
+    function rgbToHsl(r, g, b) {
+      const red = r / 255;
+      const green = g / 255;
+      const blue = b / 255;
+      const max = Math.max(red, green, blue);
+      const min = Math.min(red, green, blue);
+      const lightness = (max + min) / 2;
+      const delta = max - min;
+      let hue = 0;
+      let saturation = 0;
+
+      if (delta !== 0) {
+        saturation = delta / (1 - Math.abs(2 * lightness - 1));
+
+        switch (max) {
+          case red:
+            hue = 60 * (((green - blue) / delta) % 6);
+            break;
+          case green:
+            hue = 60 * ((blue - red) / delta + 2);
+            break;
+          default:
+            hue = 60 * ((red - green) / delta + 4);
+        }
+      }
+
+      return {
+        h: (hue + 360) % 360,
+        s: saturation,
+        l: lightness
+      };
+    }
+
+    function hslToRgb(h, s, l) {
+      const chroma = (1 - Math.abs(2 * l - 1)) * s;
+      const huePrime = h / 60;
+      const x = chroma * (1 - Math.abs((huePrime % 2) - 1));
+      let red = 0;
+      let green = 0;
+      let blue = 0;
+
+      if (huePrime >= 0 && huePrime < 1) {
+        red = chroma;
+        green = x;
+      } else if (huePrime < 2) {
+        red = x;
+        green = chroma;
+      } else if (huePrime < 3) {
+        green = chroma;
+        blue = x;
+      } else if (huePrime < 4) {
+        green = x;
+        blue = chroma;
+      } else if (huePrime < 5) {
+        red = x;
+        blue = chroma;
+      } else {
+        red = chroma;
+        blue = x;
+      }
+
+      const match = l - chroma / 2;
+      return {
+        r: (red + match) * 255,
+        g: (green + match) * 255,
+        b: (blue + match) * 255
+      };
+    }
+
+    function shiftLightness(hex, amount) {
+      const { r, g, b } = hexToRgb(hex);
+      const hsl = rgbToHsl(r, g, b);
+      const next = hslToRgb(hsl.h, Math.max(0, hsl.s * 0.82), clamp(hsl.l + amount, 0, 1));
+      return rgbToHex(next.r, next.g, next.b);
+    }
+
+    function toRgba(hex, alpha) {
+      const { r, g, b } = hexToRgb(hex);
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    function buildThemeFromAccent(hex) {
+      return {
+        bg: shiftLightness(hex, 0.42),
+        border: shiftLightness(hex, 0.3),
+        outline: shiftLightness(hex, 0.18),
+        accent: hex,
+        accentSoft: toRgba(hex, 0.18),
+        text: shiftLightness(hex, -0.12)
+      };
+    }
+
+    function drawThemeCanvas() {
+      const context = themeCanvas.getContext("2d");
+      const { width, height } = themeCanvas;
+
+      for (let x = 0; x < width; x += 1) {
+        const hue = (x / width) * 360;
+        const hueGradient = context.createLinearGradient(0, 0, 0, height);
+        hueGradient.addColorStop(0, `hsl(${hue}, 100%, 100%)`);
+        hueGradient.addColorStop(0.5, `hsl(${hue}, 100%, 50%)`);
+        hueGradient.addColorStop(1, `hsl(${hue}, 100%, 0%)`);
+        context.fillStyle = hueGradient;
+        context.fillRect(x, 0, 1, height);
+      }
+    }
+
+    function pickCanvasColor(event) {
+      const rect = themeCanvas.getBoundingClientRect();
+      const scaleX = themeCanvas.width / rect.width;
+      const scaleY = themeCanvas.height / rect.height;
+      const x = clamp((event.clientX - rect.left) * scaleX, 0, themeCanvas.width - 1);
+      const y = clamp((event.clientY - rect.top) * scaleY, 0, themeCanvas.height - 1);
+      const pixel = themeCanvas.getContext("2d").getImageData(x, y, 1, 1).data;
+      return rgbToHex(pixel[0], pixel[1], pixel[2]);
+    }
 
     function syncPreview() {
       Object.entries(fields).forEach(([key, input]) => {
@@ -669,7 +888,7 @@
     }
 
     function applyPremiumStyles() {
-      const theme = themes[themeSelect.value] || themes.classic;
+      const theme = buildThemeFromAccent(selectedAccent);
       invitationCard.style.setProperty("--invite-bg", theme.bg);
       invitationCard.style.setProperty("--invite-border", theme.border);
       invitationCard.style.setProperty("--invite-outline", theme.outline);
@@ -689,6 +908,20 @@
       invitationCard.style.removeProperty("--invite-font");
       previewHeader.textContent = "Together With Their Families";
       previewMessage.textContent = "Request the honor of your presence at the celebration of their marriage";
+    }
+
+    function setSelectedAccent(hex) {
+      selectedAccent = hex;
+      themeTriggerPreview.innerHTML = `
+        <span style="background:${selectedAccent}"></span>
+      `;
+      themeSelectedSwatch.style.background = selectedAccent;
+      themeSelectedValue.textContent = selectedAccent.toUpperCase();
+    }
+
+    function setThemePopupOpen(isOpen) {
+      themePopup.classList.toggle("is-open", isOpen);
+      themeTrigger.setAttribute("aria-expanded", String(isOpen));
     }
 
     function setPremiumUnlocked(unlocked) {
@@ -732,9 +965,28 @@
       });
     });
 
-    [themeSelect, fontSelect, headerLine, inviteMessage].forEach((input) => {
+    [fontSelect, headerLine, inviteMessage].forEach((input) => {
       input.addEventListener("input", syncPreview);
       input.addEventListener("change", syncPreview);
+    });
+
+    themeCanvas.addEventListener("click", (event) => {
+      setSelectedAccent(pickCanvasColor(event));
+      syncPreview();
+    });
+
+    themeTrigger.addEventListener("click", () => {
+      setThemePopupOpen(!themePopup.classList.contains("is-open"));
+    });
+
+    themeDone.addEventListener("click", () => {
+      setThemePopupOpen(false);
+    });
+
+    document.addEventListener("click", (event) => {
+      if (!themePicker.contains(event.target)) {
+        setThemePopupOpen(false);
+      }
     });
 
     unlockPremiumButton.addEventListener("click", openPaymentModal);
@@ -785,7 +1037,7 @@
       await document.fonts.ready;
       await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
-      const theme = themes[themeSelect.value] || themes.classic;
+      const theme = buildThemeFromAccent(selectedAccent);
 
       await html2pdf()
         .set({
@@ -846,6 +1098,8 @@
       handleDownload(downloadPremiumButton, { premium: true });
     });
 
+    drawThemeCanvas();
+    setSelectedAccent(selectedAccent);
     setPremiumUnlocked(premiumUnlocked);
     syncPreview();
   </script>
