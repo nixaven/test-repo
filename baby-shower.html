@@ -351,6 +351,12 @@
       color: var(--invite-text);
     }
 
+    .invitation.is-dual {
+      border-width: 10px;
+      outline-width: 10px;
+      outline-offset: -28px;
+    }
+
     .pdf-stage .invitation {
       width: 794px;
       height: 1123px;
@@ -397,11 +403,11 @@
       width: 90px;
       height: 1px;
       margin: 1.35rem auto;
-      background: linear-gradient(90deg, transparent, var(--invite-pink), var(--invite-blue), transparent);
+      background: linear-gradient(90deg, transparent, var(--invite-blue), transparent);
     }
 
-    .divider.blue {
-      background: linear-gradient(90deg, transparent, var(--invite-blue), transparent);
+    .divider.bottom {
+      background: linear-gradient(90deg, transparent, var(--invite-pink), transparent);
     }
 
     .invite-text,
@@ -427,6 +433,14 @@
       color: var(--invite-pink);
     }
 
+    .tone-pink {
+      color: var(--invite-pink);
+    }
+
+    .tone-blue {
+      color: var(--invite-blue);
+    }
+
     .details {
       margin-top: 1.5rem;
       font-size: 1.05rem;
@@ -441,8 +455,11 @@
       margin: 0.85rem 0 0;
       font-size: 1.4rem;
       letter-spacing: 0.35em;
+      opacity: 0.95;
+    }
+
+    .motif .pink-part {
       color: var(--invite-pink);
-      opacity: 0.9;
     }
 
     .motif .blue-part {
@@ -599,17 +616,22 @@
         <div class="divider"></div>
         <div class="invite-text">Please celebrate with us as we welcome</div>
         <div class="baby-name" id="previewBabyName">Little One</div>
-        <div class="motif"><span>✿</span> <span class="blue-part">✿</span> <span>✿</span></div>
+        <div class="motif">
+          <span class="pink-part">✿</span>
+          <span class="blue-part">✿</span>
+          <span class="pink-part">✿</span>
+          <span class="blue-part">✿</span>
+        </div>
         <div class="honoree">in honor of <span id="previewHonoree">Emma &amp; James</span></div>
         <div class="invite-text" style="margin-top: 1.4rem;">
-          <span id="previewDate">Sunday, 12 September 2027</span><br>
-          at <span id="previewTime">2:00 PM</span>
+          <span class="tone-blue" id="previewDate">Sunday, 12 September 2027</span><br>
+          at <span class="tone-pink" id="previewTime">2:00 PM</span>
         </div>
         <div class="details">
-          <strong id="previewVenue">Willow Garden House</strong><br>
-          <span id="previewLocation">12 Meadow Lane, Florence</span>
+          <strong class="tone-pink" id="previewVenue">Willow Garden House</strong><br>
+          <span class="tone-blue" id="previewLocation">12 Meadow Lane, Florence</span>
         </div>
-        <div class="divider blue"></div>
+        <div class="divider bottom"></div>
         <div class="footer-note" id="previewNote">Please join us for cake, gifts, and celebration. RSVP by 1 September.</div>
       </article>
     </section>
@@ -679,22 +701,22 @@
         text: "#644836"
       },
       bluePink: {
-        bg: "#fff9fb",
-        border: "#f0c9d6",
-        outline: "#b7d3e8",
-        accent: "#e3a4b7",
-        pink: "#e3a4b7",
+        bg: "#fcfafc",
+        border: "#e8b7c6",
+        outline: "#9fc0d8",
+        accent: "#d9a0b2",
+        pink: "#d9a0b2",
         blue: "#7fadd0",
-        text: "#5a5360"
+        text: "#56606a"
       },
       pinkBlue: {
-        bg: "#f7fbfe",
-        border: "#b7d3e8",
-        outline: "#f0c9d6",
+        bg: "#fafcfd",
+        border: "#9fc0d8",
+        outline: "#e8b7c6",
         accent: "#7fadd0",
         pink: "#7fadd0",
-        blue: "#e3a4b7",
-        text: "#53606a"
+        blue: "#d9a0b2",
+        text: "#56606a"
       }
     };
 
@@ -758,6 +780,7 @@
       invitationCard.style.setProperty("--invite-blue", mood.blue);
       invitationCard.style.setProperty("--invite-text", mood.text);
       invitationCard.style.setProperty("--invite-font", getActiveFont().stack);
+      invitationCard.classList.toggle("is-dual", moodKey === "bluePink" || moodKey === "pinkBlue");
       return mood;
     }
 
