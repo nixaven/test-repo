@@ -12,15 +12,15 @@
     :root {
       color-scheme: light;
       --ink: #4a3f4f;
-      --accent: #c48a9c;
-      --accent-soft: #f3dde4;
-      --line: #e5cfd7;
+      --accent: #9a7fb8;
+      --accent-soft: #ebe3f4;
+      --line: #ddd0e8;
       --panel: rgba(255, 255, 255, 0.94);
-      --invite-bg: #fffafb;
-      --invite-border: #f1dce3;
-      --invite-outline: #dfb8c5;
-      --invite-accent: #c48a9c;
-      --invite-text: #5a4a55;
+      --invite-bg: #faf8ff;
+      --invite-border: #e4d7ef;
+      --invite-outline: #c7b4dc;
+      --invite-accent: #9a7fb8;
+      --invite-text: #53485f;
       --invite-font: "Cormorant Garamond", Georgia, serif;
     }
 
@@ -531,9 +531,8 @@
         <label>
           Color mood
           <select id="colorMood">
-            <option value="blush">Blush pink</option>
+            <option value="pinkBlue">Blue &amp; pink</option>
             <option value="mint">Soft mint</option>
-            <option value="sky">Sky blue</option>
             <option value="butter">Butter cream</option>
           </select>
         </label>
@@ -571,12 +570,12 @@
 
   <script>
     const moods = {
-      blush: {
-        bg: "#fffafb",
-        border: "#f1dce3",
-        outline: "#dfb8c5",
-        accent: "#c48a9c",
-        text: "#5a4a55"
+      pinkBlue: {
+        bg: "#faf8ff",
+        border: "#e4d7ef",
+        outline: "#c7b4dc",
+        accent: "#9a7fb8",
+        text: "#53485f"
       },
       mint: {
         bg: "#f8fcfa",
@@ -584,13 +583,6 @@
         outline: "#b3d4c7",
         accent: "#6f9f8d",
         text: "#40584f"
-      },
-      sky: {
-        bg: "#f7fbff",
-        border: "#d7e6f5",
-        outline: "#b2c9e2",
-        accent: "#6f90b8",
-        text: "#42566f"
       },
       butter: {
         bg: "#fffdf7",
@@ -650,7 +642,7 @@
     const PDF_HEIGHT = 1123;
 
     function applyMood(moodKey) {
-      const mood = moods[moodKey] || moods.blush;
+      const mood = moods[moodKey] || moods.pinkBlue;
       invitationCard.style.setProperty("--invite-bg", mood.bg);
       invitationCard.style.setProperty("--invite-border", mood.border);
       invitationCard.style.setProperty("--invite-outline", mood.outline);
