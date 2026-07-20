@@ -999,7 +999,7 @@
               <button class="unlock-button" type="button" id="unlockPremium">Unlock for €1 (Test)</button>
             </div>
           </div>
-          <p class="premium-copy">Unlock extra styling options and download a fully customized invitation. This is a test flow with no real payment.</p>
+          <p class="premium-copy">Unlock themes, fonts, custom wording, wedding stickers, and premium PDF downloads. This is a test flow with no real payment.</p>
 
           <div class="premium-fields is-locked" id="premiumFields">
             <label>
@@ -1087,14 +1087,14 @@
               Invitation message
               <textarea id="inviteMessage">Request the honor of your presence at the celebration of their marriage</textarea>
             </label>
-          </div>
 
-          <div class="form-grid" style="gap: 0.55rem; margin-top: 1.25rem;">
-            <span style="font-size: 0.95rem; font-weight: 700;">Wedding stickers</span>
-            <p class="sticker-hint">Click a sticker to add it, or drag it onto the invitation. Tap to resize, double-click to remove.</p>
-            <div class="sticker-tray" id="stickerTray" aria-label="Wedding stickers"></div>
-            <div class="sticker-actions">
-              <button class="secondary" type="button" id="clearStickers">Clear stickers</button>
+            <div class="form-grid" style="gap: 0.55rem;">
+              <span style="font-size: 0.95rem; font-weight: 700;">Wedding stickers</span>
+              <p class="sticker-hint">Unlock premium to use stickers. Click a sticker to add it, or drag it onto the invitation.</p>
+              <div class="sticker-tray" id="stickerTray" aria-label="Wedding stickers"></div>
+              <div class="sticker-actions">
+                <button class="secondary" type="button" id="clearStickers">Clear stickers</button>
+              </div>
             </div>
           </div>
         </section>
@@ -1137,7 +1137,7 @@
   <div class="payment-modal" id="paymentModal" aria-hidden="true">
     <div class="payment-dialog" role="dialog" aria-labelledby="paymentTitle" aria-modal="true">
       <h3 id="paymentTitle">Unlock premium customization</h3>
-      <p>Get access to themes, fonts, custom wording, and premium PDF downloads.</p>
+      <p>Get access to themes, fonts, custom wording, wedding stickers, and premium PDF downloads.</p>
       <div class="payment-amount">€1.00</div>
       <div class="payment-actions">
         <button class="primary" type="button" id="confirmPayment">Pay €1 (Test)</button>
@@ -1416,6 +1416,11 @@
         });
 
         item.addEventListener("click", () => {
+          if (!premiumUnlocked) {
+            openPaymentModal();
+            return;
+          }
+
           placeSticker(item.dataset.stickerHtml, 50, 42);
         });
       });
@@ -1458,6 +1463,11 @@
     }
 
     function placeSticker(stickerHtml, xPercent, yPercent) {
+      if (!premiumUnlocked) {
+        openPaymentModal();
+        return;
+      }
+
       const sticker = document.createElement("button");
       sticker.type = "button";
       sticker.className = "placed-sticker";
@@ -1530,6 +1540,10 @@
 
     function setupStickerDropTarget() {
       invitationCard.addEventListener("dragover", (event) => {
+        if (!premiumUnlocked) {
+          return;
+        }
+
         event.preventDefault();
         event.dataTransfer.dropEffect = "copy";
         invitationCard.classList.add("drop-ready");
@@ -1542,6 +1556,12 @@
       invitationCard.addEventListener("drop", (event) => {
         event.preventDefault();
         invitationCard.classList.remove("drop-ready");
+
+        if (!premiumUnlocked) {
+          openPaymentModal();
+          return;
+        }
+
         const stickerHtml = event.dataTransfer.getData("text/plain");
         if (!stickerHtml) {
           return;
@@ -1883,6 +1903,7 @@
       if (unlocked) {
         syncPreview();
       } else {
+        clearStickers();
         resetPremiumStyles();
       }
     }
