@@ -12,15 +12,15 @@
     :root {
       color-scheme: light;
       --ink: #4a3f4f;
-      --accent: #9a7fb8;
-      --accent-soft: #ebe3f4;
-      --line: #ddd0e8;
+      --accent: #b89a55;
+      --accent-soft: #f3e9d2;
+      --line: #e5d7b8;
       --panel: rgba(255, 255, 255, 0.94);
-      --invite-bg: #faf8ff;
-      --invite-border: #e4d7ef;
-      --invite-outline: #c7b4dc;
-      --invite-accent: #9a7fb8;
-      --invite-text: #53485f;
+      --invite-bg: #fffdf7;
+      --invite-border: #efe2c4;
+      --invite-outline: #d8c295;
+      --invite-accent: #b89a55;
+      --invite-text: #5c5138;
       --invite-font: "Cormorant Garamond", Georgia, serif;
     }
 
@@ -531,9 +531,12 @@
         <label>
           Color mood
           <select id="colorMood">
-            <option value="pinkBlue">Blue &amp; pink</option>
-            <option value="mint">Soft mint</option>
-            <option value="butter">Butter cream</option>
+            <option value="cream">Soft cream</option>
+            <option value="butter">Butter yellow</option>
+            <option value="sage">Sage green</option>
+            <option value="peach">Warm peach</option>
+            <option value="pink">Pink</option>
+            <option value="blue">Blue</option>
           </select>
         </label>
 
@@ -570,26 +573,47 @@
 
   <script>
     const moods = {
-      pinkBlue: {
-        bg: "#faf8ff",
-        border: "#e4d7ef",
-        outline: "#c7b4dc",
-        accent: "#9a7fb8",
-        text: "#53485f"
-      },
-      mint: {
-        bg: "#f8fcfa",
-        border: "#d7ebe3",
-        outline: "#b3d4c7",
-        accent: "#6f9f8d",
-        text: "#40584f"
+      cream: {
+        bg: "#fffcf8",
+        border: "#eadfce",
+        outline: "#d2c1a8",
+        accent: "#9c8868",
+        text: "#5a4e3d"
       },
       butter: {
-        bg: "#fffdf7",
-        border: "#efe2c4",
-        outline: "#d8c295",
-        accent: "#b89a55",
-        text: "#5c5138"
+        bg: "#fffdf5",
+        border: "#efe2c0",
+        outline: "#d8c18e",
+        accent: "#b89a4d",
+        text: "#5c5130"
+      },
+      sage: {
+        bg: "#f7faf6",
+        border: "#d5e2d2",
+        outline: "#b3c6ae",
+        accent: "#6f8a68",
+        text: "#425240"
+      },
+      peach: {
+        bg: "#fff8f3",
+        border: "#efd5c4",
+        outline: "#d8b19a",
+        accent: "#c48a68",
+        text: "#644836"
+      },
+      pink: {
+        bg: "#fffafb",
+        border: "#f1dce3",
+        outline: "#dfb8c5",
+        accent: "#c48a9c",
+        text: "#5a4a55"
+      },
+      blue: {
+        bg: "#f7fbff",
+        border: "#d7e6f5",
+        outline: "#b2c9e2",
+        accent: "#6f90b8",
+        text: "#42566f"
       }
     };
 
@@ -642,7 +666,7 @@
     const PDF_HEIGHT = 1123;
 
     function applyMood(moodKey) {
-      const mood = moods[moodKey] || moods.pinkBlue;
+      const mood = moods[moodKey] || moods.cream;
       invitationCard.style.setProperty("--invite-bg", mood.bg);
       invitationCard.style.setProperty("--invite-border", mood.border);
       invitationCard.style.setProperty("--invite-outline", mood.outline);
@@ -879,7 +903,7 @@
       await document.fonts.ready;
       await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
-      const mood = moods[colorMood.value] || moods.pinkBlue;
+      const mood = moods[colorMood.value] || moods.cream;
 
       await html2pdf()
         .set({
