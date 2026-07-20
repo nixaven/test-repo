@@ -290,6 +290,50 @@
       background: #9d6b53;
     }
 
+    .theme-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.55rem;
+      max-height: 220px;
+      overflow: auto;
+      padding: 0.15rem;
+    }
+
+    .theme-option {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.65rem 0.7rem;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fffdfb;
+      color: var(--ink);
+      cursor: pointer;
+      text-align: left;
+      font: inherit;
+      font-size: 0.86rem;
+      font-weight: 700;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .theme-option.is-active {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(157, 107, 83, 0.14);
+    }
+
+    .theme-option-preview {
+      display: flex;
+      gap: 0.2rem;
+      flex-shrink: 0;
+    }
+
+    .theme-option-preview span {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
     select {
       width: 100%;
       padding: 0.9rem 1rem;
@@ -596,21 +640,70 @@
           <div class="premium-fields is-locked" id="premiumFields">
             <label>
               Color theme
-              <div class="theme-picker" id="themePicker">
-                <button class="theme-trigger" type="button" id="themeTrigger" aria-expanded="false" aria-controls="themePopup">
-                  <span class="theme-trigger-preview" id="themeTriggerPreview" aria-hidden="true">
-                    <span style="background:#9d6b53"></span>
+              <div class="theme-list" id="themeList" role="listbox" aria-label="Color theme"></div>
+            </label>
+
+            <label>
+              Text color
+              <div class="theme-picker" data-color-picker="text">
+                <button class="theme-trigger" type="button" data-picker-trigger aria-expanded="false">
+                  <span class="theme-trigger-preview" data-picker-preview aria-hidden="true">
+                    <span style="background:#5d473d"></span>
                   </span>
                   <span class="theme-trigger-label">Color grid</span>
                 </button>
-                <div class="theme-popup" id="themePopup">
-                  <canvas class="theme-canvas" id="themeCanvas" width="320" height="180" aria-label="Color grid"></canvas>
+                <div class="theme-popup" data-picker-popup>
+                  <canvas class="theme-canvas" data-picker-canvas width="320" height="180" aria-label="Text color grid"></canvas>
                   <div class="theme-popup-footer">
                     <div class="theme-selected">
-                      <span class="theme-selected-swatch" id="themeSelectedSwatch"></span>
-                      <span id="themeSelectedValue">#9D6B53</span>
+                      <span class="theme-selected-swatch" data-picker-swatch></span>
+                      <span data-picker-value>#5D473D</span>
                     </div>
-                    <button class="secondary" type="button" id="themeDone">Confirm</button>
+                    <button class="secondary" type="button" data-picker-confirm>Confirm</button>
+                  </div>
+                </div>
+              </div>
+            </label>
+
+            <label>
+              Background color
+              <div class="theme-picker" data-color-picker="background">
+                <button class="theme-trigger" type="button" data-picker-trigger aria-expanded="false">
+                  <span class="theme-trigger-preview" data-picker-preview aria-hidden="true">
+                    <span style="background:#fffdf9"></span>
+                  </span>
+                  <span class="theme-trigger-label">Color grid</span>
+                </button>
+                <div class="theme-popup" data-picker-popup>
+                  <canvas class="theme-canvas" data-picker-canvas width="320" height="180" aria-label="Background color grid"></canvas>
+                  <div class="theme-popup-footer">
+                    <div class="theme-selected">
+                      <span class="theme-selected-swatch" data-picker-swatch></span>
+                      <span data-picker-value>#FFFDF9</span>
+                    </div>
+                    <button class="secondary" type="button" data-picker-confirm>Confirm</button>
+                  </div>
+                </div>
+              </div>
+            </label>
+
+            <label>
+              Border color
+              <div class="theme-picker" data-color-picker="border">
+                <button class="theme-trigger" type="button" data-picker-trigger aria-expanded="false">
+                  <span class="theme-trigger-preview" data-picker-preview aria-hidden="true">
+                    <span style="background:#f3e6db"></span>
+                  </span>
+                  <span class="theme-trigger-label">Color grid</span>
+                </button>
+                <div class="theme-popup" data-picker-popup>
+                  <canvas class="theme-canvas" data-picker-canvas width="320" height="180" aria-label="Border color grid"></canvas>
+                  <div class="theme-popup-footer">
+                    <div class="theme-selected">
+                      <span class="theme-selected-swatch" data-picker-swatch></span>
+                      <span data-picker-value>#F3E6DB</span>
+                    </div>
+                    <button class="secondary" type="button" data-picker-confirm>Confirm</button>
                   </div>
                 </div>
               </div>
@@ -719,22 +812,45 @@
     const paymentModal = document.getElementById("paymentModal");
     const confirmPaymentButton = document.getElementById("confirmPayment");
     const cancelPaymentButton = document.getElementById("cancelPayment");
-    const themePicker = document.getElementById("themePicker");
-    const themeTrigger = document.getElementById("themeTrigger");
-    const themeTriggerPreview = document.getElementById("themeTriggerPreview");
-    const themePopup = document.getElementById("themePopup");
-    const themeCanvas = document.getElementById("themeCanvas");
-    const themeDone = document.getElementById("themeDone");
-    const themeSelectedSwatch = document.getElementById("themeSelectedSwatch");
-    const themeSelectedValue = document.getElementById("themeSelectedValue");
+    const themeList = document.getElementById("themeList");
     const fontSelect = document.getElementById("fontSelect");
     const headerLine = document.getElementById("headerLine");
     const inviteMessage = document.getElementById("inviteMessage");
     const previewHeader = document.getElementById("previewHeader");
     const previewMessage = document.getElementById("previewMessage");
 
+    const presetThemes = [
+      { id: "classic-blush", name: "Classic blush", bg: "#fffdf9", border: "#f3e6db", outline: "#d8bbaa", accent: "#9d6b53", text: "#5d473d" },
+      { id: "sage-garden", name: "Sage garden", bg: "#f7faf4", border: "#d9e5d1", outline: "#b8c9ae", accent: "#5f7a57", text: "#425241" },
+      { id: "midnight-gold", name: "Midnight gold", bg: "#f8f4ec", border: "#d8c7a0", outline: "#b79b63", accent: "#6d4f2b", text: "#3f3428" },
+      { id: "soft-lavender", name: "Soft lavender", bg: "#fbf8ff", border: "#e4d9f2", outline: "#c9b4df", accent: "#7d5f9a", text: "#4f3f61" },
+      { id: "rose-quartz", name: "Rose quartz", bg: "#fff7f8", border: "#f0cfd6", outline: "#d9a7b3", accent: "#b56b7c", text: "#6a3f4a" },
+      { id: "ocean-mist", name: "Ocean mist", bg: "#f4fafb", border: "#cfe5ea", outline: "#9fc4cd", accent: "#4f7f8c", text: "#355760" },
+      { id: "champagne", name: "Champagne", bg: "#fffaf2", border: "#ead7b8", outline: "#d4b889", accent: "#a8844d", text: "#5d4a2f" },
+      { id: "forest-green", name: "Forest green", bg: "#f4f8f3", border: "#c9dbc7", outline: "#9bb798", accent: "#4d6f4a", text: "#334a31" },
+      { id: "dusty-blue", name: "Dusty blue", bg: "#f5f8fb", border: "#d0dceb", outline: "#a7bacf", accent: "#5b7391", text: "#3b4c61" },
+      { id: "terracotta", name: "Terracotta", bg: "#fff7f2", border: "#ecc8b4", outline: "#d39a79", accent: "#b66a45", text: "#6b3f2a" },
+      { id: "pearl-ivory", name: "Pearl ivory", bg: "#fffcf5", border: "#ebe1cb", outline: "#d4c4a1", accent: "#9c8a63", text: "#5c5139" },
+      { id: "berry-wine", name: "Berry wine", bg: "#fbf5f7", border: "#e5c5cf", outline: "#c793a4", accent: "#8d4d63", text: "#5a3140" },
+      { id: "soft-coral", name: "Soft coral", bg: "#fff6f3", border: "#f0cfc5", outline: "#dca891", accent: "#c7755a", text: "#6d4336" },
+      { id: "slate-charcoal", name: "Slate charcoal", bg: "#f6f7f8", border: "#d5d9de", outline: "#aeb5bd", accent: "#5c6570", text: "#363c44" },
+      { id: "mint-cream", name: "Mint cream", bg: "#f5fbf8", border: "#cfe8dc", outline: "#9fceb8", accent: "#4f8f75", text: "#335e4d" },
+      { id: "amber-glow", name: "Amber glow", bg: "#fff8ee", border: "#efd3a5", outline: "#d8ae68", accent: "#b8872f", text: "#6a5120" },
+      { id: "lilac-dusk", name: "Lilac dusk", bg: "#f9f6fc", border: "#ddd0eb", outline: "#bba5d4", accent: "#7a6298", text: "#4b3d5f" },
+      { id: "emerald", name: "Emerald", bg: "#f3faf6", border: "#c5e2d2", outline: "#8fc3a8", accent: "#3f8a67", text: "#285743" },
+      { id: "sandstone", name: "Sandstone", bg: "#fbf7f1", border: "#e5d4bf", outline: "#cbb08f", accent: "#9a7a55", text: "#5c4a36" },
+      { id: "ink-navy", name: "Ink navy", bg: "#f4f6fa", border: "#c9d2e1", outline: "#96a5bf", accent: "#3f5477", text: "#2a384f" }
+    ];
+
     let premiumUnlocked = localStorage.getItem(PREMIUM_STORAGE_KEY) === "true";
-    let selectedAccent = "#9d6b53";
+    let selectedThemeId = "classic-blush";
+    let customColors = {
+      text: "#5d473d",
+      background: "#fffdf9",
+      border: "#f3e6db",
+      accent: "#9d6b53",
+      outline: "#d8bbaa"
+    };
 
     function clamp(value, min, max) {
       return Math.min(Math.max(value, min), max);
@@ -757,101 +873,63 @@
       return `#${[r, g, b].map((value) => clamp(Math.round(value), 0, 255).toString(16).padStart(2, "0")).join("")}`;
     }
 
-    function rgbToHsl(r, g, b) {
-      const red = r / 255;
-      const green = g / 255;
-      const blue = b / 255;
-      const max = Math.max(red, green, blue);
-      const min = Math.min(red, green, blue);
-      const lightness = (max + min) / 2;
-      const delta = max - min;
-      let hue = 0;
-      let saturation = 0;
-
-      if (delta !== 0) {
-        saturation = delta / (1 - Math.abs(2 * lightness - 1));
-
-        switch (max) {
-          case red:
-            hue = 60 * (((green - blue) / delta) % 6);
-            break;
-          case green:
-            hue = 60 * ((blue - red) / delta + 2);
-            break;
-          default:
-            hue = 60 * ((red - green) / delta + 4);
-        }
-      }
-
-      return {
-        h: (hue + 360) % 360,
-        s: saturation,
-        l: lightness
-      };
-    }
-
-    function hslToRgb(h, s, l) {
-      const chroma = (1 - Math.abs(2 * l - 1)) * s;
-      const huePrime = h / 60;
-      const x = chroma * (1 - Math.abs((huePrime % 2) - 1));
-      let red = 0;
-      let green = 0;
-      let blue = 0;
-
-      if (huePrime >= 0 && huePrime < 1) {
-        red = chroma;
-        green = x;
-      } else if (huePrime < 2) {
-        red = x;
-        green = chroma;
-      } else if (huePrime < 3) {
-        green = chroma;
-        blue = x;
-      } else if (huePrime < 4) {
-        green = x;
-        blue = chroma;
-      } else if (huePrime < 5) {
-        red = x;
-        blue = chroma;
-      } else {
-        red = chroma;
-        blue = x;
-      }
-
-      const match = l - chroma / 2;
-      return {
-        r: (red + match) * 255,
-        g: (green + match) * 255,
-        b: (blue + match) * 255
-      };
-    }
-
-    function shiftLightness(hex, amount) {
-      const { r, g, b } = hexToRgb(hex);
-      const hsl = rgbToHsl(r, g, b);
-      const next = hslToRgb(hsl.h, Math.max(0, hsl.s * 0.82), clamp(hsl.l + amount, 0, 1));
-      return rgbToHex(next.r, next.g, next.b);
-    }
-
     function toRgba(hex, alpha) {
       const { r, g, b } = hexToRgb(hex);
       return `rgba(${r}, ${g}, ${b}, ${alpha})`;
     }
 
-    function buildThemeFromAccent(hex) {
-      return {
-        bg: shiftLightness(hex, 0.42),
-        border: shiftLightness(hex, 0.3),
-        outline: shiftLightness(hex, 0.18),
-        accent: hex,
-        accentSoft: toRgba(hex, 0.18),
-        text: shiftLightness(hex, -0.12)
-      };
+    function getActiveTheme() {
+      return presetThemes.find((theme) => theme.id === selectedThemeId) || presetThemes[0];
     }
 
-    function drawThemeCanvas() {
-      const context = themeCanvas.getContext("2d");
-      const { width, height } = themeCanvas;
+    function applyThemeSelection(theme) {
+      selectedThemeId = theme.id;
+      customColors = {
+        text: theme.text,
+        background: theme.bg,
+        border: theme.border,
+        accent: theme.accent,
+        outline: theme.outline
+      };
+      updateThemeOptionStates();
+      updateAllPickerDisplays();
+      syncPreview();
+    }
+
+    function updateThemeOptionStates() {
+      themeList.querySelectorAll("[data-theme-id]").forEach((button) => {
+        button.classList.toggle("is-active", button.dataset.themeId === selectedThemeId);
+      });
+    }
+
+    function renderThemeList() {
+      themeList.innerHTML = presetThemes.map((theme) => `
+        <button class="theme-option" type="button" role="option" data-theme-id="${theme.id}" aria-selected="false">
+          <span class="theme-option-preview" aria-hidden="true">
+            <span style="background:${theme.bg}"></span>
+            <span style="background:${theme.border}"></span>
+            <span style="background:${theme.accent}"></span>
+            <span style="background:${theme.text}"></span>
+          </span>
+          <span>${theme.name}</span>
+        </button>
+      `).join("");
+
+      themeList.querySelectorAll("[data-theme-id]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const theme = presetThemes.find((item) => item.id === button.dataset.themeId);
+          if (theme) {
+            applyThemeSelection(theme);
+          }
+        });
+      });
+
+      updateThemeOptionStates();
+    }
+
+    function drawColorCanvas(canvas) {
+      const context = canvas.getContext("2d");
+      const { width, height } = canvas;
 
       for (let x = 0; x < width; x += 1) {
         const hue = (x / width) * 360;
@@ -864,15 +942,78 @@
       }
     }
 
-    function pickCanvasColor(event) {
-      const rect = themeCanvas.getBoundingClientRect();
-      const scaleX = themeCanvas.width / rect.width;
-      const scaleY = themeCanvas.height / rect.height;
-      const x = clamp((event.clientX - rect.left) * scaleX, 0, themeCanvas.width - 1);
-      const y = clamp((event.clientY - rect.top) * scaleY, 0, themeCanvas.height - 1);
-      const pixel = themeCanvas.getContext("2d").getImageData(x, y, 1, 1).data;
+    function pickCanvasColor(canvas, event) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const x = clamp((event.clientX - rect.left) * scaleX, 0, canvas.width - 1);
+      const y = clamp((event.clientY - rect.top) * scaleY, 0, canvas.height - 1);
+      const pixel = canvas.getContext("2d").getImageData(x, y, 1, 1).data;
       return rgbToHex(pixel[0], pixel[1], pixel[2]);
     }
+
+    function updatePickerDisplay(root, color) {
+      const preview = root.querySelector("[data-picker-preview]");
+      const swatch = root.querySelector("[data-picker-swatch]");
+      const value = root.querySelector("[data-picker-value]");
+      preview.innerHTML = `<span style="background:${color}"></span>`;
+      swatch.style.background = color;
+      value.textContent = color.toUpperCase();
+    }
+
+    function updateAllPickerDisplays() {
+      Object.entries(colorPickers).forEach(([key, root]) => {
+        updatePickerDisplay(root, customColors[key]);
+      });
+    }
+
+    function setPickerOpen(root, isOpen) {
+      const popup = root.querySelector("[data-picker-popup]");
+      const trigger = root.querySelector("[data-picker-trigger]");
+      popup.classList.toggle("is-open", isOpen);
+      trigger.setAttribute("aria-expanded", String(isOpen));
+    }
+
+    const colorPickers = {
+      text: document.querySelector('[data-color-picker="text"]'),
+      background: document.querySelector('[data-color-picker="background"]'),
+      border: document.querySelector('[data-color-picker="border"]')
+    };
+
+    Object.entries(colorPickers).forEach(([key, root]) => {
+      const canvas = root.querySelector("[data-picker-canvas]");
+      const trigger = root.querySelector("[data-picker-trigger]");
+      const confirm = root.querySelector("[data-picker-confirm]");
+
+      drawColorCanvas(canvas);
+      updatePickerDisplay(root, customColors[key]);
+
+      trigger.addEventListener("click", () => {
+        Object.values(colorPickers).forEach((other) => {
+          if (other !== root) {
+            setPickerOpen(other, false);
+          }
+        });
+        setPickerOpen(root, true);
+      });
+
+      canvas.addEventListener("click", (event) => {
+        const color = pickCanvasColor(canvas, event);
+        customColors[key] = color;
+
+        if (key === "border") {
+          customColors.outline = color;
+          customColors.accent = color;
+        }
+
+        updatePickerDisplay(root, color);
+        syncPreview();
+      });
+
+      confirm.addEventListener("click", () => {
+        setPickerOpen(root, false);
+      });
+    });
 
     function syncPreview() {
       Object.entries(fields).forEach(([key, input]) => {
@@ -888,13 +1029,12 @@
     }
 
     function applyPremiumStyles() {
-      const theme = buildThemeFromAccent(selectedAccent);
-      invitationCard.style.setProperty("--invite-bg", theme.bg);
-      invitationCard.style.setProperty("--invite-border", theme.border);
-      invitationCard.style.setProperty("--invite-outline", theme.outline);
-      invitationCard.style.setProperty("--invite-accent", theme.accent);
-      invitationCard.style.setProperty("--invite-accent-soft", theme.accentSoft);
-      invitationCard.style.setProperty("--invite-text", theme.text);
+      invitationCard.style.setProperty("--invite-bg", customColors.background);
+      invitationCard.style.setProperty("--invite-border", customColors.border);
+      invitationCard.style.setProperty("--invite-outline", customColors.outline);
+      invitationCard.style.setProperty("--invite-accent", customColors.accent);
+      invitationCard.style.setProperty("--invite-accent-soft", toRgba(customColors.accent, 0.18));
+      invitationCard.style.setProperty("--invite-text", customColors.text);
       invitationCard.style.setProperty("--invite-font", fonts[fontSelect.value] || fonts.georgia);
     }
 
@@ -908,18 +1048,6 @@
       invitationCard.style.removeProperty("--invite-font");
       previewHeader.textContent = "Together With Their Families";
       previewMessage.textContent = "Request the honor of your presence at the celebration of their marriage";
-    }
-
-    function setSelectedAccent(hex) {
-      selectedAccent = hex;
-      themeTriggerPreview.innerHTML = `<span style="background:${selectedAccent}"></span>`;
-      themeSelectedSwatch.style.background = selectedAccent;
-      themeSelectedValue.textContent = selectedAccent.toUpperCase();
-    }
-
-    function setThemePopupOpen(isOpen) {
-      themePopup.classList.toggle("is-open", isOpen);
-      themeTrigger.setAttribute("aria-expanded", String(isOpen));
     }
 
     function setPremiumUnlocked(unlocked) {
@@ -954,31 +1082,17 @@
 
     form.addEventListener("reset", () => {
       window.requestAnimationFrame(() => {
-        if (premiumUnlocked) {
-          syncPreview();
-        } else {
+        applyThemeSelection(getActiveTheme());
+        if (!premiumUnlocked) {
           resetPremiumStyles();
-          syncPreview();
         }
+        syncPreview();
       });
     });
 
     [fontSelect, headerLine, inviteMessage].forEach((input) => {
       input.addEventListener("input", syncPreview);
       input.addEventListener("change", syncPreview);
-    });
-
-    themeCanvas.addEventListener("click", (event) => {
-      setSelectedAccent(pickCanvasColor(event));
-      syncPreview();
-    });
-
-    themeTrigger.addEventListener("click", () => {
-      setThemePopupOpen(true);
-    });
-
-    themeDone.addEventListener("click", () => {
-      setThemePopupOpen(false);
     });
 
     unlockPremiumButton.addEventListener("click", openPaymentModal);
@@ -1029,8 +1143,6 @@
       await document.fonts.ready;
       await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
-      const theme = buildThemeFromAccent(selectedAccent);
-
       await html2pdf()
         .set({
           margin: 0,
@@ -1039,7 +1151,7 @@
           html2canvas: {
             scale: 2,
             useCORS: true,
-            backgroundColor: premium ? theme.bg : "#fffdf9",
+            backgroundColor: premium ? customColors.background : "#fffdf9",
             width: PDF_WIDTH,
             height: PDF_HEIGHT,
             windowWidth: PDF_WIDTH,
@@ -1090,8 +1202,8 @@
       handleDownload(downloadPremiumButton, { premium: true });
     });
 
-    drawThemeCanvas();
-    setSelectedAccent(selectedAccent);
+    renderThemeList();
+    applyThemeSelection(getActiveTheme());
     setPremiumUnlocked(premiumUnlocked);
     syncPreview();
   </script>
