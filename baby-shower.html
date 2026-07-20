@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Baby Shower Invitation Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Playfair+Display:wght@400;600&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #4a3f4f;
+      --accent: #c48a9c;
+      --accent-soft: #f3dde4;
+      --line: #e5cfd7;
+      --panel: rgba(255, 255, 255, 0.94);
+      --invite-bg: #fffafb;
+      --invite-border: #f1dce3;
+      --invite-outline: #dfb8c5;
+      --invite-accent: #c48a9c;
+      --invite-text: #5a4a55;
+      --invite-font: "Cormorant Garamond", Georgia, serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Quicksand", Georgia, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.85), transparent 40%),
+        linear-gradient(145deg, #fff7fa, #eef6f4 55%, #f7f1ea);
+    }
+
+    .top-nav {
+      width: min(1200px, 100%);
+      margin: 0 auto;
+      padding: 1.25rem 2rem 0;
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .top-nav a {
+      text-decoration: none;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.75);
+      border: 1px solid rgba(196, 138, 156, 0.25);
+      border-radius: 999px;
+      padding: 0.55rem 0.95rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .top-nav a.active {
+      background: var(--accent);
+      color: #fffafb;
+      border-color: transparent;
+    }
+
+    .page {
+      width: min(1200px, 100%);
+      margin: 0 auto;
+      padding: 1.25rem 2rem 2rem;
+      display: grid;
+      grid-template-columns: minmax(320px, 420px) minmax(320px, 1fr);
+      gap: 2rem;
+    }
+
+    .panel,
+    .preview-shell {
+      background: var(--panel);
+      border: 1px solid rgba(196, 138, 156, 0.18);
+      border-radius: 28px;
+      box-shadow: 0 20px 60px rgba(90, 74, 85, 0.1);
+    }
+
+    .panel {
+      padding: 1.75rem;
+    }
+
+    .eyebrow {
+      margin: 0 0 0.5rem;
+      color: var(--accent);
+      font-size: 0.82rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 0 0 0.75rem;
+      font-family: "Playfair Display", Georgia, serif;
+      font-size: clamp(2rem, 4vw, 2.9rem);
+      line-height: 1.1;
+      font-weight: 600;
+    }
+
+    .intro {
+      margin: 0 0 1.5rem;
+      color: #7a6673;
+      line-height: 1.6;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 1rem;
+    }
+
+    label {
+      display: grid;
+      gap: 0.45rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 0.9rem 1rem;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      font: inherit;
+      color: var(--ink);
+      background: #fffdfd;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(196, 138, 156, 0.15);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+
+    button {
+      border: 0;
+      border-radius: 999px;
+      padding: 0.95rem 1.4rem;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    .primary {
+      background: var(--accent);
+      color: #fffafb;
+    }
+
+    .secondary {
+      background: var(--accent-soft);
+      color: var(--ink);
+    }
+
+    .preview-shell {
+      padding: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: sticky;
+      top: 1.5rem;
+      align-self: start;
+      max-height: calc(100vh - 3rem);
+      overflow: auto;
+    }
+
+    .pdf-stage {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 794px;
+      height: 1123px;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: -1;
+      opacity: 0;
+    }
+
+    .invitation {
+      width: min(100%, 760px);
+      aspect-ratio: 1 / 1.414;
+      background: var(--invite-bg);
+      border: 14px solid var(--invite-border);
+      outline: 1px solid var(--invite-outline);
+      outline-offset: -24px;
+      padding: 3.5rem 2.75rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      font-family: var(--invite-font);
+      color: var(--invite-text);
+    }
+
+    .pdf-stage .invitation {
+      width: 794px;
+      height: 1123px;
+      min-height: 1123px;
+      max-height: 1123px;
+      aspect-ratio: auto;
+      margin: 0;
+      padding: 96px 72px;
+      box-shadow: none;
+      box-sizing: border-box;
+    }
+
+    .invitation::before,
+    .invitation::after {
+      content: "";
+      position: absolute;
+      width: 160px;
+      height: 160px;
+      border: 1px solid rgba(196, 138, 156, 0.22);
+      border-radius: 50%;
+    }
+
+    .invitation::before {
+      top: -55px;
+      left: -55px;
+    }
+
+    .invitation::after {
+      right: -55px;
+      bottom: -55px;
+    }
+
+    .invite-top {
+      color: var(--invite-accent);
+      font-size: 0.95rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      font-family: "Quicksand", sans-serif;
+      font-weight: 600;
+    }
+
+    .divider {
+      width: 90px;
+      height: 1px;
+      margin: 1.35rem auto;
+      background: linear-gradient(90deg, transparent, var(--invite-accent), transparent);
+    }
+
+    .invite-text,
+    .details,
+    .footer-note {
+      margin: 0 auto;
+      max-width: 34rem;
+      line-height: 1.7;
+    }
+
+    .baby-name {
+      margin: 1.1rem 0 0.35rem;
+      font-family: "Playfair Display", Georgia, serif;
+      font-size: clamp(2.4rem, 6vw, 3.8rem);
+      line-height: 1.05;
+      color: var(--invite-accent);
+      font-weight: 600;
+    }
+
+    .honoree {
+      margin: 0.35rem 0 0;
+      font-size: clamp(1.35rem, 3vw, 1.8rem);
+      font-style: italic;
+    }
+
+    .details {
+      margin-top: 1.5rem;
+      font-size: 1.05rem;
+    }
+
+    .footer-note {
+      margin-top: 1.5rem;
+      font-size: 0.98rem;
+    }
+
+    .motif {
+      margin: 0.85rem 0 0;
+      font-size: 1.4rem;
+      letter-spacing: 0.35em;
+      color: var(--invite-accent);
+      opacity: 0.75;
+    }
+
+    @media (max-width: 900px) {
+      .page,
+      .top-nav {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+
+      .page {
+        grid-template-columns: 1fr;
+      }
+
+      .preview-shell {
+        position: static;
+        max-height: none;
+        overflow: visible;
+      }
+
+      .invitation {
+        padding: 2.75rem 1.6rem;
+      }
+    }
+
+    @media print {
+      .top-nav,
+      .panel {
+        display: none;
+      }
+
+      .page {
+        display: block;
+        padding: 0;
+      }
+
+      .preview-shell {
+        border: 0;
+        box-shadow: none;
+        background: transparent;
+        padding: 0;
+      }
+
+      .invitation {
+        width: 100%;
+        min-height: 100vh;
+        border-width: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="top-nav">
+    <a href="index.html">Wedding Invitation</a>
+    <a class="active" href="baby-shower.html">Baby Shower Invitation</a>
+  </nav>
+
+  <div class="page">
+    <section class="panel">
+      <p class="eyebrow">Printable Invitation</p>
+      <h1>Baby Shower Invitation</h1>
+      <p class="intro">Enter the celebration details, preview the design live, then download an elegant PDF ready to print or share.</p>
+
+      <form class="form-grid" id="invitationForm">
+        <label>
+          Invitation title
+          <input id="inviteTitle" type="text" value="Baby Shower" autocomplete="off">
+        </label>
+
+        <label>
+          Honoring
+          <input id="honoree" type="text" value="Emma &amp; James" autocomplete="off">
+        </label>
+
+        <label>
+          Baby name / theme
+          <input id="babyName" type="text" value="Little One" autocomplete="off">
+        </label>
+
+        <label>
+          Date
+          <input id="eventDate" type="text" value="Sunday, 12 September 2027" autocomplete="off">
+        </label>
+
+        <label>
+          Time
+          <input id="eventTime" type="text" value="2:00 PM" autocomplete="off">
+        </label>
+
+        <label>
+          Venue
+          <input id="venue" type="text" value="Willow Garden House" autocomplete="off">
+        </label>
+
+        <label>
+          Location
+          <input id="location" type="text" value="12 Meadow Lane, Florence" autocomplete="off">
+        </label>
+
+        <label>
+          RSVP / note
+          <textarea id="note">Please join us for cake, gifts, and celebration. RSVP by 1 September.</textarea>
+        </label>
+
+        <label>
+          Color mood
+          <select id="colorMood">
+            <option value="blush">Blush pink</option>
+            <option value="mint">Soft mint</option>
+            <option value="sky">Sky blue</option>
+            <option value="butter">Butter cream</option>
+          </select>
+        </label>
+
+        <div class="actions">
+          <button class="primary" type="button" id="downloadPdf">Download PDF</button>
+          <button class="secondary" type="reset">Reset</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="preview-shell">
+      <article class="invitation" id="invitationCard">
+        <div class="invite-top" id="previewTitle">Baby Shower</div>
+        <div class="divider"></div>
+        <div class="invite-text">Please celebrate with us as we welcome</div>
+        <div class="baby-name" id="previewBabyName">Little One</div>
+        <div class="motif">✿ ✿ ✿</div>
+        <div class="honoree">in honor of <span id="previewHonoree">Emma &amp; James</span></div>
+        <div class="invite-text" style="margin-top: 1.4rem;">
+          <span id="previewDate">Sunday, 12 September 2027</span><br>
+          at <span id="previewTime">2:00 PM</span>
+        </div>
+        <div class="details">
+          <strong id="previewVenue">Willow Garden House</strong><br>
+          <span id="previewLocation">12 Meadow Lane, Florence</span>
+        </div>
+        <div class="divider"></div>
+        <div class="footer-note" id="previewNote">Please join us for cake, gifts, and celebration. RSVP by 1 September.</div>
+      </article>
+    </section>
+  </div>
+
+  <div class="pdf-stage" id="pdfStage" aria-hidden="true"></div>
+
+  <script>
+    const moods = {
+      blush: {
+        bg: "#fffafb",
+        border: "#f1dce3",
+        outline: "#dfb8c5",
+        accent: "#c48a9c",
+        text: "#5a4a55"
+      },
+      mint: {
+        bg: "#f8fcfa",
+        border: "#d7ebe3",
+        outline: "#b3d4c7",
+        accent: "#6f9f8d",
+        text: "#40584f"
+      },
+      sky: {
+        bg: "#f7fbff",
+        border: "#d7e6f5",
+        outline: "#b2c9e2",
+        accent: "#6f90b8",
+        text: "#42566f"
+      },
+      butter: {
+        bg: "#fffdf7",
+        border: "#efe2c4",
+        outline: "#d8c295",
+        accent: "#b89a55",
+        text: "#5c5138"
+      }
+    };
+
+    const fields = {
+      inviteTitle: document.getElementById("inviteTitle"),
+      honoree: document.getElementById("honoree"),
+      babyName: document.getElementById("babyName"),
+      eventDate: document.getElementById("eventDate"),
+      eventTime: document.getElementById("eventTime"),
+      venue: document.getElementById("venue"),
+      location: document.getElementById("location"),
+      note: document.getElementById("note")
+    };
+
+    const preview = {
+      inviteTitle: document.getElementById("previewTitle"),
+      honoree: document.getElementById("previewHonoree"),
+      babyName: document.getElementById("previewBabyName"),
+      eventDate: document.getElementById("previewDate"),
+      eventTime: document.getElementById("previewTime"),
+      venue: document.getElementById("previewVenue"),
+      location: document.getElementById("previewLocation"),
+      note: document.getElementById("previewNote")
+    };
+
+    const form = document.getElementById("invitationForm");
+    const invitationCard = document.getElementById("invitationCard");
+    const downloadButton = document.getElementById("downloadPdf");
+    const pdfStage = document.getElementById("pdfStage");
+    const colorMood = document.getElementById("colorMood");
+
+    const PDF_WIDTH = 794;
+    const PDF_HEIGHT = 1123;
+
+    function applyMood(moodKey) {
+      const mood = moods[moodKey] || moods.blush;
+      invitationCard.style.setProperty("--invite-bg", mood.bg);
+      invitationCard.style.setProperty("--invite-border", mood.border);
+      invitationCard.style.setProperty("--invite-outline", mood.outline);
+      invitationCard.style.setProperty("--invite-accent", mood.accent);
+      invitationCard.style.setProperty("--invite-text", mood.text);
+      return mood;
+    }
+
+    function syncPreview() {
+      Object.entries(fields).forEach(([key, input]) => {
+        preview[key].textContent = input.value.trim() || " ";
+      });
+      applyMood(colorMood.value);
+    }
+
+    Object.values(fields).forEach((input) => {
+      input.addEventListener("input", syncPreview);
+    });
+
+    colorMood.addEventListener("change", syncPreview);
+
+    form.addEventListener("reset", () => {
+      window.requestAnimationFrame(syncPreview);
+    });
+
+    async function downloadInvitationPdf() {
+      const fileName = `baby-shower-${fields.babyName.value.trim() || "invitation"}`
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "") || "baby-shower-invitation";
+
+      const exportCard = invitationCard.cloneNode(true);
+      pdfStage.replaceChildren(exportCard);
+
+      await document.fonts.ready;
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+      const mood = moods[colorMood.value] || moods.blush;
+
+      await html2pdf()
+        .set({
+          margin: 0,
+          filename: `${fileName}.pdf`,
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: mood.bg,
+            width: PDF_WIDTH,
+            height: PDF_HEIGHT,
+            windowWidth: PDF_WIDTH,
+            windowHeight: PDF_HEIGHT,
+            scrollX: 0,
+            scrollY: 0,
+            x: 0,
+            y: 0
+          },
+          jsPDF: {
+            unit: "px",
+            format: [PDF_WIDTH, PDF_HEIGHT],
+            orientation: "portrait"
+          },
+          pagebreak: { mode: ["avoid-all"] }
+        })
+        .from(exportCard)
+        .save();
+    }
+
+    downloadButton.addEventListener("click", async () => {
+      const originalLabel = downloadButton.textContent;
+      downloadButton.disabled = true;
+      downloadButton.textContent = "Generating PDF...";
+
+      try {
+        await downloadInvitationPdf();
+      } catch (error) {
+        console.error(error);
+        window.alert("Sorry, the PDF could not be generated. Please try again.");
+      } finally {
+        downloadButton.disabled = false;
+        downloadButton.textContent = originalLabel;
+        pdfStage.replaceChildren();
+      }
+    });
+
+    syncPreview();
+  </script>
+</body>
+</html>
