@@ -383,6 +383,7 @@
     }
 
     .placed-sticker {
+      --sticker-scale: 1;
       position: absolute;
       display: flex;
       align-items: center;
@@ -396,7 +397,7 @@
       font-size: 1.8rem;
       font-weight: 400;
       line-height: 1;
-      transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%) scale(var(--sticker-scale));
       cursor: grab;
       pointer-events: auto;
       user-select: none;
@@ -406,9 +407,60 @@
 
     .placed-sticker:hover,
     .placed-sticker:active {
-      transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%) scale(var(--sticker-scale));
       background: transparent;
       cursor: grabbing;
+    }
+
+    .placed-sticker.is-selected {
+      outline: 2px dashed color-mix(in srgb, var(--accent) 70%, white);
+      outline-offset: 6px;
+      border-radius: 8px;
+      z-index: 7;
+    }
+
+    .sticker-size-bar {
+      display: none;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.65rem 0.95rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 12px 30px rgba(74, 63, 79, 0.14);
+      width: min(100%, 280px);
+      flex-shrink: 0;
+    }
+
+    .sticker-size-bar.is-open {
+      display: flex;
+    }
+
+    .sticker-size-bar label {
+      margin: 0;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #7a6673;
+      white-space: nowrap;
+    }
+
+    .sticker-size-bar input[type="range"] {
+      flex: 1;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      accent-color: var(--accent);
+    }
+
+    .sticker-size-bar .size-value {
+      min-width: 2.4rem;
+      text-align: right;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--ink);
     }
 
     .invitation.drop-ready {
@@ -447,13 +499,15 @@
     }
 
     .preview-shell {
-      padding: 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       position: sticky;
       top: 1.5rem;
       align-self: start;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.85rem;
       max-height: calc(100vh - 3rem);
       overflow: auto;
     }
@@ -781,6 +835,12 @@
         <div class="divider bottom"></div>
         <div class="footer-note" id="previewNote">Please join us for cake, gifts, and celebration. RSVP by 1 September.</div>
       </article>
+
+      <div class="sticker-size-bar" id="stickerSizeBar" aria-hidden="true">
+        <label for="stickerSizeRange">Size</label>
+        <input id="stickerSizeRange" type="range" min="0.6" max="2.4" step="0.05" value="1">
+        <span class="size-value" id="stickerSizeValue">100%</span>
+      </div>
     </section>
   </div>
 
@@ -943,6 +1003,10 @@
     const stickerTray = document.getElementById("stickerTray");
     const stickerLayer = document.getElementById("stickerLayer");
     const clearStickersButton = document.getElementById("clearStickers");
+    const stickerSizeBar = document.getElementById("stickerSizeBar");
+    const stickerSizeRange = document.getElementById("stickerSizeRange");
+    const stickerSizeValue = document.getElementById("stickerSizeValue");
+    let selectedSticker = null;
     const dayColumn = document.getElementById("dayColumn");
     const monthColumn = document.getElementById("monthColumn");
     const yearColumn = document.getElementById("yearColumn");
@@ -1036,6 +1100,42 @@
       });
     }
 
+    function getStickerScale(sticker) {
+      const raw = Number.parseFloat(sticker.style.getPropertyValue("--sticker-scale"));
+      return Number.isFinite(raw) ? raw : 1;
+    }
+
+    function setStickerScale(sticker, scale) {
+      const next = Math.min(2.4, Math.max(0.6, scale));
+      sticker.style.setProperty("--sticker-scale", String(next));
+      return next;
+    }
+
+    function selectSticker(sticker) {
+      if (selectedSticker && selectedSticker !== sticker) {
+        selectedSticker.classList.remove("is-selected");
+      }
+
+      selectedSticker = sticker;
+      selectedSticker.classList.add("is-selected");
+
+      const scale = getStickerScale(sticker);
+      stickerSizeRange.value = String(scale);
+      stickerSizeValue.textContent = `${Math.round(scale * 100)}%`;
+      stickerSizeBar.classList.add("is-open");
+      stickerSizeBar.setAttribute("aria-hidden", "false");
+    }
+
+    function deselectSticker() {
+      if (selectedSticker) {
+        selectedSticker.classList.remove("is-selected");
+        selectedSticker = null;
+      }
+
+      stickerSizeBar.classList.remove("is-open");
+      stickerSizeBar.setAttribute("aria-hidden", "true");
+    }
+
     function placeSticker(stickerHtml, xPercent, yPercent) {
       const sticker = document.createElement("button");
       sticker.type = "button";
@@ -1043,21 +1143,45 @@
       sticker.innerHTML = decodeURIComponent(stickerHtml);
       sticker.style.left = `${xPercent}%`;
       sticker.style.top = `${yPercent}%`;
-      sticker.title = "Drag to move · Double-click to remove";
+      setStickerScale(sticker, 1);
+      sticker.title = "Tap to resize · Drag to move · Double-click to remove";
       stickerLayer.appendChild(sticker);
       enablePlacedSticker(sticker);
+      selectSticker(sticker);
     }
 
     function enablePlacedSticker(sticker) {
-      sticker.addEventListener("dblclick", () => {
+      sticker.addEventListener("dblclick", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (selectedSticker === sticker) {
+          deselectSticker();
+        }
         sticker.remove();
       });
 
       sticker.addEventListener("pointerdown", (event) => {
+        if (event.button !== 0) {
+          return;
+        }
+
         event.preventDefault();
+        event.stopPropagation();
+        selectSticker(sticker);
         sticker.setPointerCapture(event.pointerId);
 
+        const startX = event.clientX;
+        const startY = event.clientY;
+        let moved = false;
+
         const onMove = (moveEvent) => {
+          const dx = moveEvent.clientX - startX;
+          const dy = moveEvent.clientY - startY;
+          if (!moved && Math.hypot(dx, dy) < 4) {
+            return;
+          }
+
+          moved = true;
           const rect = invitationCard.getBoundingClientRect();
           const xPercent = ((moveEvent.clientX - rect.left) / rect.width) * 100;
           const yPercent = ((moveEvent.clientY - rect.top) / rect.height) * 100;
@@ -1069,14 +1193,17 @@
           sticker.releasePointerCapture(event.pointerId);
           sticker.removeEventListener("pointermove", onMove);
           sticker.removeEventListener("pointerup", onUp);
+          sticker.removeEventListener("pointercancel", onUp);
         };
 
         sticker.addEventListener("pointermove", onMove);
         sticker.addEventListener("pointerup", onUp);
+        sticker.addEventListener("pointercancel", onUp);
       });
     }
 
     function clearStickers() {
+      deselectSticker();
       stickerLayer.replaceChildren();
     }
 
@@ -1319,6 +1446,35 @@
 
     clearStickersButton.addEventListener("click", clearStickers);
 
+    stickerSizeRange.addEventListener("input", () => {
+      if (!selectedSticker) {
+        return;
+      }
+
+      const scale = setStickerScale(selectedSticker, Number.parseFloat(stickerSizeRange.value));
+      stickerSizeValue.textContent = `${Math.round(scale * 100)}%`;
+    });
+
+    stickerSizeBar.addEventListener("pointerdown", (event) => {
+      event.stopPropagation();
+    });
+
+    document.addEventListener("pointerdown", (event) => {
+      if (!selectedSticker) {
+        return;
+      }
+
+      const target = event.target;
+      if (
+        selectedSticker.contains(target) ||
+        stickerSizeBar.contains(target)
+      ) {
+        return;
+      }
+
+      deselectSticker();
+    });
+
     form.addEventListener("reset", () => {
       window.requestAnimationFrame(() => {
         resetDatePicker();
@@ -1334,7 +1490,11 @@
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-|-$/g, "") || "baby-shower-invitation";
 
+      deselectSticker();
       const exportCard = invitationCard.cloneNode(true);
+      exportCard.querySelectorAll(".placed-sticker.is-selected").forEach((sticker) => {
+        sticker.classList.remove("is-selected");
+      });
       pdfStage.replaceChildren(exportCard);
 
       await document.fonts.ready;

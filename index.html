@@ -398,6 +398,191 @@
       background: #ececec;
     }
 
+    .sticker-hint {
+      margin: 0;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #8a6f62;
+    }
+
+    .sticker-tray {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.55rem;
+      padding: 0.75rem;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #ffffff;
+    }
+
+    .sticker-item {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      padding: 0;
+      border: 1px dashed var(--line);
+      border-radius: 14px;
+      background: #fffdfb;
+      box-shadow: none;
+      font-size: 1.55rem;
+      font-weight: 400;
+      line-height: 1;
+      cursor: grab;
+      user-select: none;
+      transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .sticker-item:hover {
+      transform: translateY(-1px);
+      border-color: var(--accent);
+      background: #fff8f4;
+    }
+
+    .sticker-item:active {
+      cursor: grabbing;
+    }
+
+    .sticker-item.tone-a {
+      background: color-mix(in srgb, var(--accent) 16%, white);
+    }
+
+    .sticker-item.tone-b {
+      background: color-mix(in srgb, var(--accent-soft) 55%, white);
+    }
+
+    .sticker-rings {
+      position: relative;
+      width: 1.7rem;
+      height: 1.15rem;
+      display: inline-block;
+    }
+
+    .sticker-rings::before,
+    .sticker-rings::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      width: 0.95rem;
+      height: 0.95rem;
+      border: 2.5px solid #c9a46a;
+      border-radius: 50%;
+      box-sizing: border-box;
+    }
+
+    .sticker-rings::before {
+      left: 0;
+      border-color: #c9a46a;
+    }
+
+    .sticker-rings::after {
+      right: 0;
+      border-color: #b7b7b7;
+    }
+
+    .sticker-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .sticker-actions button {
+      padding: 0.65rem 1rem;
+      font-size: 0.85rem;
+    }
+
+    .sticker-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    .placed-sticker {
+      --sticker-scale: 1;
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      font-size: 1.8rem;
+      font-weight: 400;
+      line-height: 1;
+      transform: translate(-50%, -50%) scale(var(--sticker-scale));
+      cursor: grab;
+      pointer-events: auto;
+      user-select: none;
+      filter: drop-shadow(0 4px 8px rgba(67, 49, 40, 0.12));
+      z-index: 6;
+    }
+
+    .placed-sticker:hover,
+    .placed-sticker:active {
+      transform: translate(-50%, -50%) scale(var(--sticker-scale));
+      background: transparent;
+      cursor: grabbing;
+    }
+
+    .placed-sticker.is-selected {
+      outline: 2px dashed color-mix(in srgb, var(--accent) 70%, white);
+      outline-offset: 6px;
+      border-radius: 8px;
+      z-index: 7;
+    }
+
+    .sticker-size-bar {
+      display: none;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.65rem 0.95rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 12px 30px rgba(67, 49, 40, 0.12);
+      width: min(100%, 280px);
+      flex-shrink: 0;
+    }
+
+    .sticker-size-bar.is-open {
+      display: flex;
+    }
+
+    .sticker-size-bar label {
+      margin: 0;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #8a6f62;
+      white-space: nowrap;
+    }
+
+    .sticker-size-bar input[type="range"] {
+      flex: 1;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      accent-color: var(--accent);
+    }
+
+    .sticker-size-bar .size-value {
+      min-width: 2.4rem;
+      text-align: right;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .invitation.drop-ready {
+      box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent);
+    }
+
     select {
       width: 100%;
       padding: 0.9rem 1rem;
@@ -566,8 +751,10 @@
     .preview-shell {
       padding: 1.5rem;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
+      gap: 0.85rem;
       position: sticky;
       top: 1.5rem;
       align-self: start;
@@ -798,6 +985,15 @@
           <textarea id="note">Dinner and dancing to follow. Formal attire requested.</textarea>
         </label>
 
+        <div class="form-grid" style="gap: 0.55rem;">
+          <span style="font-size: 0.95rem; font-weight: 700;">Wedding stickers</span>
+          <p class="sticker-hint">Click a sticker to add it, or drag it onto the invitation. Tap to resize, double-click to remove.</p>
+          <div class="sticker-tray" id="stickerTray" aria-label="Wedding stickers"></div>
+          <div class="sticker-actions">
+            <button class="secondary" type="button" id="clearStickers">Clear stickers</button>
+          </div>
+        </div>
+
         <div class="actions">
           <button class="primary" type="button" id="downloadPdf">Download Basic PDF</button>
           <button class="premium-download" type="button" id="downloadPremiumPdf" disabled>Download Premium PDF</button>
@@ -907,6 +1103,7 @@
 
     <section class="preview-shell">
       <article class="invitation" id="invitationCard">
+        <div class="sticker-layer" id="stickerLayer"></div>
         <div class="invite-top" id="previewHeader">Together With Their Families</div>
         <div class="divider"></div>
         <div class="invite-text" id="previewMessage">Request the honor of your presence at the celebration of their marriage</div>
@@ -926,6 +1123,12 @@
         <div class="divider"></div>
         <div class="footer-note" id="previewNote">Dinner and dancing to follow. Formal attire requested.</div>
       </article>
+
+      <div class="sticker-size-bar" id="stickerSizeBar" aria-hidden="true">
+        <label for="stickerSizeRange">Size</label>
+        <input id="stickerSizeRange" type="range" min="0.6" max="2.4" step="0.05" value="1">
+        <span class="size-value" id="stickerSizeValue">100%</span>
+      </div>
     </section>
   </div>
 
@@ -969,6 +1172,26 @@
       { id: "roboto", name: "Roboto", stack: '"Roboto", sans-serif' },
       { id: "source-serif", name: "Source Serif 4", stack: '"Source Serif 4", Georgia, serif' }
     ];
+
+    const weddingStickers = [
+      { id: "rings", html: "💍", tone: "a", label: "Rings" },
+      { id: "ring-pair", html: '<span class="sticker-rings" aria-hidden="true"></span>', tone: "b", label: "Interlocked rings" },
+      { id: "hearts", html: "💕", tone: "a", label: "Hearts" },
+      { id: "rose", html: "🌹", tone: "b", label: "Rose" },
+      { id: "bouquet", html: "💐", tone: "a", label: "Bouquet" },
+      { id: "blossom", html: "🌸", tone: "b", label: "Blossom" },
+      { id: "cheers", html: "🥂", tone: "a", label: "Cheers" },
+      { id: "cake", html: "🎂", tone: "b", label: "Wedding cake" },
+      { id: "dove", html: "🕊️", tone: "a", label: "Dove" },
+      { id: "diamond", html: "💎", tone: "b", label: "Diamond" },
+      { id: "sparkle", html: "✨", tone: "a", label: "Sparkle" },
+      { id: "church", html: "⛪", tone: "b", label: "Chapel" },
+      { id: "bow", html: "🎀", tone: "a", label: "Bow" },
+      { id: "crown", html: "👑", tone: "b", label: "Crown" },
+      { id: "love-letter", html: "💌", tone: "a", label: "Love letter" },
+      { id: "bells", html: "🔔", tone: "b", label: "Bells" }
+    ];
+
     const fields = {
       partnerOne: document.getElementById("partnerOne"),
       partnerTwo: document.getElementById("partnerTwo"),
@@ -1000,6 +1223,13 @@
     const cancelPaymentButton = document.getElementById("cancelPayment");
     const themeList = document.getElementById("themeList");
     const fontList = document.getElementById("fontList");
+    const stickerTray = document.getElementById("stickerTray");
+    const stickerLayer = document.getElementById("stickerLayer");
+    const clearStickersButton = document.getElementById("clearStickers");
+    const stickerSizeBar = document.getElementById("stickerSizeBar");
+    const stickerSizeRange = document.getElementById("stickerSizeRange");
+    const stickerSizeValue = document.getElementById("stickerSizeValue");
+    let selectedSticker = null;
     const headerLine = document.getElementById("headerLine");
     const inviteMessage = document.getElementById("inviteMessage");
     const previewHeader = document.getElementById("previewHeader");
@@ -1159,6 +1389,169 @@
       });
 
       updateFontOptionStates();
+    }
+
+    function renderStickerTray() {
+      stickerTray.innerHTML = weddingStickers.map((sticker) => `
+        <button
+          class="sticker-item tone-${sticker.tone}"
+          type="button"
+          draggable="true"
+          data-sticker-id="${sticker.id}"
+          data-sticker-html="${encodeURIComponent(sticker.html)}"
+          aria-label="${sticker.label}"
+          title="${sticker.label}"
+        >${sticker.html}</button>
+      `).join("");
+
+      stickerTray.querySelectorAll(".sticker-item").forEach((item) => {
+        item.addEventListener("dragstart", (event) => {
+          event.dataTransfer.setData("text/plain", item.dataset.stickerHtml);
+          event.dataTransfer.effectAllowed = "copy";
+          invitationCard.classList.add("drop-ready");
+        });
+
+        item.addEventListener("dragend", () => {
+          invitationCard.classList.remove("drop-ready");
+        });
+
+        item.addEventListener("click", () => {
+          placeSticker(item.dataset.stickerHtml, 50, 42);
+        });
+      });
+    }
+
+    function getStickerScale(sticker) {
+      const raw = Number.parseFloat(sticker.style.getPropertyValue("--sticker-scale"));
+      return Number.isFinite(raw) ? raw : 1;
+    }
+
+    function setStickerScale(sticker, scale) {
+      const next = Math.min(2.4, Math.max(0.6, scale));
+      sticker.style.setProperty("--sticker-scale", String(next));
+      return next;
+    }
+
+    function selectSticker(sticker) {
+      if (selectedSticker && selectedSticker !== sticker) {
+        selectedSticker.classList.remove("is-selected");
+      }
+
+      selectedSticker = sticker;
+      selectedSticker.classList.add("is-selected");
+
+      const scale = getStickerScale(sticker);
+      stickerSizeRange.value = String(scale);
+      stickerSizeValue.textContent = `${Math.round(scale * 100)}%`;
+      stickerSizeBar.classList.add("is-open");
+      stickerSizeBar.setAttribute("aria-hidden", "false");
+    }
+
+    function deselectSticker() {
+      if (selectedSticker) {
+        selectedSticker.classList.remove("is-selected");
+        selectedSticker = null;
+      }
+
+      stickerSizeBar.classList.remove("is-open");
+      stickerSizeBar.setAttribute("aria-hidden", "true");
+    }
+
+    function placeSticker(stickerHtml, xPercent, yPercent) {
+      const sticker = document.createElement("button");
+      sticker.type = "button";
+      sticker.className = "placed-sticker";
+      sticker.innerHTML = decodeURIComponent(stickerHtml);
+      sticker.style.left = `${xPercent}%`;
+      sticker.style.top = `${yPercent}%`;
+      setStickerScale(sticker, 1);
+      sticker.title = "Tap to resize · Drag to move · Double-click to remove";
+      stickerLayer.appendChild(sticker);
+      enablePlacedSticker(sticker);
+      selectSticker(sticker);
+    }
+
+    function enablePlacedSticker(sticker) {
+      sticker.addEventListener("dblclick", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (selectedSticker === sticker) {
+          deselectSticker();
+        }
+        sticker.remove();
+      });
+
+      sticker.addEventListener("pointerdown", (event) => {
+        if (event.button !== 0) {
+          return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+        selectSticker(sticker);
+        sticker.setPointerCapture(event.pointerId);
+
+        const startX = event.clientX;
+        const startY = event.clientY;
+        let moved = false;
+
+        const onMove = (moveEvent) => {
+          const dx = moveEvent.clientX - startX;
+          const dy = moveEvent.clientY - startY;
+          if (!moved && Math.hypot(dx, dy) < 4) {
+            return;
+          }
+
+          moved = true;
+          const rect = invitationCard.getBoundingClientRect();
+          const xPercent = ((moveEvent.clientX - rect.left) / rect.width) * 100;
+          const yPercent = ((moveEvent.clientY - rect.top) / rect.height) * 100;
+          sticker.style.left = `${Math.min(95, Math.max(5, xPercent))}%`;
+          sticker.style.top = `${Math.min(95, Math.max(5, yPercent))}%`;
+        };
+
+        const onUp = () => {
+          sticker.releasePointerCapture(event.pointerId);
+          sticker.removeEventListener("pointermove", onMove);
+          sticker.removeEventListener("pointerup", onUp);
+          sticker.removeEventListener("pointercancel", onUp);
+        };
+
+        sticker.addEventListener("pointermove", onMove);
+        sticker.addEventListener("pointerup", onUp);
+        sticker.addEventListener("pointercancel", onUp);
+      });
+    }
+
+    function clearStickers() {
+      deselectSticker();
+      stickerLayer.replaceChildren();
+    }
+
+    function setupStickerDropTarget() {
+      invitationCard.addEventListener("dragover", (event) => {
+        event.preventDefault();
+        event.dataTransfer.dropEffect = "copy";
+        invitationCard.classList.add("drop-ready");
+      });
+
+      invitationCard.addEventListener("dragleave", () => {
+        invitationCard.classList.remove("drop-ready");
+      });
+
+      invitationCard.addEventListener("drop", (event) => {
+        event.preventDefault();
+        invitationCard.classList.remove("drop-ready");
+        const stickerHtml = event.dataTransfer.getData("text/plain");
+        if (!stickerHtml) {
+          return;
+        }
+
+        const rect = invitationCard.getBoundingClientRect();
+        const xPercent = ((event.clientX - rect.left) / rect.width) * 100;
+        const yPercent = ((event.clientY - rect.top) / rect.height) * 100;
+        placeSticker(stickerHtml, xPercent, yPercent);
+      });
     }
 
     function drawColorCanvas(canvas) {
@@ -1512,12 +1905,41 @@
       window.requestAnimationFrame(() => {
         resetDatePicker();
         resetTimePicker();
+        clearStickers();
         applyThemeSelection(getActiveTheme());
         if (!premiumUnlocked) {
           resetPremiumStyles();
         }
         syncPreview();
       });
+    });
+
+    clearStickersButton.addEventListener("click", clearStickers);
+
+    stickerSizeRange.addEventListener("input", () => {
+      if (!selectedSticker) {
+        return;
+      }
+
+      const scale = setStickerScale(selectedSticker, Number.parseFloat(stickerSizeRange.value));
+      stickerSizeValue.textContent = `${Math.round(scale * 100)}%`;
+    });
+
+    stickerSizeBar.addEventListener("pointerdown", (event) => {
+      event.stopPropagation();
+    });
+
+    document.addEventListener("pointerdown", (event) => {
+      if (!selectedSticker) {
+        return;
+      }
+
+      const target = event.target;
+      if (selectedSticker.contains(target) || stickerSizeBar.contains(target)) {
+        return;
+      }
+
+      deselectSticker();
     });
 
     [headerLine, inviteMessage].forEach((input) => {
@@ -1555,7 +1977,11 @@
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-|-$/g, "") || `${prefix}-wedding-invitation`;
 
+      deselectSticker();
       const exportCard = invitationCard.cloneNode(true);
+      exportCard.querySelectorAll(".placed-sticker.is-selected").forEach((sticker) => {
+        sticker.classList.remove("is-selected");
+      });
       if (!premium) {
         exportCard.style.removeProperty("--invite-bg");
         exportCard.style.removeProperty("--invite-border");
@@ -1636,6 +2062,8 @@
     initTimePicker();
     renderThemeList();
     renderFontList();
+    renderStickerTray();
+    setupStickerDropTarget();
     applyThemeSelection(getActiveTheme());
     setPremiumUnlocked(premiumUnlocked);
     syncPreview();
