@@ -879,7 +879,7 @@
       await document.fonts.ready;
       await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
-      const mood = moods[colorMood.value] || moods.blush;
+      const mood = moods[colorMood.value] || moods.pinkBlue;
 
       await html2pdf()
         .set({
