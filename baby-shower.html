@@ -159,6 +159,30 @@
 
     .date-picker.time-picker {
       grid-template-columns: 1fr 1fr 1fr;
+      padding-top: 0.75rem;
+    }
+
+    .time-column-wrap {
+      display: grid;
+      gap: 0.35rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .time-column-label {
+      text-align: center;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .date-picker.time-picker .date-column {
+      height: 160px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #ffffff;
     }
 
     .date-picker::before {
@@ -473,11 +497,20 @@
         <label>
           Time
           <div class="date-picker time-picker" id="timePicker" aria-label="Event time picker">
-            <div class="date-column" id="hourColumn" data-type="hour"></div>
-            <div class="date-column" id="minuteColumn" data-type="minute"></div>
-            <div class="date-column" id="periodColumn" data-type="period"></div>
+            <div class="time-column-wrap">
+              <div class="time-column-label">Hour</div>
+              <div class="date-column" id="hourColumn" data-type="hour"></div>
+            </div>
+            <div class="time-column-wrap">
+              <div class="time-column-label">Min</div>
+              <div class="date-column" id="minuteColumn" data-type="minute"></div>
+            </div>
+            <div class="time-column-wrap">
+              <div class="time-column-label">AM/PM</div>
+              <div class="date-column" id="periodColumn" data-type="period"></div>
+            </div>
           </div>
-          <div class="date-display" id="timeDisplay">2:00 PM</div>
+          <div class="date-display" id="timeDisplay">Selected time: 2:00 PM</div>
         </label>
 
         <label>
@@ -633,6 +666,10 @@
 
     function formatSelectedTime() {
       return `${selectedTime.hour}:${String(selectedTime.minute).padStart(2, "0")} ${selectedTime.period}`;
+    }
+
+    function formatSelectedTimeLabel() {
+      return `Selected time: ${formatSelectedTime()}`;
     }
 
     function daysInMonth(year, monthIndex) {
@@ -820,7 +857,7 @@
       preview.eventDate.textContent = formattedDate;
       preview.eventTime.textContent = formattedTime;
       dateDisplay.textContent = formattedDate;
-      timeDisplay.textContent = formattedTime;
+      timeDisplay.textContent = formatSelectedTimeLabel();
       applyMood(colorMood.value);
     }
 
@@ -898,8 +935,19 @@
       }
     });
 
-    initDatePicker();
-    initTimePicker();
+    // Ensure the time wheels always initialize, even if date setup fails.
+    try {
+      initDatePicker();
+    } catch (error) {
+      console.error("Date picker failed to start:", error);
+    }
+
+    try {
+      initTimePicker();
+    } catch (error) {
+      console.error("Time picker failed to start:", error);
+    }
+
     syncPreview();
   </script>
 </body>
