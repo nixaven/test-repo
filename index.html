@@ -610,7 +610,7 @@
                       <span class="theme-selected-swatch" id="themeSelectedSwatch"></span>
                       <span id="themeSelectedValue">#9D6B53</span>
                     </div>
-                    <button class="secondary" type="button" id="themeDone">Done</button>
+                    <button class="secondary" type="button" id="themeDone">Confirm</button>
                   </div>
                 </div>
               </div>
@@ -840,12 +840,12 @@
 
     function buildThemeFromAccent(hex) {
       return {
-        bg: shiftLightness(hex, 0.42),
+        bg: "#fffdf9",
         border: shiftLightness(hex, 0.3),
         outline: shiftLightness(hex, 0.18),
         accent: hex,
         accentSoft: toRgba(hex, 0.18),
-        text: shiftLightness(hex, -0.12)
+        text: "#5d473d"
       };
     }
 
@@ -912,9 +912,7 @@
 
     function setSelectedAccent(hex) {
       selectedAccent = hex;
-      themeTriggerPreview.innerHTML = `
-        <span style="background:${selectedAccent}"></span>
-      `;
+      themeTriggerPreview.innerHTML = `<span style="background:${selectedAccent}"></span>`;
       themeSelectedSwatch.style.background = selectedAccent;
       themeSelectedValue.textContent = selectedAccent.toUpperCase();
     }
@@ -976,17 +974,11 @@
     });
 
     themeTrigger.addEventListener("click", () => {
-      setThemePopupOpen(!themePopup.classList.contains("is-open"));
+      setThemePopupOpen(true);
     });
 
     themeDone.addEventListener("click", () => {
       setThemePopupOpen(false);
-    });
-
-    document.addEventListener("click", (event) => {
-      if (!themePicker.contains(event.target)) {
-        setThemePopupOpen(false);
-      }
     });
 
     unlockPremiumButton.addEventListener("click", openPaymentModal);
