@@ -3,2091 +3,345 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wedding Invitation Generator</title>
+  <title>Atelier Invites</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Comfortaa:wght@400;600&family=EB+Garamond:wght@400;600&family=Lexend:wght@400;600&family=Lobster&family=Lora:wght@400;600&family=Merriweather:wght@400;700&family=Merriweather+Sans:wght@400;600&family=Montserrat:wght@400;600&family=Noto+Sans+Symbols:wght@400;600&family=Nunito:wght@400;600&family=Pacifico&family=Playfair+Display:wght@400;600&family=Poppins:wght@400;600&family=Roboto:wght@400;500&family=Source+Serif+4:wght@400;600&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      color-scheme: light;
-      font-family: Georgia, "Times New Roman", serif;
-      --bg: #f8f1ea;
-      --panel: rgba(255, 255, 255, 0.94);
-      --ink: #433128;
-      --accent: #9d6b53;
-      --accent-soft: #ead7cb;
-      --line: #dbc3b5;
+      --ink: #1c2420;
+      --muted: rgba(28, 36, 32, 0.72);
+      --wedding: #3d2f28;
+      --wedding-glow: #d4b483;
+      --baby: #2a4550;
+      --baby-glow: #9ec9c4;
     }
 
     * {
       box-sizing: border-box;
     }
 
+    html,
     body {
       margin: 0;
+      min-height: 100%;
+      height: 100%;
+    }
+
+    body {
+      font-family: "Outfit", sans-serif;
+      color: var(--ink);
+      background: #101612;
+      overflow: hidden;
+    }
+
+    .chooser {
+      position: relative;
       min-height: 100vh;
-      background:
-        radial-gradient(circle at top, rgba(255, 255, 255, 0.7), transparent 40%),
-        linear-gradient(135deg, #f9f4ef, #f0e2d7);
-      color: var(--ink);
-    }
-
-    .top-nav {
-      width: min(1200px, 100%);
-      margin: 0 auto;
-      padding: 1.25rem 2rem 0;
-      display: flex;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-    }
-
-    .top-nav a {
-      text-decoration: none;
-      color: var(--ink);
-      background: rgba(255, 255, 255, 0.75);
-      border: 1px solid rgba(157, 107, 83, 0.22);
-      border-radius: 999px;
-      padding: 0.55rem 0.95rem;
-      font-size: 0.9rem;
-      font-weight: 700;
-    }
-
-    .top-nav a.active {
-      background: var(--accent);
-      color: #fffaf7;
-      border-color: transparent;
-    }
-
-    .page {
-      width: min(1200px, 100%);
-      margin: 0 auto;
-      padding: 1.25rem 2rem 2rem;
+      min-height: 100dvh;
       display: grid;
-      grid-template-columns: minmax(320px, 420px) minmax(320px, 1fr);
-      gap: 2rem;
+      grid-template-rows: auto 1fr;
+      isolation: isolate;
     }
 
-    .panel,
-    .preview-shell {
-      background: var(--panel);
-      border: 1px solid rgba(157, 107, 83, 0.16);
-      border-radius: 28px;
-      box-shadow: 0 20px 60px rgba(67, 49, 40, 0.12);
+    .brand-bar {
+      position: relative;
+      z-index: 3;
+      padding: 1.5rem 2rem 0;
+      text-align: center;
+      animation: rise 0.9s ease both;
     }
 
-    .panel {
-      padding: 1.75rem;
+    .brand {
+      margin: 0;
+      font-family: "Fraunces", Georgia, serif;
+      font-size: clamp(2.4rem, 6vw, 4.2rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      color: #f4efe6;
+      text-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
     }
 
-    .eyebrow {
-      margin: 0 0 0.5rem;
-      color: var(--accent);
-      font-size: 0.82rem;
+    .tagline {
+      margin: 0.7rem auto 0;
+      max-width: 28rem;
+      color: rgba(244, 239, 230, 0.78);
+      font-size: clamp(0.95rem, 2vw, 1.1rem);
+      font-weight: 400;
+      line-height: 1.5;
+      animation: rise 0.9s ease 0.12s both;
+    }
+
+    .choices {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      min-height: 0;
+      height: 100%;
+    }
+
+    .choice {
+      position: relative;
+      flex: 1 1 50%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: flex-start;
+      padding: clamp(1.5rem, 4vw, 3.5rem);
+      text-decoration: none;
+      color: inherit;
+      overflow: hidden;
+      isolation: isolate;
+      min-height: 55vh;
+      transition: flex 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .choice::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      transform: scale(1.04);
+      transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1), filter 0.5s ease;
+    }
+
+    .choice::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: linear-gradient(180deg, transparent 28%, rgba(8, 10, 9, 0.78) 100%);
+      transition: opacity 0.4s ease;
+    }
+
+    .choice-wedding::before {
+      background:
+        radial-gradient(circle at 30% 20%, rgba(212, 180, 131, 0.35), transparent 42%),
+        linear-gradient(145deg, #5a463a 0%, #2a211c 55%, #171311 100%);
+    }
+
+    .choice-baby::before {
+      background:
+        radial-gradient(circle at 70% 18%, rgba(158, 201, 196, 0.38), transparent 45%),
+        linear-gradient(215deg, #3d6a72 0%, #243f48 52%, #142228 100%);
+    }
+
+    .choice:hover::before,
+    .choice:focus-visible::before {
+      transform: scale(1.1);
+      filter: saturate(1.08);
+    }
+
+    .choices:has(.choice-wedding:hover) .choice-wedding,
+    .choices:has(.choice-wedding:focus-visible) .choice-wedding {
+      flex: 1.35;
+    }
+
+    .choices:has(.choice-baby:hover) .choice-baby,
+    .choices:has(.choice-baby:focus-visible) .choice-baby {
+      flex: 1.35;
+    }
+
+    .choice-label {
+      margin: 0 0 0.55rem;
+      font-size: 0.78rem;
+      font-weight: 700;
       letter-spacing: 0.22em;
       text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.7);
     }
 
-    h1 {
-      margin: 0 0 0.75rem;
-      font-size: clamp(2rem, 4vw, 3rem);
-      line-height: 1.1;
+    .choice-title {
+      margin: 0;
+      font-family: "Fraunces", Georgia, serif;
+      font-size: clamp(2rem, 4.5vw, 3.4rem);
+      font-weight: 700;
+      line-height: 1.05;
+      color: #fffaf4;
     }
 
-    .intro {
-      margin: 0 0 1.5rem;
-      color: #6b5144;
-      line-height: 1.6;
+    .choice-copy {
+      margin: 0.85rem 0 1.4rem;
+      max-width: 22rem;
+      color: rgba(255, 250, 244, 0.78);
+      line-height: 1.55;
+      font-size: 1rem;
     }
 
-    .form-grid {
-      display: grid;
-      gap: 1rem;
-    }
-
-    label {
-      display: grid;
-      gap: 0.45rem;
+    .choice-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.85rem 1.25rem;
+      border-radius: 999px;
+      font-weight: 700;
       font-size: 0.95rem;
-      font-weight: 700;
+      letter-spacing: 0.02em;
+      transition: transform 0.25s ease, background 0.25s ease, color 0.25s ease;
     }
 
-    input,
-    textarea {
-      width: 100%;
-      padding: 0.9rem 1rem;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      font: inherit;
-      color: var(--ink);
-      background: #fffdfb;
-      outline: none;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    .choice-wedding .choice-cta {
+      background: var(--wedding-glow);
+      color: #2a211c;
     }
 
-    textarea {
-      min-height: 110px;
-      resize: vertical;
+    .choice-baby .choice-cta {
+      background: var(--baby-glow);
+      color: #152227;
     }
 
-    input:focus,
-    textarea:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 4px rgba(157, 107, 83, 0.15);
+    .choice:hover .choice-cta,
+    .choice:focus-visible .choice-cta {
+      transform: translateY(-2px);
     }
 
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-      margin-top: 0.5rem;
-    }
-
-    button {
-      border: 0;
-      border-radius: 999px;
-      padding: 0.95rem 1.4rem;
-      font: inherit;
-      font-weight: 700;
-      cursor: pointer;
-      transition: transform 0.2s ease, opacity 0.2s ease;
-    }
-
-    button:hover {
-      transform: translateY(-1px);
-    }
-
-    .primary {
-      background: var(--accent);
-      color: #fffaf7;
-    }
-
-    .secondary {
-      background: var(--accent-soft);
-      color: var(--ink);
-    }
-
-    .premium {
-      margin-top: 1.75rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid var(--line);
-    }
-
-    .premium-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.75rem;
-      margin-bottom: 0.5rem;
-      flex-wrap: wrap;
-    }
-
-    .premium-header h2 {
-      margin: 0;
-      font-size: 1.35rem;
-    }
-
-    .premium-lock {
-      display: flex;
-      align-items: center;
-      gap: 0.55rem;
-      flex-wrap: wrap;
-    }
-
-    .badge {
-      padding: 0.35rem 0.75rem;
-      border-radius: 999px;
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      background: #f4e8df;
-      color: var(--accent);
-    }
-
-    .badge.unlocked {
-      background: #e8f5e9;
-      color: #2e7d32;
-    }
-
-    .premium-copy {
-      margin: 0 0 1rem;
-      color: #6b5144;
-      line-height: 1.5;
-      font-size: 0.95rem;
-    }
-
-    .premium-fields {
-      display: grid;
-      gap: 1rem;
-    }
-
-    .premium-fields.is-locked {
-      opacity: 0.55;
-      pointer-events: none;
-      user-select: none;
-    }
-
-    .theme-picker {
-      position: relative;
-    }
-
-    .theme-trigger {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.75rem;
-      padding: 0.85rem 1rem;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      background: #fffdfb;
-      color: var(--ink);
-      cursor: pointer;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .theme-trigger:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 4px rgba(157, 107, 83, 0.15);
-    }
-
-    .theme-trigger-preview {
-      display: flex;
-      gap: 0.35rem;
-      align-items: center;
-    }
-
-    .theme-trigger-preview span {
-      display: block;
-      width: 18px;
-      height: 18px;
-      border-radius: 999px;
-      border: 1px solid rgba(0, 0, 0, 0.08);
-    }
-
-    .theme-trigger-label {
-      flex: 1;
-      text-align: left;
-      font-weight: 700;
-    }
-
-    .theme-popup {
-      position: absolute;
-      top: calc(100% + 0.5rem);
-      left: 0;
-      z-index: 20;
-      display: none;
-      gap: 0.75rem;
-      width: 100%;
-      padding: 0.9rem;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      background: #fffdfb;
-      box-shadow: 0 18px 40px rgba(67, 49, 40, 0.14);
-    }
-
-    .theme-popup.is-open {
-      display: grid;
-    }
-
-    .theme-canvas {
-      display: block;
-      width: 100%;
-      height: 180px;
-      border-radius: 14px;
-      cursor: crosshair;
-      border: 1px solid rgba(0, 0, 0, 0.08);
-    }
-
-    .theme-popup-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.75rem;
-    }
-
-    .theme-selected {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      font-size: 0.88rem;
-      color: #6b5144;
-      font-weight: 700;
-    }
-
-    .theme-selected-swatch {
-      width: 22px;
-      height: 22px;
-      border-radius: 999px;
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      background: #9d6b53;
-    }
-
-    .theme-list {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 0.55rem;
-      max-height: 220px;
-      overflow: auto;
-      padding: 0.15rem;
-    }
-
-    .theme-option {
-      display: flex;
-      align-items: center;
-      gap: 0.55rem;
-      padding: 0.65rem 0.7rem;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: #fffdfb;
-      color: var(--ink);
-      cursor: pointer;
-      text-align: left;
-      font: inherit;
-      font-size: 0.86rem;
-      font-weight: 700;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .theme-option.is-active {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(157, 107, 83, 0.14);
-    }
-
-    .theme-option-preview {
-      display: flex;
-      gap: 0.2rem;
-      flex-shrink: 0;
-    }
-
-    .theme-option-preview span {
-      width: 12px;
-      height: 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(0, 0, 0, 0.08);
-    }
-
-    .font-list {
-      display: grid;
-      gap: 0.15rem;
-      max-height: 280px;
-      overflow: auto;
-      padding: 0.35rem;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      background: #ffffff;
-    }
-
-    .font-option {
-      width: 100%;
-      padding: 0.7rem 0.85rem;
-      border: 0;
-      border-radius: 8px;
-      background: transparent;
-      color: #1f1f1f;
-      cursor: pointer;
-      text-align: left;
-      font-size: 1.15rem;
-      line-height: 1.3;
-      transition: background 0.15s ease;
-    }
-
-    .font-option:hover,
-    .font-option.is-active {
-      background: #ececec;
-    }
-
-    .sticker-hint {
-      margin: 0;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: #8a6f62;
-    }
-
-    .sticker-tray {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 0.55rem;
-      padding: 0.75rem;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      background: #ffffff;
-    }
-
-    .sticker-item {
-      aspect-ratio: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0;
-      padding: 0;
-      border: 1px dashed var(--line);
-      border-radius: 14px;
-      background: #fffdfb;
-      box-shadow: none;
-      font-size: 1.55rem;
-      font-weight: 400;
-      line-height: 1;
-      cursor: grab;
-      user-select: none;
-      transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
-    }
-
-    .sticker-item:hover {
-      transform: translateY(-1px);
-      border-color: var(--accent);
-      background: #fff8f4;
-    }
-
-    .sticker-item:active {
-      cursor: grabbing;
-    }
-
-    .sticker-item.tone-a {
-      background: color-mix(in srgb, var(--accent) 16%, white);
-    }
-
-    .sticker-item.tone-b {
-      background: color-mix(in srgb, var(--accent-soft) 55%, white);
-    }
-
-    .sticker-rings {
-      position: relative;
-      width: 1.7rem;
-      height: 1.15rem;
+    .choice-cta span {
       display: inline-block;
+      transition: transform 0.25s ease;
     }
 
-    .sticker-rings::before,
-    .sticker-rings::after {
-      content: "";
+    .choice:hover .choice-cta span,
+    .choice:focus-visible .choice-cta span {
+      transform: translateX(4px);
+    }
+
+    .motif {
       position: absolute;
-      top: 0;
-      width: 0.95rem;
-      height: 0.95rem;
-      border: 2.5px solid #c9a46a;
+      top: 18%;
+      right: 12%;
+      width: min(38vw, 220px);
+      aspect-ratio: 1;
+      border: 1px solid rgba(255, 255, 255, 0.18);
       border-radius: 50%;
-      box-sizing: border-box;
-    }
-
-    .sticker-rings::before {
-      left: 0;
-      border-color: #c9a46a;
-    }
-
-    .sticker-rings::after {
-      right: 0;
-      border-color: #b7b7b7;
-    }
-
-    .sticker-actions {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .sticker-actions button {
-      padding: 0.65rem 1rem;
-      font-size: 0.85rem;
-    }
-
-    .sticker-layer {
-      position: absolute;
-      inset: 0;
-      z-index: 5;
-      pointer-events: none;
-    }
-
-    .placed-sticker {
-      --sticker-scale: 1;
-      position: absolute;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0;
-      padding: 0;
-      border: 0;
-      border-radius: 0;
-      background: transparent;
-      box-shadow: none;
-      font-size: 1.8rem;
-      font-weight: 400;
-      line-height: 1;
-      transform: translate(-50%, -50%) scale(var(--sticker-scale));
-      cursor: grab;
-      pointer-events: auto;
-      user-select: none;
-      filter: drop-shadow(0 4px 8px rgba(67, 49, 40, 0.12));
-      z-index: 6;
-    }
-
-    .placed-sticker:hover,
-    .placed-sticker:active {
-      transform: translate(-50%, -50%) scale(var(--sticker-scale));
-      background: transparent;
-      cursor: grabbing;
-    }
-
-    .placed-sticker.is-selected {
-      outline: 2px dashed color-mix(in srgb, var(--accent) 70%, white);
-      outline-offset: 6px;
-      border-radius: 8px;
-      z-index: 7;
-    }
-
-    .sticker-size-bar {
-      display: none;
-      align-items: center;
-      gap: 0.65rem;
-      padding: 0.65rem 0.95rem;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.96);
-      box-shadow: 0 12px 30px rgba(67, 49, 40, 0.12);
-      width: min(100%, 280px);
-      flex-shrink: 0;
-    }
-
-    .sticker-size-bar.is-open {
-      display: flex;
-    }
-
-    .sticker-size-bar label {
-      margin: 0;
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      color: #8a6f62;
-      white-space: nowrap;
-    }
-
-    .sticker-size-bar input[type="range"] {
-      flex: 1;
-      padding: 0;
-      border: 0;
-      background: transparent;
-      box-shadow: none;
-      accent-color: var(--accent);
-    }
-
-    .sticker-size-bar .size-value {
-      min-width: 2.4rem;
-      text-align: right;
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--ink);
-    }
-
-    .invitation.drop-ready {
-      box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent);
-    }
-
-    select {
-      width: 100%;
-      padding: 0.9rem 1rem;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      font: inherit;
-      color: var(--ink);
-      background: #fffdfb;
-      outline: none;
-    }
-
-    select:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 4px rgba(157, 107, 83, 0.15);
-    }
-
-    .date-picker {
-      display: grid;
-      grid-template-columns: 1fr 1.4fr 1fr;
-      gap: 0.45rem;
-      padding: 0.55rem;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      background: #fffdfb;
-      position: relative;
-    }
-
-    .date-picker.time-picker {
-      grid-template-columns: 1fr 1fr 1fr;
-    }
-
-    .date-picker::before {
-      content: "";
-      position: absolute;
-      left: 0.55rem;
-      right: 0.55rem;
-      top: 50%;
-      height: 36px;
-      transform: translateY(-50%);
-      border-radius: 10px;
-      background: rgba(157, 107, 83, 0.1);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .date-column {
-      position: relative;
-      z-index: 1;
-      height: 140px;
-      overflow-y: auto;
-      scroll-snap-type: y mandatory;
-      scrollbar-width: none;
-      -ms-overflow-style: none;
-      text-align: center;
-    }
-
-    .date-column::-webkit-scrollbar {
-      display: none;
-    }
-
-    .date-option {
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      scroll-snap-align: center;
-      font-size: 0.98rem;
-      font-weight: 700;
-      color: #8a6f62;
       opacity: 0.55;
-      transition: color 0.15s ease, opacity 0.15s ease, transform 0.15s ease;
-    }
-
-    .date-option.is-active {
-      color: var(--ink);
-      opacity: 1;
-      transform: scale(1.05);
-    }
-
-    .date-spacer {
-      height: 52px;
-      flex-shrink: 0;
-    }
-
-    .date-display {
-      margin-top: 0.55rem;
-      text-align: center;
-      font-size: 0.95rem;
-      color: #6b5144;
-      font-weight: 700;
-    }
-
-    .unlock-button {
-      margin: 0;
-      padding: 0.55rem 0.95rem;
-      white-space: nowrap;
-      background: linear-gradient(135deg, #9d6b53, #7a4f3d);
-      color: #fffaf7;
-      font-size: 0.85rem;
-    }
-
-    .premium-download {
-      background: #2e7d32;
-      color: #ffffff;
-    }
-
-    .premium-download:disabled {
-      opacity: 0.55;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .payment-modal {
-      position: fixed;
-      inset: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 1rem;
-      background: rgba(67, 49, 40, 0.45);
-      z-index: 1000;
-    }
-
-    .payment-modal.is-open {
-      display: flex;
-    }
-
-    .payment-dialog {
-      width: min(100%, 420px);
-      padding: 1.75rem;
-      border-radius: 24px;
-      background: #fffdf9;
-      box-shadow: 0 24px 60px rgba(67, 49, 40, 0.2);
-      text-align: center;
-    }
-
-    .payment-dialog h3 {
-      margin: 0 0 0.75rem;
-      font-size: 1.6rem;
-    }
-
-    .payment-dialog p {
-      margin: 0 0 1.25rem;
-      color: #6b5144;
-      line-height: 1.6;
-    }
-
-    .payment-amount {
-      margin: 0 0 1.25rem;
-      font-size: 2.4rem;
-      font-weight: 700;
-      color: var(--accent);
-    }
-
-    .payment-actions {
-      display: grid;
-      gap: 0.75rem;
-    }
-
-    .payment-test-note {
-      margin: 1rem 0 0;
-      font-size: 0.85rem;
-      color: #8a6f62;
-    }
-
-    .preview-shell {
-      padding: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0.85rem;
-      position: sticky;
-      top: 1.5rem;
-      align-self: start;
-      max-height: calc(100vh - 3rem);
-      overflow: auto;
-    }
-
-    .pdf-stage {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 794px;
-      height: 1123px;
-      overflow: hidden;
       pointer-events: none;
-      z-index: -1;
-      opacity: 0;
+      animation: drift 8s ease-in-out infinite alternate;
     }
 
-    .invitation {
-      width: min(100%, 760px);
-      aspect-ratio: 1 / 1.414;
-      background: var(--invite-bg, #fffdf9);
-      border: 14px solid var(--invite-border, #f3e6db);
-      outline: 1px solid var(--invite-outline, #d8bbaa);
-      outline-offset: -24px;
-      padding: 4rem 3rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-      font-family: var(--invite-font, Georgia, "Times New Roman", serif);
-      transition: background 0.25s ease, border-color 0.25s ease;
+    .choice-wedding .motif {
+      box-shadow: inset 0 0 60px rgba(212, 180, 131, 0.18);
     }
 
-    .pdf-stage .invitation {
-      width: 794px;
-      height: 1123px;
-      min-height: 1123px;
-      max-height: 1123px;
-      aspect-ratio: auto;
-      margin: 0;
-      padding: 96px 72px;
-      box-shadow: none;
-      box-sizing: border-box;
-    }
-
-    .pdf-stage .names {
-      font-size: 3.2rem;
-    }
-
-    .invitation::before,
-    .invitation::after {
-      content: "";
-      position: absolute;
-      width: 180px;
-      height: 180px;
-      border: 1px solid var(--invite-accent-soft, rgba(157, 107, 83, 0.18));
-      border-radius: 50%;
-    }
-
-    .invitation::before {
-      top: -65px;
-      left: -65px;
-    }
-
-    .invitation::after {
-      right: -65px;
-      bottom: -65px;
-    }
-
-    .invite-top {
-      color: var(--invite-accent, var(--accent));
-      font-size: 0.92rem;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-    }
-
-    .names {
-      margin: 1.5rem 0 1rem;
-      font-size: clamp(2.2rem, 5vw, 4rem);
-      line-height: 1.1;
-      font-weight: 400;
-    }
-
-    .invite-text,
-    .details,
-    .footer-note {
-      margin: 0 auto;
-      max-width: 34rem;
-      line-height: 1.7;
-      color: var(--invite-text, #5d473d);
-    }
-
-    .ampersand {
-      display: block;
-      margin: 0.4rem 0;
-      font-size: 2rem;
-      color: var(--invite-accent, var(--accent));
-    }
-
-    .details {
-      margin-top: 1.8rem;
-      font-size: 1.05rem;
-    }
-
-    .footer-note {
-      margin-top: 1.8rem;
-      font-size: 0.98rem;
+    .choice-baby .motif {
+      top: 22%;
+      right: auto;
+      left: 10%;
+      box-shadow: inset 0 0 60px rgba(158, 201, 196, 0.2);
+      animation-delay: -2.5s;
     }
 
     .divider {
-      width: 90px;
-      height: 1px;
-      margin: 1.5rem auto;
-      background: linear-gradient(90deg, transparent, var(--invite-accent, var(--accent)), transparent);
+      position: absolute;
+      top: 18%;
+      bottom: 12%;
+      left: 50%;
+      width: 1px;
+      background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+      transform: translateX(-50%);
+      z-index: 4;
+      pointer-events: none;
+      animation: fade-in 1.1s ease 0.3s both;
     }
 
-    @media (max-width: 900px) {
-      .page,
-      .top-nav {
-        padding-left: 1rem;
-        padding-right: 1rem;
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
       }
-
-      .page {
-        grid-template-columns: 1fr;
-      }
-
-      .preview-shell {
-        position: static;
-        max-height: none;
-        overflow: visible;
-      }
-
-      .invitation {
-        padding: 3rem 1.75rem;
+      to {
+        opacity: 1;
+        transform: translateY(0);
       }
     }
 
-    @media print {
+    @keyframes fade-in {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes drift {
+      from { transform: translateY(0) scale(1); }
+      to { transform: translateY(12px) scale(1.04); }
+    }
+
+    .choice-wedding {
+      animation: rise 0.95s ease 0.18s both;
+    }
+
+    .choice-baby {
+      animation: rise 0.95s ease 0.28s both;
+    }
+
+    @media (max-width: 800px) {
       body {
-        background: #ffffff;
+        overflow: auto;
       }
 
-      .top-nav,
-      .panel {
+      .chooser {
+        min-height: 100dvh;
+      }
+
+      .brand-bar {
+        padding: 1.25rem 1.25rem 0.75rem;
+      }
+
+      .choices {
+        flex-direction: column;
+      }
+
+      .choice {
+        min-height: 42vh;
+        flex: 1 1 50%;
+      }
+
+      .divider {
         display: none;
       }
 
-      .page {
-        display: block;
-        padding: 0;
+      .motif {
+        width: 140px;
+        top: 12%;
+        right: 8%;
       }
+    }
 
-      .preview-shell {
-        border: 0;
-        box-shadow: none;
-        background: transparent;
-        padding: 0;
-      }
-
-      .invitation {
-        width: 100%;
-        min-height: 100vh;
-        border-width: 10px;
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation: none !important;
+        transition: none !important;
       }
     }
   </style>
 </head>
 <body>
-  <nav class="top-nav">
-    <a class="active" href="/test-repo/index.html">Wedding Invitation</a>
-    <a href="/test-repo/baby-shower.html">Baby Shower Invitation</a>
-  </nav>
+  <main class="chooser">
+    <header class="brand-bar">
+      <h1 class="brand">Atelier Invites</h1>
+      <p class="tagline">Choose your celebration. Open a full-screen invitation studio.</p>
+    </header>
 
-  <div class="page">
-    <section class="panel">
-      <p class="eyebrow">Printable Invitation</p>
-      <h1>Wedding Invitation Generator</h1>
-      <p class="intro">Enter the event details, preview the design live, then download a polished PDF invitation ready to print or share.</p>
+    <div class="choices">
+      <a class="choice choice-wedding" href="/test-repo/wedding.html">
+        <span class="motif" aria-hidden="true"></span>
+        <p class="choice-label">For the couple</p>
+        <h2 class="choice-title">Wedding invitation</h2>
+        <p class="choice-copy">Craft a formal invite with themes, fonts, stickers, and premium PDF export.</p>
+        <span class="choice-cta">Open wedding studio <span aria-hidden="true">→</span></span>
+      </a>
 
-      <form class="form-grid" id="invitationForm">
-        <label>
-          Partner one
-          <input id="partnerOne" type="text" value="Olivia Grace" autocomplete="off">
-        </label>
-
-        <label>
-          Partner two
-          <input id="partnerTwo" type="text" value="Ethan James" autocomplete="off">
-        </label>
-
-        <label>
-          Wedding date
-          <div class="date-picker" id="datePicker" aria-label="Wedding date picker">
-            <div class="date-column" id="dayColumn" data-type="day"></div>
-            <div class="date-column" id="monthColumn" data-type="month"></div>
-            <div class="date-column" id="yearColumn" data-type="year"></div>
-          </div>
-          <div class="date-display" id="dateDisplay">Saturday, 14 June 2027</div>
-        </label>
-
-        <label>
-          Time
-          <div class="date-picker time-picker" id="timePicker" aria-label="Wedding time picker">
-            <div class="date-column" id="hourColumn" data-type="hour"></div>
-            <div class="date-column" id="minuteColumn" data-type="minute"></div>
-            <div class="date-column" id="periodColumn" data-type="period"></div>
-          </div>
-          <div class="date-display" id="timeDisplay">4:00 PM</div>
-        </label>
-
-        <label>
-          Venue
-          <input id="venue" type="text" value="Rosewood Garden Estate" autocomplete="off">
-        </label>
-
-        <label>
-          Location
-          <input id="location" type="text" value="Florence, Italy" autocomplete="off">
-        </label>
-
-        <label>
-          Additional note
-          <textarea id="note">Dinner and dancing to follow. Formal attire requested.</textarea>
-        </label>
-
-        <div class="actions">
-          <button class="primary" type="button" id="downloadPdf">Download Basic PDF</button>
-          <button class="premium-download" type="button" id="downloadPremiumPdf" disabled>Download Premium PDF</button>
-          <button class="secondary" type="reset">Reset</button>
-        </div>
-
-        <section class="premium" id="premiumSection">
-          <div class="premium-header">
-            <h2>Premium customization</h2>
-            <div class="premium-lock">
-              <span class="badge" id="premiumBadge">Locked · €1</span>
-              <button class="unlock-button" type="button" id="unlockPremium">Unlock for €1 (Test)</button>
-            </div>
-          </div>
-          <p class="premium-copy">Unlock themes, fonts, custom wording, wedding stickers, and premium PDF downloads. This is a test flow with no real payment.</p>
-
-          <div class="premium-fields is-locked" id="premiumFields">
-            <label>
-              Color theme
-              <div class="theme-list" id="themeList" role="listbox" aria-label="Color theme"></div>
-            </label>
-
-            <label>
-              Text color
-              <div class="theme-picker" data-color-picker="text">
-                <button class="theme-trigger" type="button" data-picker-trigger aria-expanded="false">
-                  <span class="theme-trigger-preview" data-picker-preview aria-hidden="true">
-                    <span style="background:#5d473d"></span>
-                  </span>
-                  <span class="theme-trigger-label">Color grid</span>
-                </button>
-                <div class="theme-popup" data-picker-popup>
-                  <canvas class="theme-canvas" data-picker-canvas width="320" height="180" aria-label="Text color grid"></canvas>
-                  <div class="theme-popup-footer">
-                    <div class="theme-selected">
-                      <span class="theme-selected-swatch" data-picker-swatch></span>
-                      <span data-picker-value>#5D473D</span>
-                    </div>
-                    <button class="secondary" type="button" data-picker-confirm>Confirm</button>
-                  </div>
-                </div>
-              </div>
-            </label>
-
-            <label>
-              Background color
-              <div class="theme-picker" data-color-picker="background">
-                <button class="theme-trigger" type="button" data-picker-trigger aria-expanded="false">
-                  <span class="theme-trigger-preview" data-picker-preview aria-hidden="true">
-                    <span style="background:#fffdf9"></span>
-                  </span>
-                  <span class="theme-trigger-label">Color grid</span>
-                </button>
-                <div class="theme-popup" data-picker-popup>
-                  <canvas class="theme-canvas" data-picker-canvas width="320" height="180" aria-label="Background color grid"></canvas>
-                  <div class="theme-popup-footer">
-                    <div class="theme-selected">
-                      <span class="theme-selected-swatch" data-picker-swatch></span>
-                      <span data-picker-value>#FFFDF9</span>
-                    </div>
-                    <button class="secondary" type="button" data-picker-confirm>Confirm</button>
-                  </div>
-                </div>
-              </div>
-            </label>
-
-            <label>
-              Border color
-              <div class="theme-picker" data-color-picker="border">
-                <button class="theme-trigger" type="button" data-picker-trigger aria-expanded="false">
-                  <span class="theme-trigger-preview" data-picker-preview aria-hidden="true">
-                    <span style="background:#f3e6db"></span>
-                  </span>
-                  <span class="theme-trigger-label">Color grid</span>
-                </button>
-                <div class="theme-popup" data-picker-popup>
-                  <canvas class="theme-canvas" data-picker-canvas width="320" height="180" aria-label="Border color grid"></canvas>
-                  <div class="theme-popup-footer">
-                    <div class="theme-selected">
-                      <span class="theme-selected-swatch" data-picker-swatch></span>
-                      <span data-picker-value>#F3E6DB</span>
-                    </div>
-                    <button class="secondary" type="button" data-picker-confirm>Confirm</button>
-                  </div>
-                </div>
-              </div>
-            </label>
-
-            <label>
-              Font style
-              <div class="font-list" id="fontList" role="listbox" aria-label="Font style"></div>
-            </label>
-
-            <label>
-              Header line
-              <input id="headerLine" type="text" value="Together With Their Families" autocomplete="off">
-            </label>
-
-            <label>
-              Invitation message
-              <textarea id="inviteMessage">Request the honor of your presence at the celebration of their marriage</textarea>
-            </label>
-
-            <div class="form-grid" style="gap: 0.55rem;">
-              <span style="font-size: 0.95rem; font-weight: 700;">Wedding stickers</span>
-              <p class="sticker-hint">Unlock premium to use stickers. Click a sticker to add it, or drag it onto the invitation.</p>
-              <div class="sticker-tray" id="stickerTray" aria-label="Wedding stickers"></div>
-              <div class="sticker-actions">
-                <button class="secondary" type="button" id="clearStickers">Clear stickers</button>
-              </div>
-            </div>
-          </div>
-        </section>
-      </form>
-    </section>
-
-    <section class="preview-shell">
-      <article class="invitation" id="invitationCard">
-        <div class="sticker-layer" id="stickerLayer"></div>
-        <div class="invite-top" id="previewHeader">Together With Their Families</div>
-        <div class="divider"></div>
-        <div class="invite-text" id="previewMessage">Request the honor of your presence at the celebration of their marriage</div>
-        <div class="names">
-          <span id="previewPartnerOne">Olivia Grace</span>
-          <span class="ampersand">&amp;</span>
-          <span id="previewPartnerTwo">Ethan James</span>
-        </div>
-        <div class="invite-text">
-          <span id="previewDate">Saturday, 14 June 2027</span><br>
-          at <span id="previewTime">4:00 PM</span>
-        </div>
-        <div class="details">
-          <strong id="previewVenue">Rosewood Garden Estate</strong><br>
-          <span id="previewLocation">Florence, Italy</span>
-        </div>
-        <div class="divider"></div>
-        <div class="footer-note" id="previewNote">Dinner and dancing to follow. Formal attire requested.</div>
-      </article>
-
-      <div class="sticker-size-bar" id="stickerSizeBar" aria-hidden="true">
-        <label for="stickerSizeRange">Size</label>
-        <input id="stickerSizeRange" type="range" min="0.6" max="2.4" step="0.05" value="1">
-        <span class="size-value" id="stickerSizeValue">100%</span>
-      </div>
-    </section>
-  </div>
-
-  <div class="pdf-stage" id="pdfStage" aria-hidden="true"></div>
-
-  <div class="payment-modal" id="paymentModal" aria-hidden="true">
-    <div class="payment-dialog" role="dialog" aria-labelledby="paymentTitle" aria-modal="true">
-      <h3 id="paymentTitle">Unlock premium customization</h3>
-      <p>Get access to themes, fonts, custom wording, wedding stickers, and premium PDF downloads.</p>
-      <div class="payment-amount">€1.00</div>
-      <div class="payment-actions">
-        <button class="primary" type="button" id="confirmPayment">Pay €1 (Test)</button>
-        <button class="secondary" type="button" id="cancelPayment">Cancel</button>
-      </div>
-      <p class="payment-test-note">Test mode only. No real payment will be processed.</p>
+      <a class="choice choice-baby" href="/test-repo/baby-shower.html">
+        <span class="motif" aria-hidden="true"></span>
+        <p class="choice-label">For the little one</p>
+        <h2 class="choice-title">Baby shower invitation</h2>
+        <p class="choice-copy">Design a soft celebration card with moods, fonts, stickers, and PDF download.</p>
+        <span class="choice-cta">Open baby shower studio <span aria-hidden="true">→</span></span>
+      </a>
     </div>
-  </div>
 
-  <script>
-    const PREMIUM_STORAGE_KEY = "wedding-invite-premium-unlocked";
-
-    const fonts = [
-      { id: "caveat", name: "Caveat", stack: '"Caveat", cursive' },
-      { id: "comfortaa", name: "Comfortaa", stack: '"Comfortaa", sans-serif' },
-      { id: "comic-sans", name: "Comic Sans MS", stack: '"Comic Sans MS", "Comic Sans", cursive' },
-      { id: "courier-new", name: "Courier New", stack: '"Courier New", Courier, monospace' },
-      { id: "eb-garamond", name: "EB Garamond", stack: '"EB Garamond", Georgia, serif' },
-      { id: "georgia", name: "Georgia", stack: 'Georgia, "Times New Roman", serif' },
-      { id: "impact", name: "Impact", stack: 'Impact, Haettenschweiler, sans-serif' },
-      { id: "lexend", name: "Lexend", stack: '"Lexend", sans-serif' },
-      { id: "lobster", name: "Lobster", stack: '"Lobster", cursive' },
-      { id: "lora", name: "Lora", stack: '"Lora", Georgia, serif' },
-      { id: "merriweather", name: "Merriweather", stack: '"Merriweather", Georgia, serif' },
-      { id: "merriweather-sans", name: "Merriweather Sans", stack: '"Merriweather Sans", sans-serif' },
-      { id: "montserrat", name: "Montserrat", stack: '"Montserrat", sans-serif' },
-      { id: "noto-sans-symbols", name: "Noto Sans Symbols", stack: '"Noto Sans Symbols", sans-serif' },
-      { id: "nunito", name: "Nunito", stack: '"Nunito", sans-serif' },
-      { id: "pacifico", name: "Pacifico", stack: '"Pacifico", cursive' },
-      { id: "playfair", name: "Playfair Display", stack: '"Playfair Display", Georgia, serif' },
-      { id: "poppins", name: "Poppins", stack: '"Poppins", sans-serif' },
-      { id: "roboto", name: "Roboto", stack: '"Roboto", sans-serif' },
-      { id: "source-serif", name: "Source Serif 4", stack: '"Source Serif 4", Georgia, serif' }
-    ];
-
-    const weddingStickers = [
-      { id: "rings", html: "💍", tone: "a", label: "Rings" },
-      { id: "ring-pair", html: '<span class="sticker-rings" aria-hidden="true"></span>', tone: "b", label: "Interlocked rings" },
-      { id: "hearts", html: "💕", tone: "a", label: "Hearts" },
-      { id: "rose", html: "🌹", tone: "b", label: "Rose" },
-      { id: "bouquet", html: "💐", tone: "a", label: "Bouquet" },
-      { id: "blossom", html: "🌸", tone: "b", label: "Blossom" },
-      { id: "cheers", html: "🥂", tone: "a", label: "Cheers" },
-      { id: "cake", html: "🎂", tone: "b", label: "Wedding cake" },
-      { id: "dove", html: "🕊️", tone: "a", label: "Dove" },
-      { id: "diamond", html: "💎", tone: "b", label: "Diamond" },
-      { id: "sparkle", html: "✨", tone: "a", label: "Sparkle" },
-      { id: "church", html: "⛪", tone: "b", label: "Chapel" },
-      { id: "bow", html: "🎀", tone: "a", label: "Bow" },
-      { id: "crown", html: "👑", tone: "b", label: "Crown" },
-      { id: "love-letter", html: "💌", tone: "a", label: "Love letter" },
-      { id: "bells", html: "🔔", tone: "b", label: "Bells" }
-    ];
-
-    const fields = {
-      partnerOne: document.getElementById("partnerOne"),
-      partnerTwo: document.getElementById("partnerTwo"),
-      venue: document.getElementById("venue"),
-      location: document.getElementById("location"),
-      note: document.getElementById("note")
-    };
-
-    const preview = {
-      partnerOne: document.getElementById("previewPartnerOne"),
-      partnerTwo: document.getElementById("previewPartnerTwo"),
-      weddingDate: document.getElementById("previewDate"),
-      weddingTime: document.getElementById("previewTime"),
-      venue: document.getElementById("previewVenue"),
-      location: document.getElementById("previewLocation"),
-      note: document.getElementById("previewNote")
-    };
-
-    const form = document.getElementById("invitationForm");
-    const invitationCard = document.getElementById("invitationCard");
-    const downloadButton = document.getElementById("downloadPdf");
-    const downloadPremiumButton = document.getElementById("downloadPremiumPdf");
-    const pdfStage = document.getElementById("pdfStage");
-    const premiumFields = document.getElementById("premiumFields");
-    const premiumBadge = document.getElementById("premiumBadge");
-    const unlockPremiumButton = document.getElementById("unlockPremium");
-    const paymentModal = document.getElementById("paymentModal");
-    const confirmPaymentButton = document.getElementById("confirmPayment");
-    const cancelPaymentButton = document.getElementById("cancelPayment");
-    const themeList = document.getElementById("themeList");
-    const fontList = document.getElementById("fontList");
-    const stickerTray = document.getElementById("stickerTray");
-    const stickerLayer = document.getElementById("stickerLayer");
-    const clearStickersButton = document.getElementById("clearStickers");
-    const stickerSizeBar = document.getElementById("stickerSizeBar");
-    const stickerSizeRange = document.getElementById("stickerSizeRange");
-    const stickerSizeValue = document.getElementById("stickerSizeValue");
-    let selectedSticker = null;
-    const headerLine = document.getElementById("headerLine");
-    const inviteMessage = document.getElementById("inviteMessage");
-    const previewHeader = document.getElementById("previewHeader");
-    const previewMessage = document.getElementById("previewMessage");
-    const dayColumn = document.getElementById("dayColumn");
-    const monthColumn = document.getElementById("monthColumn");
-    const yearColumn = document.getElementById("yearColumn");
-    const dateDisplay = document.getElementById("dateDisplay");
-    const hourColumn = document.getElementById("hourColumn");
-    const minuteColumn = document.getElementById("minuteColumn");
-    const periodColumn = document.getElementById("periodColumn");
-    const timeDisplay = document.getElementById("timeDisplay");
-
-    const monthNames = [
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"
-    ];
-    const weekdayNames = [
-      "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
-    ];
-
-    let selectedDate = { day: 14, month: 5, year: 2027 };
-    let selectedTime = { hour: 4, minute: 0, period: "PM" };
-
-    const presetThemes = [
-      { id: "classic-blush", name: "Classic blush", bg: "#fffdf9", border: "#f3e6db", outline: "#d8bbaa", accent: "#9d6b53", text: "#5d473d" },
-      { id: "sage-garden", name: "Sage garden", bg: "#f7faf4", border: "#d9e5d1", outline: "#b8c9ae", accent: "#5f7a57", text: "#425241" },
-      { id: "midnight-gold", name: "Midnight gold", bg: "#f8f4ec", border: "#d8c7a0", outline: "#b79b63", accent: "#6d4f2b", text: "#3f3428" },
-      { id: "soft-lavender", name: "Soft lavender", bg: "#fbf8ff", border: "#e4d9f2", outline: "#c9b4df", accent: "#7d5f9a", text: "#4f3f61" },
-      { id: "rose-quartz", name: "Rose quartz", bg: "#fff7f8", border: "#f0cfd6", outline: "#d9a7b3", accent: "#b56b7c", text: "#6a3f4a" },
-      { id: "ocean-mist", name: "Ocean mist", bg: "#f4fafb", border: "#cfe5ea", outline: "#9fc4cd", accent: "#4f7f8c", text: "#355760" },
-      { id: "champagne", name: "Champagne", bg: "#fffaf2", border: "#ead7b8", outline: "#d4b889", accent: "#a8844d", text: "#5d4a2f" },
-      { id: "forest-green", name: "Forest green", bg: "#f4f8f3", border: "#c9dbc7", outline: "#9bb798", accent: "#4d6f4a", text: "#334a31" },
-      { id: "dusty-blue", name: "Dusty blue", bg: "#f5f8fb", border: "#d0dceb", outline: "#a7bacf", accent: "#5b7391", text: "#3b4c61" },
-      { id: "terracotta", name: "Terracotta", bg: "#fff7f2", border: "#ecc8b4", outline: "#d39a79", accent: "#b66a45", text: "#6b3f2a" },
-      { id: "pearl-ivory", name: "Pearl ivory", bg: "#fffcf5", border: "#ebe1cb", outline: "#d4c4a1", accent: "#9c8a63", text: "#5c5139" },
-      { id: "berry-wine", name: "Berry wine", bg: "#fbf5f7", border: "#e5c5cf", outline: "#c793a4", accent: "#8d4d63", text: "#5a3140" },
-      { id: "soft-coral", name: "Soft coral", bg: "#fff6f3", border: "#f0cfc5", outline: "#dca891", accent: "#c7755a", text: "#6d4336" },
-      { id: "slate-charcoal", name: "Slate charcoal", bg: "#f6f7f8", border: "#d5d9de", outline: "#aeb5bd", accent: "#5c6570", text: "#363c44" },
-      { id: "mint-cream", name: "Mint cream", bg: "#f5fbf8", border: "#cfe8dc", outline: "#9fceb8", accent: "#4f8f75", text: "#335e4d" },
-      { id: "amber-glow", name: "Amber glow", bg: "#fff8ee", border: "#efd3a5", outline: "#d8ae68", accent: "#b8872f", text: "#6a5120" },
-      { id: "lilac-dusk", name: "Lilac dusk", bg: "#f9f6fc", border: "#ddd0eb", outline: "#bba5d4", accent: "#7a6298", text: "#4b3d5f" },
-      { id: "emerald", name: "Emerald", bg: "#f3faf6", border: "#c5e2d2", outline: "#8fc3a8", accent: "#3f8a67", text: "#285743" },
-      { id: "sandstone", name: "Sandstone", bg: "#fbf7f1", border: "#e5d4bf", outline: "#cbb08f", accent: "#9a7a55", text: "#5c4a36" },
-      { id: "ink-navy", name: "Ink navy", bg: "#f4f6fa", border: "#c9d2e1", outline: "#96a5bf", accent: "#3f5477", text: "#2a384f" }
-    ];
-
-    let premiumUnlocked = localStorage.getItem(PREMIUM_STORAGE_KEY) === "true";
-    let selectedThemeId = "classic-blush";
-    let selectedFontId = "caveat";
-    let customColors = {
-      text: "#5d473d",
-      background: "#fffdf9",
-      border: "#f3e6db",
-      accent: "#9d6b53",
-      outline: "#d8bbaa"
-    };
-
-    function clamp(value, min, max) {
-      return Math.min(Math.max(value, min), max);
-    }
-
-    function hexToRgb(hex) {
-      const value = hex.replace("#", "");
-      const normalized = value.length === 3
-        ? value.split("").map((char) => char + char).join("")
-        : value;
-      const int = Number.parseInt(normalized, 16);
-      return {
-        r: (int >> 16) & 255,
-        g: (int >> 8) & 255,
-        b: int & 255
-      };
-    }
-
-    function rgbToHex(r, g, b) {
-      return `#${[r, g, b].map((value) => clamp(Math.round(value), 0, 255).toString(16).padStart(2, "0")).join("")}`;
-    }
-
-    function toRgba(hex, alpha) {
-      const { r, g, b } = hexToRgb(hex);
-      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-    }
-
-    function getActiveTheme() {
-      return presetThemes.find((theme) => theme.id === selectedThemeId) || presetThemes[0];
-    }
-
-    function applyThemeSelection(theme) {
-      selectedThemeId = theme.id;
-      customColors = {
-        text: theme.text,
-        background: theme.bg,
-        border: theme.border,
-        accent: theme.accent,
-        outline: theme.outline
-      };
-      updateThemeOptionStates();
-      updateAllPickerDisplays();
-      syncPreview();
-    }
-
-    function updateThemeOptionStates() {
-      themeList.querySelectorAll("[data-theme-id]").forEach((button) => {
-        button.classList.toggle("is-active", button.dataset.themeId === selectedThemeId);
-      });
-    }
-
-    function renderThemeList() {
-      themeList.innerHTML = presetThemes.map((theme) => `
-        <button class="theme-option" type="button" role="option" data-theme-id="${theme.id}" aria-selected="false">
-          <span class="theme-option-preview" aria-hidden="true">
-            <span style="background:${theme.bg}"></span>
-            <span style="background:${theme.border}"></span>
-            <span style="background:${theme.accent}"></span>
-            <span style="background:${theme.text}"></span>
-          </span>
-          <span>${theme.name}</span>
-        </button>
-      `).join("");
-
-      themeList.querySelectorAll("[data-theme-id]").forEach((button) => {
-        button.addEventListener("click", () => {
-          const theme = presetThemes.find((item) => item.id === button.dataset.themeId);
-          if (theme) {
-            applyThemeSelection(theme);
-          }
-        });
-      });
-
-      updateThemeOptionStates();
-    }
-
-    function getActiveFont() {
-      return fonts.find((font) => font.id === selectedFontId) || fonts[0];
-    }
-
-    function updateFontOptionStates() {
-      fontList.querySelectorAll("[data-font-id]").forEach((button) => {
-        button.classList.toggle("is-active", button.dataset.fontId === selectedFontId);
-      });
-    }
-
-    function renderFontList() {
-      fontList.innerHTML = fonts.map((font) => `
-        <button class="font-option" type="button" role="option" data-font-id="${font.id}" style="font-family: ${font.stack}">
-          ${font.name}
-        </button>
-      `).join("");
-
-      fontList.querySelectorAll("[data-font-id]").forEach((button) => {
-        button.addEventListener("click", () => {
-          selectedFontId = button.dataset.fontId;
-          updateFontOptionStates();
-          syncPreview();
-        });
-      });
-
-      updateFontOptionStates();
-    }
-
-    function renderStickerTray() {
-      stickerTray.innerHTML = weddingStickers.map((sticker) => `
-        <button
-          class="sticker-item tone-${sticker.tone}"
-          type="button"
-          draggable="true"
-          data-sticker-id="${sticker.id}"
-          data-sticker-html="${encodeURIComponent(sticker.html)}"
-          aria-label="${sticker.label}"
-          title="${sticker.label}"
-        >${sticker.html}</button>
-      `).join("");
-
-      stickerTray.querySelectorAll(".sticker-item").forEach((item) => {
-        item.addEventListener("dragstart", (event) => {
-          event.dataTransfer.setData("text/plain", item.dataset.stickerHtml);
-          event.dataTransfer.effectAllowed = "copy";
-          invitationCard.classList.add("drop-ready");
-        });
-
-        item.addEventListener("dragend", () => {
-          invitationCard.classList.remove("drop-ready");
-        });
-
-        item.addEventListener("click", () => {
-          if (!premiumUnlocked) {
-            openPaymentModal();
-            return;
-          }
-
-          placeSticker(item.dataset.stickerHtml, 50, 42);
-        });
-      });
-    }
-
-    function getStickerScale(sticker) {
-      const raw = Number.parseFloat(sticker.style.getPropertyValue("--sticker-scale"));
-      return Number.isFinite(raw) ? raw : 1;
-    }
-
-    function setStickerScale(sticker, scale) {
-      const next = Math.min(2.4, Math.max(0.6, scale));
-      sticker.style.setProperty("--sticker-scale", String(next));
-      return next;
-    }
-
-    function selectSticker(sticker) {
-      if (selectedSticker && selectedSticker !== sticker) {
-        selectedSticker.classList.remove("is-selected");
-      }
-
-      selectedSticker = sticker;
-      selectedSticker.classList.add("is-selected");
-
-      const scale = getStickerScale(sticker);
-      stickerSizeRange.value = String(scale);
-      stickerSizeValue.textContent = `${Math.round(scale * 100)}%`;
-      stickerSizeBar.classList.add("is-open");
-      stickerSizeBar.setAttribute("aria-hidden", "false");
-    }
-
-    function deselectSticker() {
-      if (selectedSticker) {
-        selectedSticker.classList.remove("is-selected");
-        selectedSticker = null;
-      }
-
-      stickerSizeBar.classList.remove("is-open");
-      stickerSizeBar.setAttribute("aria-hidden", "true");
-    }
-
-    function placeSticker(stickerHtml, xPercent, yPercent) {
-      if (!premiumUnlocked) {
-        openPaymentModal();
-        return;
-      }
-
-      const sticker = document.createElement("button");
-      sticker.type = "button";
-      sticker.className = "placed-sticker";
-      sticker.innerHTML = decodeURIComponent(stickerHtml);
-      sticker.style.left = `${xPercent}%`;
-      sticker.style.top = `${yPercent}%`;
-      setStickerScale(sticker, 1);
-      sticker.title = "Tap to resize · Drag to move · Double-click to remove";
-      stickerLayer.appendChild(sticker);
-      enablePlacedSticker(sticker);
-      selectSticker(sticker);
-    }
-
-    function enablePlacedSticker(sticker) {
-      sticker.addEventListener("dblclick", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        if (selectedSticker === sticker) {
-          deselectSticker();
-        }
-        sticker.remove();
-      });
-
-      sticker.addEventListener("pointerdown", (event) => {
-        if (event.button !== 0) {
-          return;
-        }
-
-        event.preventDefault();
-        event.stopPropagation();
-        selectSticker(sticker);
-        sticker.setPointerCapture(event.pointerId);
-
-        const startX = event.clientX;
-        const startY = event.clientY;
-        let moved = false;
-
-        const onMove = (moveEvent) => {
-          const dx = moveEvent.clientX - startX;
-          const dy = moveEvent.clientY - startY;
-          if (!moved && Math.hypot(dx, dy) < 4) {
-            return;
-          }
-
-          moved = true;
-          const rect = invitationCard.getBoundingClientRect();
-          const xPercent = ((moveEvent.clientX - rect.left) / rect.width) * 100;
-          const yPercent = ((moveEvent.clientY - rect.top) / rect.height) * 100;
-          sticker.style.left = `${Math.min(95, Math.max(5, xPercent))}%`;
-          sticker.style.top = `${Math.min(95, Math.max(5, yPercent))}%`;
-        };
-
-        const onUp = () => {
-          sticker.releasePointerCapture(event.pointerId);
-          sticker.removeEventListener("pointermove", onMove);
-          sticker.removeEventListener("pointerup", onUp);
-          sticker.removeEventListener("pointercancel", onUp);
-        };
-
-        sticker.addEventListener("pointermove", onMove);
-        sticker.addEventListener("pointerup", onUp);
-        sticker.addEventListener("pointercancel", onUp);
-      });
-    }
-
-    function clearStickers() {
-      deselectSticker();
-      stickerLayer.replaceChildren();
-    }
-
-    function setupStickerDropTarget() {
-      invitationCard.addEventListener("dragover", (event) => {
-        if (!premiumUnlocked) {
-          return;
-        }
-
-        event.preventDefault();
-        event.dataTransfer.dropEffect = "copy";
-        invitationCard.classList.add("drop-ready");
-      });
-
-      invitationCard.addEventListener("dragleave", () => {
-        invitationCard.classList.remove("drop-ready");
-      });
-
-      invitationCard.addEventListener("drop", (event) => {
-        event.preventDefault();
-        invitationCard.classList.remove("drop-ready");
-
-        if (!premiumUnlocked) {
-          openPaymentModal();
-          return;
-        }
-
-        const stickerHtml = event.dataTransfer.getData("text/plain");
-        if (!stickerHtml) {
-          return;
-        }
-
-        const rect = invitationCard.getBoundingClientRect();
-        const xPercent = ((event.clientX - rect.left) / rect.width) * 100;
-        const yPercent = ((event.clientY - rect.top) / rect.height) * 100;
-        placeSticker(stickerHtml, xPercent, yPercent);
-      });
-    }
-
-    function drawColorCanvas(canvas) {
-      const context = canvas.getContext("2d");
-      const { width, height } = canvas;
-
-      for (let x = 0; x < width; x += 1) {
-        const hue = (x / width) * 360;
-        const hueGradient = context.createLinearGradient(0, 0, 0, height);
-        hueGradient.addColorStop(0, `hsl(${hue}, 100%, 100%)`);
-        hueGradient.addColorStop(0.5, `hsl(${hue}, 100%, 50%)`);
-        hueGradient.addColorStop(1, `hsl(${hue}, 100%, 0%)`);
-        context.fillStyle = hueGradient;
-        context.fillRect(x, 0, 1, height);
-      }
-    }
-
-    function pickCanvasColor(canvas, event) {
-      const rect = canvas.getBoundingClientRect();
-      const scaleX = canvas.width / rect.width;
-      const scaleY = canvas.height / rect.height;
-      const x = clamp((event.clientX - rect.left) * scaleX, 0, canvas.width - 1);
-      const y = clamp((event.clientY - rect.top) * scaleY, 0, canvas.height - 1);
-      const pixel = canvas.getContext("2d").getImageData(x, y, 1, 1).data;
-      return rgbToHex(pixel[0], pixel[1], pixel[2]);
-    }
-
-    function updatePickerDisplay(root, color) {
-      const preview = root.querySelector("[data-picker-preview]");
-      const swatch = root.querySelector("[data-picker-swatch]");
-      const value = root.querySelector("[data-picker-value]");
-      preview.innerHTML = `<span style="background:${color}"></span>`;
-      swatch.style.background = color;
-      value.textContent = color.toUpperCase();
-    }
-
-    function updateAllPickerDisplays() {
-      Object.entries(colorPickers).forEach(([key, root]) => {
-        updatePickerDisplay(root, customColors[key]);
-      });
-    }
-
-    function setPickerOpen(root, isOpen) {
-      const popup = root.querySelector("[data-picker-popup]");
-      const trigger = root.querySelector("[data-picker-trigger]");
-      popup.classList.toggle("is-open", isOpen);
-      trigger.setAttribute("aria-expanded", String(isOpen));
-    }
-
-    const colorPickers = {
-      text: document.querySelector('[data-color-picker="text"]'),
-      background: document.querySelector('[data-color-picker="background"]'),
-      border: document.querySelector('[data-color-picker="border"]')
-    };
-
-    Object.entries(colorPickers).forEach(([key, root]) => {
-      const canvas = root.querySelector("[data-picker-canvas]");
-      const trigger = root.querySelector("[data-picker-trigger]");
-      const confirm = root.querySelector("[data-picker-confirm]");
-
-      drawColorCanvas(canvas);
-      updatePickerDisplay(root, customColors[key]);
-
-      trigger.addEventListener("click", () => {
-        Object.values(colorPickers).forEach((other) => {
-          if (other !== root) {
-            setPickerOpen(other, false);
-          }
-        });
-        setPickerOpen(root, true);
-      });
-
-      canvas.addEventListener("click", (event) => {
-        const color = pickCanvasColor(canvas, event);
-        customColors[key] = color;
-
-        if (key === "border") {
-          customColors.outline = color;
-          customColors.accent = color;
-        }
-
-        updatePickerDisplay(root, color);
-        syncPreview();
-      });
-
-      confirm.addEventListener("click", () => {
-        setPickerOpen(root, false);
-      });
-    });
-
-    function syncPreview() {
-      Object.entries(fields).forEach(([key, input]) => {
-        const value = input.value.trim();
-        preview[key].textContent = value || " ";
-      });
-
-      const formattedDate = formatSelectedDate();
-      const formattedTime = formatSelectedTime();
-      preview.weddingDate.textContent = formattedDate;
-      preview.weddingTime.textContent = formattedTime;
-      dateDisplay.textContent = formattedDate;
-      timeDisplay.textContent = formattedTime;
-
-      if (premiumUnlocked) {
-        previewHeader.textContent = headerLine.value.trim() || " ";
-        previewMessage.textContent = inviteMessage.value.trim() || " ";
-        applyPremiumStyles();
-      }
-    }
-
-    function daysInMonth(year, monthIndex) {
-      return new Date(year, monthIndex + 1, 0).getDate();
-    }
-
-    function formatSelectedDate() {
-      const date = new Date(selectedDate.year, selectedDate.month, selectedDate.day);
-      return `${weekdayNames[date.getDay()]}, ${selectedDate.day} ${monthNames[selectedDate.month]} ${selectedDate.year}`;
-    }
-
-    function formatSelectedTime() {
-      return `${selectedTime.hour}:${String(selectedTime.minute).padStart(2, "0")} ${selectedTime.period}`;
-    }
-
-    function createDateOptions(column, values, formatter = (value) => String(value)) {
-      column.innerHTML = "";
-      const topSpacer = document.createElement("div");
-      topSpacer.className = "date-spacer";
-      column.appendChild(topSpacer);
-
-      values.forEach((value) => {
-        const option = document.createElement("div");
-        option.className = "date-option";
-        option.dataset.value = String(value);
-        option.textContent = formatter(value);
-        column.appendChild(option);
-      });
-
-      const bottomSpacer = document.createElement("div");
-      bottomSpacer.className = "date-spacer";
-      column.appendChild(bottomSpacer);
-    }
-
-    function scrollColumnToValue(column, value, smooth = false) {
-      const option = column.querySelector(`[data-value="${value}"]`);
-      if (!option) {
-        return;
-      }
-
-      column.scrollTo({
-        top: option.offsetTop - column.clientHeight / 2 + option.clientHeight / 2,
-        behavior: smooth ? "smooth" : "auto"
-      });
-    }
-
-    function updateActiveOptions(column, value) {
-      column.querySelectorAll(".date-option").forEach((option) => {
-        option.classList.toggle("is-active", option.dataset.value === String(value));
-      });
-    }
-
-    function rebuildDayOptions() {
-      const maxDay = daysInMonth(selectedDate.year, selectedDate.month);
-      if (selectedDate.day > maxDay) {
-        selectedDate.day = maxDay;
-      }
-
-      const days = Array.from({ length: maxDay }, (_, index) => index + 1);
-      createDateOptions(dayColumn, days);
-      updateActiveOptions(dayColumn, selectedDate.day);
-      scrollColumnToValue(dayColumn, selectedDate.day);
-    }
-
-    function getCenteredValue(column) {
-      const center = column.scrollTop + column.clientHeight / 2;
-      const options = Array.from(column.querySelectorAll(".date-option"));
-      let closest = options[0];
-      let closestDistance = Infinity;
-
-      options.forEach((option) => {
-        const optionCenter = option.offsetTop + option.clientHeight / 2;
-        const distance = Math.abs(optionCenter - center);
-        if (distance < closestDistance) {
-          closest = option;
-          closestDistance = distance;
-        }
-      });
-
-      return closest ? closest.dataset.value : null;
-    }
-
-    function bindDateColumn(column, onChange) {
-      let scrollTimeout;
-
-      column.addEventListener("scroll", () => {
-        const value = getCenteredValue(column);
-        if (value == null) {
-          return;
-        }
-
-        onChange(value, false);
-        window.clearTimeout(scrollTimeout);
-        scrollTimeout = window.setTimeout(() => {
-          scrollColumnToValue(column, value, true);
-          onChange(value, true);
-        }, 80);
-      });
-    }
-
-    function initDatePicker() {
-      createDateOptions(monthColumn, monthNames.map((_, index) => index), (value) => monthNames[value]);
-      createDateOptions(
-        yearColumn,
-        Array.from({ length: 31 }, (_, index) => 2020 + index)
-      );
-      rebuildDayOptions();
-
-      updateActiveOptions(monthColumn, selectedDate.month);
-      updateActiveOptions(yearColumn, selectedDate.year);
-      scrollColumnToValue(monthColumn, selectedDate.month);
-      scrollColumnToValue(yearColumn, selectedDate.year);
-
-      bindDateColumn(dayColumn, (value) => {
-        selectedDate.day = Number(value);
-        updateActiveOptions(dayColumn, selectedDate.day);
-        syncPreview();
-      });
-
-      bindDateColumn(monthColumn, (value) => {
-        selectedDate.month = Number(value);
-        updateActiveOptions(monthColumn, selectedDate.month);
-        rebuildDayOptions();
-        syncPreview();
-      });
-
-      bindDateColumn(yearColumn, (value) => {
-        selectedDate.year = Number(value);
-        updateActiveOptions(yearColumn, selectedDate.year);
-        rebuildDayOptions();
-        syncPreview();
-      });
-    }
-
-    function resetDatePicker() {
-      selectedDate = { day: 14, month: 5, year: 2027 };
-      rebuildDayOptions();
-      updateActiveOptions(monthColumn, selectedDate.month);
-      updateActiveOptions(yearColumn, selectedDate.year);
-      scrollColumnToValue(dayColumn, selectedDate.day);
-      scrollColumnToValue(monthColumn, selectedDate.month);
-      scrollColumnToValue(yearColumn, selectedDate.year);
-    }
-
-    function initTimePicker() {
-      createDateOptions(hourColumn, Array.from({ length: 12 }, (_, index) => index + 1));
-      createDateOptions(
-        minuteColumn,
-        Array.from({ length: 60 }, (_, index) => index),
-        (value) => String(value).padStart(2, "0")
-      );
-      createDateOptions(periodColumn, ["AM", "PM"]);
-
-      updateActiveOptions(hourColumn, selectedTime.hour);
-      updateActiveOptions(minuteColumn, selectedTime.minute);
-      updateActiveOptions(periodColumn, selectedTime.period);
-      scrollColumnToValue(hourColumn, selectedTime.hour);
-      scrollColumnToValue(minuteColumn, selectedTime.minute);
-      scrollColumnToValue(periodColumn, selectedTime.period);
-
-      bindDateColumn(hourColumn, (value) => {
-        selectedTime.hour = Number(value);
-        updateActiveOptions(hourColumn, selectedTime.hour);
-        syncPreview();
-      });
-
-      bindDateColumn(minuteColumn, (value) => {
-        selectedTime.minute = Number(value);
-        updateActiveOptions(minuteColumn, selectedTime.minute);
-        syncPreview();
-      });
-
-      bindDateColumn(periodColumn, (value) => {
-        selectedTime.period = value;
-        updateActiveOptions(periodColumn, selectedTime.period);
-        syncPreview();
-      });
-    }
-
-    function resetTimePicker() {
-      selectedTime = { hour: 4, minute: 0, period: "PM" };
-      updateActiveOptions(hourColumn, selectedTime.hour);
-      updateActiveOptions(minuteColumn, selectedTime.minute);
-      updateActiveOptions(periodColumn, selectedTime.period);
-      scrollColumnToValue(hourColumn, selectedTime.hour);
-      scrollColumnToValue(minuteColumn, selectedTime.minute);
-      scrollColumnToValue(periodColumn, selectedTime.period);
-    }
-
-    function applyPremiumStyles() {
-      invitationCard.style.setProperty("--invite-bg", customColors.background);
-      invitationCard.style.setProperty("--invite-border", customColors.border);
-      invitationCard.style.setProperty("--invite-outline", customColors.outline);
-      invitationCard.style.setProperty("--invite-accent", customColors.accent);
-      invitationCard.style.setProperty("--invite-accent-soft", toRgba(customColors.accent, 0.18));
-      invitationCard.style.setProperty("--invite-text", customColors.text);
-      invitationCard.style.setProperty("--invite-font", getActiveFont().stack);
-    }
-
-    function resetPremiumStyles() {
-      invitationCard.style.removeProperty("--invite-bg");
-      invitationCard.style.removeProperty("--invite-border");
-      invitationCard.style.removeProperty("--invite-outline");
-      invitationCard.style.removeProperty("--invite-accent");
-      invitationCard.style.removeProperty("--invite-accent-soft");
-      invitationCard.style.removeProperty("--invite-text");
-      invitationCard.style.removeProperty("--invite-font");
-      previewHeader.textContent = "Together With Their Families";
-      previewMessage.textContent = "Request the honor of your presence at the celebration of their marriage";
-    }
-
-    function setPremiumUnlocked(unlocked) {
-      premiumUnlocked = unlocked;
-      localStorage.setItem(PREMIUM_STORAGE_KEY, unlocked ? "true" : "false");
-      premiumFields.classList.toggle("is-locked", !unlocked);
-      unlockPremiumButton.hidden = unlocked;
-      downloadPremiumButton.disabled = !unlocked;
-      premiumBadge.textContent = unlocked ? "Unlocked" : "Locked · €1";
-      premiumBadge.classList.toggle("unlocked", unlocked);
-
-      if (unlocked) {
-        syncPreview();
-      } else {
-        clearStickers();
-        resetPremiumStyles();
-      }
-    }
-
-    function openPaymentModal() {
-      paymentModal.classList.add("is-open");
-      paymentModal.setAttribute("aria-hidden", "false");
-    }
-
-    function closePaymentModal() {
-      paymentModal.classList.remove("is-open");
-      paymentModal.setAttribute("aria-hidden", "true");
-    }
-
-    Object.values(fields).forEach((input) => {
-      input.addEventListener("input", syncPreview);
-    });
-
-    form.addEventListener("reset", () => {
-      window.requestAnimationFrame(() => {
-        resetDatePicker();
-        resetTimePicker();
-        clearStickers();
-        applyThemeSelection(getActiveTheme());
-        if (!premiumUnlocked) {
-          resetPremiumStyles();
-        }
-        syncPreview();
-      });
-    });
-
-    clearStickersButton.addEventListener("click", clearStickers);
-
-    stickerSizeRange.addEventListener("input", () => {
-      if (!selectedSticker) {
-        return;
-      }
-
-      const scale = setStickerScale(selectedSticker, Number.parseFloat(stickerSizeRange.value));
-      stickerSizeValue.textContent = `${Math.round(scale * 100)}%`;
-    });
-
-    stickerSizeBar.addEventListener("pointerdown", (event) => {
-      event.stopPropagation();
-    });
-
-    document.addEventListener("pointerdown", (event) => {
-      if (!selectedSticker) {
-        return;
-      }
-
-      const target = event.target;
-      if (selectedSticker.contains(target) || stickerSizeBar.contains(target)) {
-        return;
-      }
-
-      deselectSticker();
-    });
-
-    [headerLine, inviteMessage].forEach((input) => {
-      input.addEventListener("input", syncPreview);
-      input.addEventListener("change", syncPreview);
-    });
-
-    unlockPremiumButton.addEventListener("click", openPaymentModal);
-    cancelPaymentButton.addEventListener("click", closePaymentModal);
-    paymentModal.addEventListener("click", (event) => {
-      if (event.target === paymentModal) {
-        closePaymentModal();
-      }
-    });
-
-    confirmPaymentButton.addEventListener("click", () => {
-      confirmPaymentButton.disabled = true;
-      confirmPaymentButton.textContent = "Processing...";
-
-      window.setTimeout(() => {
-        setPremiumUnlocked(true);
-        closePaymentModal();
-        confirmPaymentButton.disabled = false;
-        confirmPaymentButton.textContent = "Pay €1 (Test)";
-      }, 900);
-    });
-
-    const PDF_WIDTH = 794;
-    const PDF_HEIGHT = 1123;
-
-    async function downloadInvitationPdf({ premium = false } = {}) {
-      const prefix = premium ? "premium" : "basic";
-      const fileName = `${prefix}-${fields.partnerOne.value.trim() || "wedding"}-${fields.partnerTwo.value.trim() || "invitation"}`
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "") || `${prefix}-wedding-invitation`;
-
-      deselectSticker();
-      const exportCard = invitationCard.cloneNode(true);
-      exportCard.querySelectorAll(".placed-sticker.is-selected").forEach((sticker) => {
-        sticker.classList.remove("is-selected");
-      });
-      if (!premium) {
-        exportCard.style.removeProperty("--invite-bg");
-        exportCard.style.removeProperty("--invite-border");
-        exportCard.style.removeProperty("--invite-outline");
-        exportCard.style.removeProperty("--invite-accent");
-        exportCard.style.removeProperty("--invite-accent-soft");
-        exportCard.style.removeProperty("--invite-text");
-        exportCard.style.removeProperty("--invite-font");
-        exportCard.querySelector("#previewHeader").textContent = "Together With Their Families";
-        exportCard.querySelector("#previewMessage").textContent = "Request the honor of your presence at the celebration of their marriage";
-      }
-
-      pdfStage.replaceChildren(exportCard);
-
-      await document.fonts.ready;
-      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-
-      await html2pdf()
-        .set({
-          margin: 0,
-          filename: `${fileName}.pdf`,
-          image: { type: "jpeg", quality: 0.98 },
-          html2canvas: {
-            scale: 2,
-            useCORS: true,
-            backgroundColor: premium ? customColors.background : "#fffdf9",
-            width: PDF_WIDTH,
-            height: PDF_HEIGHT,
-            windowWidth: PDF_WIDTH,
-            windowHeight: PDF_HEIGHT,
-            scrollX: 0,
-            scrollY: 0,
-            x: 0,
-            y: 0
-          },
-          jsPDF: {
-            unit: "px",
-            format: [PDF_WIDTH, PDF_HEIGHT],
-            orientation: "portrait"
-          },
-          pagebreak: { mode: ["avoid-all"] }
-        })
-        .from(exportCard)
-        .save();
-    }
-
-    async function handleDownload(button, options) {
-      const originalLabel = button.textContent;
-      button.disabled = true;
-      button.textContent = "Generating PDF...";
-
-      try {
-        await downloadInvitationPdf(options);
-      } catch (error) {
-        console.error(error);
-        window.alert("Sorry, the PDF could not be generated. Please try again.");
-      } finally {
-        button.disabled = options.premium ? !premiumUnlocked : false;
-        button.textContent = originalLabel;
-        pdfStage.replaceChildren();
-      }
-    }
-
-    downloadButton.addEventListener("click", () => {
-      handleDownload(downloadButton, { premium: false });
-    });
-
-    downloadPremiumButton.addEventListener("click", () => {
-      if (!premiumUnlocked) {
-        openPaymentModal();
-        return;
-      }
-
-      handleDownload(downloadPremiumButton, { premium: true });
-    });
-
-    initDatePicker();
-    initTimePicker();
-    renderThemeList();
-    renderFontList();
-    renderStickerTray();
-    setupStickerDropTarget();
-    applyThemeSelection(getActiveTheme());
-    setPremiumUnlocked(premiumUnlocked);
-    syncPreview();
-  </script>
+    <div class="divider" aria-hidden="true"></div>
+  </main>
 </body>
 </html>
