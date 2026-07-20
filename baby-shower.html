@@ -905,23 +905,6 @@
           <textarea id="note">Please join us for cake, gifts, and celebration. RSVP by 1 September.</textarea>
         </label>
 
-        <label>
-          Color mood
-          <select id="colorMood">
-            <option value="cream">Soft cream</option>
-            <option value="butter">Butter yellow</option>
-            <option value="sage">Sage green</option>
-            <option value="peach">Warm peach</option>
-            <option value="bluePink">Blue and pink</option>
-            <option value="pinkBlue">Pink and blue (swapped)</option>
-          </select>
-        </label>
-
-        <label>
-          Font style
-          <div class="font-list" id="fontList" role="listbox" aria-label="Font style"></div>
-        </label>
-
         <section class="premium" id="premiumSection">
           <div class="premium-header">
             <h2>Premium extras</h2>
@@ -930,12 +913,29 @@
               <button class="unlock-button" type="button" id="unlockPremium">Unlock for €1 (Test)</button>
             </div>
           </div>
-          <p class="premium-copy">Unlock stickers and place them on your invitation. This is a test flow with no real payment.</p>
+          <p class="premium-copy">Unlock color moods, fonts, stickers, and PDF download. This is a test flow with no real payment.</p>
 
           <div class="premium-fields is-locked" id="premiumFields">
+            <label>
+              Color mood
+              <select id="colorMood">
+                <option value="cream">Soft cream</option>
+                <option value="butter">Butter yellow</option>
+                <option value="sage">Sage green</option>
+                <option value="peach">Warm peach</option>
+                <option value="bluePink">Blue and pink</option>
+                <option value="pinkBlue">Pink and blue (swapped)</option>
+              </select>
+            </label>
+
+            <label>
+              Font style
+              <div class="font-list" id="fontList" role="listbox" aria-label="Font style"></div>
+            </label>
+
             <div class="form-grid" style="gap: 0.55rem;">
               <span style="font-size: 0.95rem; font-weight: 700;">Stickers</span>
-              <p class="sticker-hint">Unlock to use stickers. Click to add, or drag onto the invitation. Tap to resize, double-click to remove.</p>
+              <p class="sticker-hint">Click a sticker to add it, or drag it onto the invitation. Tap to resize, double-click to remove.</p>
               <div class="sticker-tray" id="stickerTray" aria-label="Theme stickers"></div>
               <div class="sticker-actions">
                 <button class="secondary" type="button" id="clearStickers">Clear stickers</button>
@@ -990,7 +990,7 @@
   <div class="payment-modal" id="paymentModal" aria-hidden="true">
     <div class="payment-dialog" role="dialog" aria-labelledby="paymentTitle" aria-modal="true">
       <h3 id="paymentTitle">Unlock premium extras</h3>
-      <p>Get access to stickers and PDF download for your baby shower invitation.</p>
+      <p>Get access to color moods, fonts, stickers, and PDF download for your baby shower invitation.</p>
       <div class="payment-amount">€1.00</div>
       <div class="payment-actions">
         <button class="primary" type="button" id="confirmPayment">Pay €1 (Test)</button>
@@ -1227,6 +1227,11 @@
 
       fontList.querySelectorAll("[data-font-id]").forEach((button) => {
         button.addEventListener("click", () => {
+          if (!premiumUnlocked) {
+            openPaymentModal();
+            return;
+          }
+
           selectedFontId = button.dataset.fontId;
           updateFontOptionStates();
           syncPreview();
@@ -1436,6 +1441,11 @@
 
       if (!unlocked) {
         clearStickers();
+        colorMood.value = "cream";
+        selectedFontId = "playfair";
+        updateFontOptionStates();
+        renderStickerTray();
+        syncPreview();
       }
     }
 
@@ -1656,6 +1666,12 @@
     });
 
     colorMood.addEventListener("change", () => {
+      if (!premiumUnlocked) {
+        colorMood.value = "cream";
+        openPaymentModal();
+        return;
+      }
+
       renderStickerTray();
       syncPreview();
     });
