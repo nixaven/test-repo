@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Wedding Invitation Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     :root {
@@ -138,6 +141,146 @@
       color: var(--ink);
     }
 
+    .premium {
+      margin-top: 1.75rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--line);
+    }
+
+    .premium-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .premium-header h2 {
+      margin: 0;
+      font-size: 1.35rem;
+    }
+
+    .badge {
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: #f4e8df;
+      color: var(--accent);
+    }
+
+    .badge.unlocked {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .premium-copy {
+      margin: 0 0 1rem;
+      color: #6b5144;
+      line-height: 1.5;
+      font-size: 0.95rem;
+    }
+
+    .premium-fields {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .premium-fields.is-locked {
+      opacity: 0.55;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    select {
+      width: 100%;
+      padding: 0.9rem 1rem;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      font: inherit;
+      color: var(--ink);
+      background: #fffdfb;
+      outline: none;
+    }
+
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(157, 107, 83, 0.15);
+    }
+
+    .unlock-button {
+      width: 100%;
+      margin-top: 1rem;
+      background: linear-gradient(135deg, #9d6b53, #7a4f3d);
+      color: #fffaf7;
+    }
+
+    .premium-download {
+      background: #2e7d32;
+      color: #ffffff;
+    }
+
+    .premium-download:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .payment-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      background: rgba(67, 49, 40, 0.45);
+      z-index: 1000;
+    }
+
+    .payment-modal.is-open {
+      display: flex;
+    }
+
+    .payment-dialog {
+      width: min(100%, 420px);
+      padding: 1.75rem;
+      border-radius: 24px;
+      background: #fffdf9;
+      box-shadow: 0 24px 60px rgba(67, 49, 40, 0.2);
+      text-align: center;
+    }
+
+    .payment-dialog h3 {
+      margin: 0 0 0.75rem;
+      font-size: 1.6rem;
+    }
+
+    .payment-dialog p {
+      margin: 0 0 1.25rem;
+      color: #6b5144;
+      line-height: 1.6;
+    }
+
+    .payment-amount {
+      margin: 0 0 1.25rem;
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .payment-actions {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .payment-test-note {
+      margin: 1rem 0 0;
+      font-size: 0.85rem;
+      color: #8a6f62;
+    }
+
     .preview-shell {
       padding: 1.5rem;
       display: flex;
@@ -160,9 +303,9 @@
     .invitation {
       width: min(100%, 760px);
       aspect-ratio: 1 / 1.414;
-      background: #fffdf9;
-      border: 14px solid #f3e6db;
-      outline: 1px solid #d8bbaa;
+      background: var(--invite-bg, #fffdf9);
+      border: 14px solid var(--invite-border, #f3e6db);
+      outline: 1px solid var(--invite-outline, #d8bbaa);
       outline-offset: -24px;
       padding: 4rem 3rem;
       display: flex;
@@ -171,6 +314,8 @@
       text-align: center;
       position: relative;
       overflow: hidden;
+      font-family: var(--invite-font, Georgia, "Times New Roman", serif);
+      transition: background 0.25s ease, border-color 0.25s ease;
     }
 
     .pdf-stage .invitation {
@@ -195,7 +340,7 @@
       position: absolute;
       width: 180px;
       height: 180px;
-      border: 1px solid rgba(157, 107, 83, 0.18);
+      border: 1px solid var(--invite-accent-soft, rgba(157, 107, 83, 0.18));
       border-radius: 50%;
     }
 
@@ -210,7 +355,7 @@
     }
 
     .invite-top {
-      color: var(--accent);
+      color: var(--invite-accent, var(--accent));
       font-size: 0.92rem;
       letter-spacing: 0.35em;
       text-transform: uppercase;
@@ -229,14 +374,14 @@
       margin: 0 auto;
       max-width: 34rem;
       line-height: 1.7;
-      color: #5d473d;
+      color: var(--invite-text, #5d473d);
     }
 
     .ampersand {
       display: block;
       margin: 0.4rem 0;
       font-size: 2rem;
-      color: var(--accent);
+      color: var(--invite-accent, var(--accent));
     }
 
     .details {
@@ -253,7 +398,7 @@
       width: 90px;
       height: 1px;
       margin: 1.5rem auto;
-      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      background: linear-gradient(90deg, transparent, var(--invite-accent, var(--accent)), transparent);
     }
 
     @media (max-width: 900px) {
@@ -340,17 +485,59 @@
         </label>
 
         <div class="actions">
-          <button class="primary" type="button" id="downloadPdf">Download PDF</button>
+          <button class="primary" type="button" id="downloadPdf">Download Basic PDF</button>
+          <button class="premium-download" type="button" id="downloadPremiumPdf" disabled>Download Premium PDF</button>
           <button class="secondary" type="reset">Reset</button>
         </div>
+
+        <section class="premium" id="premiumSection">
+          <div class="premium-header">
+            <h2>Premium customization</h2>
+            <span class="badge" id="premiumBadge">Locked · €1</span>
+          </div>
+          <p class="premium-copy">Unlock extra styling options and download a fully customized invitation. This is a test flow with no real payment.</p>
+
+          <div class="premium-fields is-locked" id="premiumFields">
+            <label>
+              Color theme
+              <select id="themeSelect">
+                <option value="classic">Classic blush</option>
+                <option value="sage">Sage garden</option>
+                <option value="midnight">Midnight gold</option>
+                <option value="lavender">Soft lavender</option>
+              </select>
+            </label>
+
+            <label>
+              Font style
+              <select id="fontSelect">
+                <option value="georgia">Georgia serif</option>
+                <option value="playfair">Playfair Display</option>
+                <option value="cormorant">Cormorant Garamond</option>
+              </select>
+            </label>
+
+            <label>
+              Header line
+              <input id="headerLine" type="text" value="Together With Their Families" autocomplete="off">
+            </label>
+
+            <label>
+              Invitation message
+              <textarea id="inviteMessage">Request the honor of your presence at the celebration of their marriage</textarea>
+            </label>
+          </div>
+
+          <button class="unlock-button" type="button" id="unlockPremium">Unlock for €1 (Test)</button>
+        </section>
       </form>
     </section>
 
     <section class="preview-shell">
       <article class="invitation" id="invitationCard">
-        <div class="invite-top">Together With Their Families</div>
+        <div class="invite-top" id="previewHeader">Together With Their Families</div>
         <div class="divider"></div>
-        <div class="invite-text">Request the honor of your presence at the celebration of their marriage</div>
+        <div class="invite-text" id="previewMessage">Request the honor of your presence at the celebration of their marriage</div>
         <div class="names">
           <span id="previewPartnerOne">Olivia Grace</span>
           <span class="ampersand">&amp;</span>
@@ -372,7 +559,62 @@
 
   <div class="pdf-stage" id="pdfStage" aria-hidden="true"></div>
 
+  <div class="payment-modal" id="paymentModal" aria-hidden="true">
+    <div class="payment-dialog" role="dialog" aria-labelledby="paymentTitle" aria-modal="true">
+      <h3 id="paymentTitle">Unlock premium customization</h3>
+      <p>Get access to themes, fonts, custom wording, and premium PDF downloads.</p>
+      <div class="payment-amount">€1.00</div>
+      <div class="payment-actions">
+        <button class="primary" type="button" id="confirmPayment">Pay €1 (Test)</button>
+        <button class="secondary" type="button" id="cancelPayment">Cancel</button>
+      </div>
+      <p class="payment-test-note">Test mode only. No real payment will be processed.</p>
+    </div>
+  </div>
+
   <script>
+    const PREMIUM_STORAGE_KEY = "wedding-invite-premium-unlocked";
+
+    const themes = {
+      classic: {
+        bg: "#fffdf9",
+        border: "#f3e6db",
+        outline: "#d8bbaa",
+        accent: "#9d6b53",
+        accentSoft: "rgba(157, 107, 83, 0.18)",
+        text: "#5d473d"
+      },
+      sage: {
+        bg: "#f7faf4",
+        border: "#d9e5d1",
+        outline: "#b8c9ae",
+        accent: "#5f7a57",
+        accentSoft: "rgba(95, 122, 87, 0.18)",
+        text: "#425241"
+      },
+      midnight: {
+        bg: "#f8f4ec",
+        border: "#d8c7a0",
+        outline: "#b79b63",
+        accent: "#6d4f2b",
+        accentSoft: "rgba(109, 79, 43, 0.18)",
+        text: "#3f3428"
+      },
+      lavender: {
+        bg: "#fbf8ff",
+        border: "#e4d9f2",
+        outline: "#c9b4df",
+        accent: "#7d5f9a",
+        accentSoft: "rgba(125, 95, 154, 0.18)",
+        text: "#4f3f61"
+      }
+    };
+
+    const fonts = {
+      georgia: 'Georgia, "Times New Roman", serif',
+      playfair: '"Playfair Display", Georgia, serif',
+      cormorant: '"Cormorant Garamond", Georgia, serif'
+    };
     const fields = {
       partnerOne: document.getElementById("partnerOne"),
       partnerTwo: document.getElementById("partnerTwo"),
@@ -396,13 +638,83 @@
     const form = document.getElementById("invitationForm");
     const invitationCard = document.getElementById("invitationCard");
     const downloadButton = document.getElementById("downloadPdf");
+    const downloadPremiumButton = document.getElementById("downloadPremiumPdf");
     const pdfStage = document.getElementById("pdfStage");
+    const premiumFields = document.getElementById("premiumFields");
+    const premiumBadge = document.getElementById("premiumBadge");
+    const unlockPremiumButton = document.getElementById("unlockPremium");
+    const paymentModal = document.getElementById("paymentModal");
+    const confirmPaymentButton = document.getElementById("confirmPayment");
+    const cancelPaymentButton = document.getElementById("cancelPayment");
+    const themeSelect = document.getElementById("themeSelect");
+    const fontSelect = document.getElementById("fontSelect");
+    const headerLine = document.getElementById("headerLine");
+    const inviteMessage = document.getElementById("inviteMessage");
+    const previewHeader = document.getElementById("previewHeader");
+    const previewMessage = document.getElementById("previewMessage");
+
+    let premiumUnlocked = localStorage.getItem(PREMIUM_STORAGE_KEY) === "true";
 
     function syncPreview() {
       Object.entries(fields).forEach(([key, input]) => {
         const value = input.value.trim();
         preview[key].textContent = value || " ";
       });
+
+      if (premiumUnlocked) {
+        previewHeader.textContent = headerLine.value.trim() || " ";
+        previewMessage.textContent = inviteMessage.value.trim() || " ";
+        applyPremiumStyles();
+      }
+    }
+
+    function applyPremiumStyles() {
+      const theme = themes[themeSelect.value] || themes.classic;
+      invitationCard.style.setProperty("--invite-bg", theme.bg);
+      invitationCard.style.setProperty("--invite-border", theme.border);
+      invitationCard.style.setProperty("--invite-outline", theme.outline);
+      invitationCard.style.setProperty("--invite-accent", theme.accent);
+      invitationCard.style.setProperty("--invite-accent-soft", theme.accentSoft);
+      invitationCard.style.setProperty("--invite-text", theme.text);
+      invitationCard.style.setProperty("--invite-font", fonts[fontSelect.value] || fonts.georgia);
+    }
+
+    function resetPremiumStyles() {
+      invitationCard.style.removeProperty("--invite-bg");
+      invitationCard.style.removeProperty("--invite-border");
+      invitationCard.style.removeProperty("--invite-outline");
+      invitationCard.style.removeProperty("--invite-accent");
+      invitationCard.style.removeProperty("--invite-accent-soft");
+      invitationCard.style.removeProperty("--invite-text");
+      invitationCard.style.removeProperty("--invite-font");
+      previewHeader.textContent = "Together With Their Families";
+      previewMessage.textContent = "Request the honor of your presence at the celebration of their marriage";
+    }
+
+    function setPremiumUnlocked(unlocked) {
+      premiumUnlocked = unlocked;
+      localStorage.setItem(PREMIUM_STORAGE_KEY, unlocked ? "true" : "false");
+      premiumFields.classList.toggle("is-locked", !unlocked);
+      unlockPremiumButton.hidden = unlocked;
+      downloadPremiumButton.disabled = !unlocked;
+      premiumBadge.textContent = unlocked ? "Unlocked" : "Locked · €1";
+      premiumBadge.classList.toggle("unlocked", unlocked);
+
+      if (unlocked) {
+        syncPreview();
+      } else {
+        resetPremiumStyles();
+      }
+    }
+
+    function openPaymentModal() {
+      paymentModal.classList.add("is-open");
+      paymentModal.setAttribute("aria-hidden", "false");
+    }
+
+    function closePaymentModal() {
+      paymentModal.classList.remove("is-open");
+      paymentModal.setAttribute("aria-hidden", "true");
     }
 
     Object.values(fields).forEach((input) => {
@@ -410,23 +722,70 @@
     });
 
     form.addEventListener("reset", () => {
-      window.requestAnimationFrame(syncPreview);
+      window.requestAnimationFrame(() => {
+        if (premiumUnlocked) {
+          syncPreview();
+        } else {
+          resetPremiumStyles();
+          syncPreview();
+        }
+      });
+    });
+
+    [themeSelect, fontSelect, headerLine, inviteMessage].forEach((input) => {
+      input.addEventListener("input", syncPreview);
+      input.addEventListener("change", syncPreview);
+    });
+
+    unlockPremiumButton.addEventListener("click", openPaymentModal);
+    cancelPaymentButton.addEventListener("click", closePaymentModal);
+    paymentModal.addEventListener("click", (event) => {
+      if (event.target === paymentModal) {
+        closePaymentModal();
+      }
+    });
+
+    confirmPaymentButton.addEventListener("click", () => {
+      confirmPaymentButton.disabled = true;
+      confirmPaymentButton.textContent = "Processing...";
+
+      window.setTimeout(() => {
+        setPremiumUnlocked(true);
+        closePaymentModal();
+        confirmPaymentButton.disabled = false;
+        confirmPaymentButton.textContent = "Pay €1 (Test)";
+      }, 900);
     });
 
     const PDF_WIDTH = 794;
     const PDF_HEIGHT = 1123;
 
-    async function downloadInvitationPdf() {
-      const fileName = `${fields.partnerOne.value.trim() || "wedding"}-${fields.partnerTwo.value.trim() || "invitation"}`
+    async function downloadInvitationPdf({ premium = false } = {}) {
+      const prefix = premium ? "premium" : "basic";
+      const fileName = `${prefix}-${fields.partnerOne.value.trim() || "wedding"}-${fields.partnerTwo.value.trim() || "invitation"}`
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "") || "wedding-invitation";
+        .replace(/^-|-$/g, "") || `${prefix}-wedding-invitation`;
 
       const exportCard = invitationCard.cloneNode(true);
+      if (!premium) {
+        exportCard.style.removeProperty("--invite-bg");
+        exportCard.style.removeProperty("--invite-border");
+        exportCard.style.removeProperty("--invite-outline");
+        exportCard.style.removeProperty("--invite-accent");
+        exportCard.style.removeProperty("--invite-accent-soft");
+        exportCard.style.removeProperty("--invite-text");
+        exportCard.style.removeProperty("--invite-font");
+        exportCard.querySelector("#previewHeader").textContent = "Together With Their Families";
+        exportCard.querySelector("#previewMessage").textContent = "Request the honor of your presence at the celebration of their marriage";
+      }
+
       pdfStage.replaceChildren(exportCard);
 
       await document.fonts.ready;
       await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+      const theme = themes[themeSelect.value] || themes.classic;
 
       await html2pdf()
         .set({
@@ -436,7 +795,7 @@
           html2canvas: {
             scale: 2,
             useCORS: true,
-            backgroundColor: "#fffdf9",
+            backgroundColor: premium ? theme.bg : "#fffdf9",
             width: PDF_WIDTH,
             height: PDF_HEIGHT,
             windowWidth: PDF_WIDTH,
@@ -457,23 +816,37 @@
         .save();
     }
 
-    downloadButton.addEventListener("click", async () => {
-      const originalLabel = downloadButton.textContent;
-      downloadButton.disabled = true;
-      downloadButton.textContent = "Generating PDF...";
+    async function handleDownload(button, options) {
+      const originalLabel = button.textContent;
+      button.disabled = true;
+      button.textContent = "Generating PDF...";
 
       try {
-        await downloadInvitationPdf();
+        await downloadInvitationPdf(options);
       } catch (error) {
         console.error(error);
         window.alert("Sorry, the PDF could not be generated. Please try again.");
       } finally {
-        downloadButton.disabled = false;
-        downloadButton.textContent = originalLabel;
+        button.disabled = options.premium ? !premiumUnlocked : false;
+        button.textContent = originalLabel;
         pdfStage.replaceChildren();
       }
+    }
+
+    downloadButton.addEventListener("click", () => {
+      handleDownload(downloadButton, { premium: false });
     });
 
+    downloadPremiumButton.addEventListener("click", () => {
+      if (!premiumUnlocked) {
+        openPaymentModal();
+        return;
+      }
+
+      handleDownload(downloadPremiumButton, { premium: true });
+    });
+
+    setPremiumUnlocked(premiumUnlocked);
     syncPreview();
   </script>
 </body>
