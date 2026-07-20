@@ -6,7 +6,7 @@
   <title>Wedding Invitation Generator</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@400;600&family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Crimson+Text:wght@400;600&family=Dancing+Script:wght@400;600&family=EB+Garamond:wght@400;600&family=Great+Vibes&family=Italiana&family=Josefin+Sans:wght@400;600&family=Libre+Baskerville:wght@400;700&family=Lora:wght@400;600&family=Montserrat:wght@400;600&family=Parisienne&family=Pinyon+Script&family=Playfair+Display:wght@400;600&family=Prata&family=Raleway:wght@400;600&family=Spectral:wght@400;600&family=Tangerine:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Comfortaa:wght@400;600&family=EB+Garamond:wght@400;600&family=Lexend:wght@400;600&family=Lobster&family=Lora:wght@400;600&family=Merriweather:wght@400;700&family=Merriweather+Sans:wght@400;600&family=Montserrat:wght@400;600&family=Noto+Sans+Symbols:wght@400;600&family=Nunito:wght@400;600&family=Pacifico&family=Playfair+Display:wght@400;600&family=Poppins:wght@400;600&family=Roboto:wght@400;500&family=Source+Serif+4:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     :root {
@@ -336,28 +336,32 @@
 
     .font-list {
       display: grid;
-      gap: 0.45rem;
-      max-height: 260px;
+      gap: 0.15rem;
+      max-height: 280px;
       overflow: auto;
-      padding: 0.15rem;
+      padding: 0.35rem;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #ffffff;
     }
 
     .font-option {
       width: 100%;
-      padding: 0.8rem 0.9rem;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: #fffdfb;
-      color: var(--ink);
+      padding: 0.7rem 0.85rem;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: #1f1f1f;
       cursor: pointer;
       text-align: left;
-      font-size: 1.05rem;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      font-size: 1.15rem;
+      line-height: 1.3;
+      transition: background 0.15s ease;
     }
 
+    .font-option:hover,
     .font-option.is-active {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(157, 107, 83, 0.14);
+      background: #ececec;
     }
 
     select {
@@ -810,26 +814,26 @@
     const PREMIUM_STORAGE_KEY = "wedding-invite-premium-unlocked";
 
     const fonts = [
-      { id: "georgia", name: "Georgia", stack: 'Georgia, "Times New Roman", serif' },
-      { id: "playfair", name: "Playfair Display", stack: '"Playfair Display", Georgia, serif' },
-      { id: "cormorant", name: "Cormorant Garamond", stack: '"Cormorant Garamond", Georgia, serif' },
-      { id: "great-vibes", name: "Great Vibes", stack: '"Great Vibes", cursive' },
-      { id: "parisienne", name: "Parisienne", stack: '"Parisienne", cursive' },
-      { id: "pinyon", name: "Pinyon Script", stack: '"Pinyon Script", cursive' },
-      { id: "tangerine", name: "Tangerine", stack: '"Tangerine", cursive' },
-      { id: "dancing", name: "Dancing Script", stack: '"Dancing Script", cursive' },
-      { id: "libre", name: "Libre Baskerville", stack: '"Libre Baskerville", Georgia, serif' },
-      { id: "lora", name: "Lora", stack: '"Lora", Georgia, serif' },
+      { id: "caveat", name: "Caveat", stack: '"Caveat", cursive' },
+      { id: "comfortaa", name: "Comfortaa", stack: '"Comfortaa", sans-serif' },
+      { id: "comic-sans", name: "Comic Sans MS", stack: '"Comic Sans MS", "Comic Sans", cursive' },
+      { id: "courier-new", name: "Courier New", stack: '"Courier New", Courier, monospace' },
       { id: "eb-garamond", name: "EB Garamond", stack: '"EB Garamond", Georgia, serif' },
-      { id: "cinzel", name: "Cinzel", stack: '"Cinzel", Georgia, serif' },
-      { id: "josefin", name: "Josefin Sans", stack: '"Josefin Sans", sans-serif' },
+      { id: "georgia", name: "Georgia", stack: 'Georgia, "Times New Roman", serif' },
+      { id: "impact", name: "Impact", stack: 'Impact, Haettenschweiler, sans-serif' },
+      { id: "lexend", name: "Lexend", stack: '"Lexend", sans-serif' },
+      { id: "lobster", name: "Lobster", stack: '"Lobster", cursive' },
+      { id: "lora", name: "Lora", stack: '"Lora", Georgia, serif' },
+      { id: "merriweather", name: "Merriweather", stack: '"Merriweather", Georgia, serif' },
+      { id: "merriweather-sans", name: "Merriweather Sans", stack: '"Merriweather Sans", sans-serif' },
       { id: "montserrat", name: "Montserrat", stack: '"Montserrat", sans-serif' },
-      { id: "raleway", name: "Raleway", stack: '"Raleway", sans-serif' },
-      { id: "crimson", name: "Crimson Text", stack: '"Crimson Text", Georgia, serif' },
-      { id: "italiana", name: "Italiana", stack: '"Italiana", Georgia, serif' },
-      { id: "prata", name: "Prata", stack: '"Prata", Georgia, serif' },
-      { id: "bodoni", name: "Bodoni Moda", stack: '"Bodoni Moda", Georgia, serif' },
-      { id: "spectral", name: "Spectral", stack: '"Spectral", Georgia, serif' }
+      { id: "noto-sans-symbols", name: "Noto Sans Symbols", stack: '"Noto Sans Symbols", sans-serif' },
+      { id: "nunito", name: "Nunito", stack: '"Nunito", sans-serif' },
+      { id: "pacifico", name: "Pacifico", stack: '"Pacifico", cursive' },
+      { id: "playfair", name: "Playfair Display", stack: '"Playfair Display", Georgia, serif' },
+      { id: "poppins", name: "Poppins", stack: '"Poppins", sans-serif' },
+      { id: "roboto", name: "Roboto", stack: '"Roboto", sans-serif' },
+      { id: "source-serif", name: "Source Serif 4", stack: '"Source Serif 4", Georgia, serif' }
     ];
     const fields = {
       partnerOne: document.getElementById("partnerOne"),
@@ -894,7 +898,7 @@
 
     let premiumUnlocked = localStorage.getItem(PREMIUM_STORAGE_KEY) === "true";
     let selectedThemeId = "classic-blush";
-    let selectedFontId = "georgia";
+    let selectedFontId = "caveat";
     let customColors = {
       text: "#5d473d",
       background: "#fffdf9",
