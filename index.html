@@ -391,6 +391,10 @@
       position: relative;
     }
 
+    .date-picker.time-picker {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
     .date-picker::before {
       content: "";
       position: absolute;
@@ -724,7 +728,12 @@
 
         <label>
           Time
-          <input id="weddingTime" type="text" value="4:00 PM" autocomplete="off">
+          <div class="date-picker time-picker" id="timePicker" aria-label="Wedding time picker">
+            <div class="date-column" id="hourColumn" data-type="hour"></div>
+            <div class="date-column" id="minuteColumn" data-type="minute"></div>
+            <div class="date-column" id="periodColumn" data-type="period"></div>
+          </div>
+          <div class="date-display" id="timeDisplay">4:00 PM</div>
         </label>
 
         <label>
@@ -915,7 +924,6 @@
     const fields = {
       partnerOne: document.getElementById("partnerOne"),
       partnerTwo: document.getElementById("partnerTwo"),
-      weddingTime: document.getElementById("weddingTime"),
       venue: document.getElementById("venue"),
       location: document.getElementById("location"),
       note: document.getElementById("note")
@@ -952,6 +960,10 @@
     const monthColumn = document.getElementById("monthColumn");
     const yearColumn = document.getElementById("yearColumn");
     const dateDisplay = document.getElementById("dateDisplay");
+    const hourColumn = document.getElementById("hourColumn");
+    const minuteColumn = document.getElementById("minuteColumn");
+    const periodColumn = document.getElementById("periodColumn");
+    const timeDisplay = document.getElementById("timeDisplay");
 
     const monthNames = [
       "January", "February", "March", "April", "May", "June",
@@ -962,6 +974,7 @@
     ];
 
     let selectedDate = { day: 14, month: 5, year: 2027 };
+    let selectedTime = { hour: 4, minute: 0, period: "PM" };
 
     const presetThemes = [
       { id: "classic-blush", name: "Classic blush", bg: "#fffdf9", border: "#f3e6db", outline: "#d8bbaa", accent: "#9d6b53", text: "#5d473d" },
@@ -1195,8 +1208,11 @@
       });
 
       const formattedDate = formatSelectedDate();
+      const formattedTime = formatSelectedTime();
       preview.weddingDate.textContent = formattedDate;
+      preview.weddingTime.textContent = formattedTime;
       dateDisplay.textContent = formattedDate;
+      timeDisplay.textContent = formattedTime;
 
       if (premiumUnlocked) {
         previewHeader.textContent = headerLine.value.trim() || " ";
@@ -1212,6 +1228,10 @@
     function formatSelectedDate() {
       const date = new Date(selectedDate.year, selectedDate.month, selectedDate.day);
       return `${weekdayNames[date.getDay()]}, ${selectedDate.day} ${monthNames[selectedDate.month]} ${selectedDate.year}`;
+    }
+
+    function formatSelectedTime() {
+      return `${selectedTime.hour}:${String(selectedTime.minute).padStart(2, "0")} ${selectedTime.period}`;
     }
 
     function createDateOptions(column, values, formatter = (value) => String(value)) {
@@ -1343,6 +1363,51 @@
       scrollColumnToValue(yearColumn, selectedDate.year);
     }
 
+    function initTimePicker() {
+      createDateOptions(hourColumn, Array.from({ length: 12 }, (_, index) => index + 1));
+      createDateOptions(
+        minuteColumn,
+        Array.from({ length: 60 }, (_, index) => index),
+        (value) => String(value).padStart(2, "0")
+      );
+      createDateOptions(periodColumn, ["AM", "PM"]);
+
+      updateActiveOptions(hourColumn, selectedTime.hour);
+      updateActiveOptions(minuteColumn, selectedTime.minute);
+      updateActiveOptions(periodColumn, selectedTime.period);
+      scrollColumnToValue(hourColumn, selectedTime.hour);
+      scrollColumnToValue(minuteColumn, selectedTime.minute);
+      scrollColumnToValue(periodColumn, selectedTime.period);
+
+      bindDateColumn(hourColumn, (value) => {
+        selectedTime.hour = Number(value);
+        updateActiveOptions(hourColumn, selectedTime.hour);
+        syncPreview();
+      });
+
+      bindDateColumn(minuteColumn, (value) => {
+        selectedTime.minute = Number(value);
+        updateActiveOptions(minuteColumn, selectedTime.minute);
+        syncPreview();
+      });
+
+      bindDateColumn(periodColumn, (value) => {
+        selectedTime.period = value;
+        updateActiveOptions(periodColumn, selectedTime.period);
+        syncPreview();
+      });
+    }
+
+    function resetTimePicker() {
+      selectedTime = { hour: 4, minute: 0, period: "PM" };
+      updateActiveOptions(hourColumn, selectedTime.hour);
+      updateActiveOptions(minuteColumn, selectedTime.minute);
+      updateActiveOptions(periodColumn, selectedTime.period);
+      scrollColumnToValue(hourColumn, selectedTime.hour);
+      scrollColumnToValue(minuteColumn, selectedTime.minute);
+      scrollColumnToValue(periodColumn, selectedTime.period);
+    }
+
     function applyPremiumStyles() {
       invitationCard.style.setProperty("--invite-bg", customColors.background);
       invitationCard.style.setProperty("--invite-border", customColors.border);
@@ -1398,6 +1463,7 @@
     form.addEventListener("reset", () => {
       window.requestAnimationFrame(() => {
         resetDatePicker();
+        resetTimePicker();
         applyThemeSelection(getActiveTheme());
         if (!premiumUnlocked) {
           resetPremiumStyles();
@@ -1519,6 +1585,7 @@
     });
 
     initDatePicker();
+    initTimePicker();
     renderThemeList();
     renderFontList();
     applyThemeSelection(getActiveTheme());
