@@ -840,12 +840,12 @@
 
     function buildThemeFromAccent(hex) {
       return {
-        bg: "#fffdf9",
+        bg: shiftLightness(hex, 0.42),
         border: shiftLightness(hex, 0.3),
         outline: shiftLightness(hex, 0.18),
         accent: hex,
         accentSoft: toRgba(hex, 0.18),
-        text: "#5d473d"
+        text: shiftLightness(hex, -0.12)
       };
     }
 
