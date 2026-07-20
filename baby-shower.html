@@ -655,13 +655,14 @@
     .pdf-stage {
       position: fixed;
       top: 0;
-      left: 0;
+      left: -10000px;
       width: 794px;
       height: 1123px;
       overflow: hidden;
       pointer-events: none;
-      z-index: -1;
-      opacity: 0;
+      z-index: 0;
+      opacity: 1;
+      background: #fff;
     }
 
     .invitation {
@@ -713,13 +714,13 @@
     .invitation::before {
       top: -55px;
       left: -55px;
-      border-color: color-mix(in srgb, var(--invite-pink) 55%, white);
+      border-color: rgba(217, 160, 178, 0.55);
     }
 
     .invitation::after {
       right: -55px;
       bottom: -55px;
-      border-color: color-mix(in srgb, var(--invite-blue) 55%, white);
+      border-color: rgba(127, 173, 208, 0.55);
     }
 
     .invite-top {
@@ -1713,18 +1714,22 @@
       }, 900);
     });
 
-    stickerSizeRange.addEventListener("input", () => {
-      if (!selectedSticker) {
-        return;
-      }
+    if (stickerSizeRange) {
+      stickerSizeRange.addEventListener("input", () => {
+        if (!selectedSticker) {
+          return;
+        }
 
-      const scale = setStickerScale(selectedSticker, Number.parseFloat(stickerSizeRange.value));
-      stickerSizeValue.textContent = `${Math.round(scale * 100)}%`;
-    });
+        const scale = setStickerScale(selectedSticker, Number.parseFloat(stickerSizeRange.value));
+        stickerSizeValue.textContent = `${Math.round(scale * 100)}%`;
+      });
+    }
 
-    stickerSizeBar.addEventListener("pointerdown", (event) => {
-      event.stopPropagation();
-    });
+    if (stickerSizeBar) {
+      stickerSizeBar.addEventListener("pointerdown", (event) => {
+        event.stopPropagation();
+      });
+    }
 
     document.addEventListener("pointerdown", (event) => {
       if (!selectedSticker) {
@@ -1752,6 +1757,10 @@
     });
 
     async function downloadInvitationPdf({ premium = false } = {}) {
+      if (typeof html2pdf !== "function") {
+        throw new Error("PDF library failed to load. Please refresh the page and try again.");
+      }
+
       const prefix = premium ? "premium" : "basic";
       const fileName = `${prefix}-baby-shower-${fields.babyName.value.trim() || "invitation"}`
         .toLowerCase()
@@ -1760,21 +1769,24 @@
 
       deselectSticker();
       const exportCard = invitationCard.cloneNode(true);
+      exportCard.removeAttribute("id");
+      exportCard.querySelectorAll("[id]").forEach((node) => node.removeAttribute("id"));
       exportCard.querySelectorAll(".placed-sticker.is-selected").forEach((sticker) => {
         sticker.classList.remove("is-selected");
       });
 
       if (!premium) {
-        exportCard.style.removeProperty("--invite-bg");
-        exportCard.style.removeProperty("--invite-border");
-        exportCard.style.removeProperty("--invite-outline");
-        exportCard.style.removeProperty("--invite-accent");
-        exportCard.style.removeProperty("--invite-pink");
-        exportCard.style.removeProperty("--invite-blue");
-        exportCard.style.removeProperty("--invite-text");
-        exportCard.style.removeProperty("--invite-font");
+        const cream = moods.cream;
+        exportCard.style.setProperty("--invite-bg", cream.bg);
+        exportCard.style.setProperty("--invite-border", cream.border);
+        exportCard.style.setProperty("--invite-outline", cream.outline);
+        exportCard.style.setProperty("--invite-accent", cream.accent);
+        exportCard.style.setProperty("--invite-pink", cream.pink);
+        exportCard.style.setProperty("--invite-blue", cream.blue);
+        exportCard.style.setProperty("--invite-text", cream.text);
+        exportCard.style.setProperty("--invite-font", '"Playfair Display", Georgia, serif');
         exportCard.classList.remove("is-dual");
-        const stickerLayerClone = exportCard.querySelector("#stickerLayer");
+        const stickerLayerClone = exportCard.querySelector(".sticker-layer");
         if (stickerLayerClone) {
           stickerLayerClone.replaceChildren();
         }
@@ -1782,7 +1794,15 @@
 
       pdfStage.replaceChildren(exportCard);
 
-      await document.fonts.ready;
+      try {
+        await Promise.race([
+          document.fonts.ready,
+          new Promise((resolve) => window.setTimeout(resolve, 1500))
+        ]);
+      } catch (error) {
+        console.warn("Font wait skipped:", error);
+      }
+
       await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
       const mood = premium
@@ -1797,6 +1817,7 @@
           html2canvas: {
             scale: 2,
             useCORS: true,
+            allowTaint: true,
             backgroundColor: mood.bg,
             width: PDF_WIDTH,
             height: PDF_HEIGHT,
@@ -1805,12 +1826,14 @@
             scrollX: 0,
             scrollY: 0,
             x: 0,
-            y: 0
+            y: 0,
+            logging: false
           },
           jsPDF: {
             unit: "px",
             format: [PDF_WIDTH, PDF_HEIGHT],
-            orientation: "portrait"
+            orientation: "portrait",
+            hotfixes: ["px_scaling"]
           },
           pagebreak: { mode: ["avoid-all"] }
         })
@@ -1819,6 +1842,10 @@
     }
 
     async function handleDownload(button, options) {
+      if (!button) {
+        return;
+      }
+
       const originalLabel = button.textContent;
       button.disabled = true;
       button.textContent = "Generating PDF...";
@@ -1827,7 +1854,9 @@
         await downloadInvitationPdf(options);
       } catch (error) {
         console.error(error);
-        window.alert("Sorry, the PDF could not be generated. Please try again.");
+        window.alert(error && error.message
+          ? `Sorry, the PDF could not be generated: ${error.message}`
+          : "Sorry, the PDF could not be generated. Please try again.");
       } finally {
         button.disabled = options.premium ? !premiumUnlocked : false;
         button.textContent = originalLabel;
@@ -1835,18 +1864,24 @@
       }
     }
 
-    downloadButton.addEventListener("click", () => {
-      handleDownload(downloadButton, { premium: false });
-    });
+    if (downloadButton) {
+      downloadButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        handleDownload(downloadButton, { premium: false });
+      });
+    }
 
-    downloadPremiumButton.addEventListener("click", () => {
-      if (!premiumUnlocked) {
-        openPaymentModal();
-        return;
-      }
+    if (downloadPremiumButton) {
+      downloadPremiumButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        if (!premiumUnlocked) {
+          openPaymentModal();
+          return;
+        }
 
-      handleDownload(downloadPremiumButton, { premium: true });
-    });
+        handleDownload(downloadPremiumButton, { premium: true });
+      });
+    }
 
     // Ensure the time wheels always initialize, even if date setup fails.
     try {
