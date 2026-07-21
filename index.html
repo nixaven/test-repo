@@ -88,30 +88,131 @@
       gap: 1.15rem;
       min-height: 320px;
       padding: 2rem 1.85rem 1.9rem;
-      border: 1px solid var(--line);
       border-radius: 22px;
-      background: var(--panel);
       text-decoration: none;
       color: inherit;
       overflow: hidden;
-      box-shadow: 0 10px 30px rgba(42, 41, 38, 0.04);
       transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
       animation: rise 0.75s ease both;
     }
 
+    .choice::before,
+    .choice::after {
+      content: "";
+      position: absolute;
+      width: 110px;
+      height: 110px;
+      border: 1px solid;
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0.45;
+    }
+
+    .choice::before {
+      top: -42px;
+      left: -42px;
+    }
+
+    .choice::after {
+      right: -42px;
+      bottom: -42px;
+    }
+
     .choice-wedding {
+      background: #f5f8fb;
+      border: 3px solid #d0dceb;
+      box-shadow:
+        inset 0 0 0 1px #a7bacf,
+        0 10px 30px rgba(59, 76, 97, 0.08);
       animation-delay: 0.12s;
     }
 
+    .choice-wedding::before,
+    .choice-wedding::after {
+      border-color: rgba(167, 186, 207, 0.55);
+    }
+
+    .choice-wedding:hover,
+    .choice-wedding:focus-visible {
+      transform: translateY(-4px);
+      border-color: #a7bacf;
+      box-shadow:
+        inset 0 0 0 1px #96a5bf,
+        0 18px 40px rgba(59, 76, 97, 0.14);
+      outline: none;
+    }
+
+    .choice-wedding .choice-watermark {
+      color: rgba(91, 115, 145, 0.38);
+    }
+
+    .choice-wedding .choice-icon {
+      background: rgba(201, 210, 225, 0.55);
+      color: #5b7391;
+    }
+
+    .choice-wedding .choice-title {
+      color: #3b4c61;
+    }
+
+    .choice-wedding .choice-copy {
+      color: #5b7391;
+    }
+
+    .choice-wedding .choice-cta {
+      color: #3f5477;
+    }
+
     .choice-baby {
+      background: #fcfafc;
+      border: 3px solid #e8b7c6;
+      box-shadow:
+        inset 0 0 0 1px #9fc0d8,
+        0 10px 30px rgba(127, 173, 208, 0.12);
       animation-delay: 0.2s;
+    }
+
+    .choice-baby::before {
+      border-color: rgba(232, 183, 198, 0.55);
+    }
+
+    .choice-baby::after {
+      border-color: rgba(159, 192, 216, 0.55);
+    }
+
+    .choice-baby:hover,
+    .choice-baby:focus-visible {
+      transform: translateY(-4px);
+      border-color: #d9a0b2;
+      box-shadow:
+        inset 0 0 0 1px #7fadd0,
+        0 18px 40px rgba(127, 173, 208, 0.18);
+      outline: none;
+    }
+
+    .choice-baby .choice-watermark {
+      color: rgba(217, 160, 178, 0.42);
+    }
+
+    .choice-baby .choice-icon {
+      background: rgba(232, 183, 198, 0.35);
+      color: #d9a0b2;
+    }
+
+    .choice-baby .choice-title {
+      color: #56606a;
+    }
+
+    .choice-baby .choice-copy {
+      color: #7a6673;
+    }
+
+    .choice-baby .choice-cta {
+      color: #7fadd0;
     }
 
     .choice:hover,
     .choice:focus-visible {
-      transform: translateY(-4px);
-      border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
-      box-shadow: 0 18px 40px rgba(42, 41, 38, 0.08);
       outline: none;
     }
 
@@ -122,7 +223,6 @@
       font-weight: 600;
       line-height: 0.95;
       letter-spacing: -0.03em;
-      color: color-mix(in srgb, var(--accent) 55%, white);
       opacity: 0.9;
     }
 
@@ -132,8 +232,6 @@
       display: grid;
       place-items: center;
       border-radius: 999px;
-      background: var(--accent-soft);
-      color: #8a7044;
       flex-shrink: 0;
     }
 
@@ -153,13 +251,11 @@
       font-size: clamp(1.7rem, 3vw, 2.15rem);
       font-weight: 700;
       line-height: 1.15;
-      color: var(--ink);
     }
 
     .choice-copy {
       margin: 0;
       max-width: 28rem;
-      color: var(--muted);
       font-size: 0.98rem;
       line-height: 1.65;
       font-weight: 500;
@@ -170,7 +266,6 @@
       display: inline-flex;
       align-items: center;
       gap: 0.45rem;
-      color: #8a7044;
       font-size: 0.92rem;
       font-weight: 600;
     }
