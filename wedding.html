@@ -580,6 +580,17 @@
       color: var(--ink);
     }
 
+    .resizable-text {
+      cursor: pointer;
+      border-radius: 8px;
+      transition: outline-color 0.15s ease;
+    }
+
+    .resizable-text.is-selected {
+      outline: 2px dashed color-mix(in srgb, var(--accent) 70%, white);
+      outline-offset: 6px;
+    }
+
     .invitation.drop-ready {
       box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent);
     }
@@ -1105,24 +1116,24 @@
     <section class="preview-shell">
       <article class="invitation" id="invitationCard">
         <div class="sticker-layer" id="stickerLayer"></div>
-        <div class="invite-top" id="previewHeader">Together With Their Families</div>
+        <div class="invite-top resizable-text" id="previewHeader" title="Tap to resize">Together With Their Families</div>
         <div class="divider"></div>
-        <div class="invite-text" id="previewMessage">Request the honor of your presence at the celebration of their marriage</div>
+        <div class="invite-text resizable-text" id="previewMessage" title="Tap to resize">Request the honor of your presence at the celebration of their marriage</div>
         <div class="names">
-          <span id="previewPartnerOne">Olivia Grace</span>
-          <span class="ampersand">&amp;</span>
-          <span id="previewPartnerTwo">Ethan James</span>
+          <span class="resizable-text" id="previewPartnerOne" title="Tap to resize">Olivia Grace</span>
+          <span class="ampersand resizable-text" id="previewAmpersand" title="Tap to resize">&amp;</span>
+          <span class="resizable-text" id="previewPartnerTwo" title="Tap to resize">Ethan James</span>
         </div>
         <div class="invite-text">
-          <span id="previewDate">Saturday, 14 June 2027</span><br>
-          at <span id="previewTime">4:00 PM</span>
+          <span class="resizable-text" id="previewDate" title="Tap to resize">Saturday, 14 June 2027</span><br>
+          at <span class="resizable-text" id="previewTime" title="Tap to resize">4:00 PM</span>
         </div>
         <div class="details">
-          <strong id="previewVenue">Rosewood Garden Estate</strong><br>
-          <span id="previewLocation">Florence, Italy</span>
+          <strong class="resizable-text" id="previewVenue" title="Tap to resize">Rosewood Garden Estate</strong><br>
+          <span class="resizable-text" id="previewLocation" title="Tap to resize">Florence, Italy</span>
         </div>
         <div class="divider"></div>
-        <div class="footer-note" id="previewNote">Dinner and dancing to follow. Formal attire requested.</div>
+        <div class="footer-note resizable-text" id="previewNote" title="Tap to resize">Dinner and dancing to follow. Formal attire requested.</div>
       </article>
 
       <div class="sticker-size-bar" id="stickerSizeBar" aria-hidden="true">
@@ -1231,6 +1242,7 @@
     const stickerSizeRange = document.getElementById("stickerSizeRange");
     const stickerSizeValue = document.getElementById("stickerSizeValue");
     let selectedSticker = null;
+    let selectedText = null;
     const headerLine = document.getElementById("headerLine");
     const inviteMessage = document.getElementById("inviteMessage");
     const previewHeader = document.getElementById("previewHeader");
@@ -1438,29 +1450,99 @@
       return next;
     }
 
-    function selectSticker(sticker) {
-      if (selectedSticker && selectedSticker !== sticker) {
-        selectedSticker.classList.remove("is-selected");
-      }
-
-      selectedSticker = sticker;
-      selectedSticker.classList.add("is-selected");
-
-      const scale = getStickerScale(sticker);
+    function openSizeBar(scale) {
       stickerSizeRange.value = String(scale);
       stickerSizeValue.textContent = `${Math.round(scale * 100)}%`;
       stickerSizeBar.classList.add("is-open");
       stickerSizeBar.setAttribute("aria-hidden", "false");
     }
 
-    function deselectSticker() {
+    function closeSizeBar() {
+      stickerSizeBar.classList.remove("is-open");
+      stickerSizeBar.setAttribute("aria-hidden", "true");
+    }
+
+    function getTextScale(el) {
+      const raw = Number.parseFloat(el.dataset.textScale || "1");
+      return Number.isFinite(raw) ? raw : 1;
+    }
+
+    function setTextScale(el, scale) {
+      const next = Math.min(2.4, Math.max(0.6, scale));
+      if (!el.dataset.baseFontSize) {
+        const current = Number.parseFloat(window.getComputedStyle(el).fontSize);
+        const currentScale = getTextScale(el);
+        el.dataset.baseFontSize = String(current / currentScale);
+      }
+
+      el.dataset.textScale = String(next);
+      el.style.fontSize = `${Number.parseFloat(el.dataset.baseFontSize) * next}px`;
+      return next;
+    }
+
+    function deselectText() {
+      if (selectedText) {
+        selectedText.classList.remove("is-selected");
+        selectedText = null;
+      }
+    }
+
+    function selectText(el) {
+      deselectSticker(false);
+      if (selectedText && selectedText !== el) {
+        selectedText.classList.remove("is-selected");
+      }
+
+      selectedText = el;
+      selectedText.classList.add("is-selected");
+      openSizeBar(getTextScale(el));
+    }
+
+    function selectSticker(sticker) {
+      deselectText();
+      if (selectedSticker && selectedSticker !== sticker) {
+        selectedSticker.classList.remove("is-selected");
+      }
+
+      selectedSticker = sticker;
+      selectedSticker.classList.add("is-selected");
+      openSizeBar(getStickerScale(sticker));
+    }
+
+    function deselectSticker(closeBar = true) {
       if (selectedSticker) {
         selectedSticker.classList.remove("is-selected");
         selectedSticker = null;
       }
 
-      stickerSizeBar.classList.remove("is-open");
-      stickerSizeBar.setAttribute("aria-hidden", "true");
+      if (closeBar && !selectedText) {
+        closeSizeBar();
+      }
+    }
+
+    function deselectAll() {
+      deselectText();
+      deselectSticker(true);
+      closeSizeBar();
+    }
+
+    function resetTextScales() {
+      deselectText();
+      invitationCard.querySelectorAll(".resizable-text").forEach((el) => {
+        el.classList.remove("is-selected");
+        delete el.dataset.textScale;
+        delete el.dataset.baseFontSize;
+        el.style.removeProperty("font-size");
+      });
+    }
+
+    function setupTextResizers() {
+      invitationCard.querySelectorAll(".resizable-text").forEach((el) => {
+        el.addEventListener("pointerdown", (event) => {
+          event.stopPropagation();
+          selectText(el);
+        });
+      });
     }
 
     function placeSticker(stickerHtml, xPercent, yPercent) {
@@ -1487,9 +1569,12 @@
         event.preventDefault();
         event.stopPropagation();
         if (selectedSticker === sticker) {
-          deselectSticker();
+          deselectSticker(false);
         }
         sticker.remove();
+        if (!selectedText) {
+          closeSizeBar();
+        }
       });
 
       sticker.addEventListener("pointerdown", (event) => {
@@ -1535,8 +1620,11 @@
     }
 
     function clearStickers() {
-      deselectSticker();
+      deselectSticker(false);
       stickerLayer.replaceChildren();
+      if (!selectedText) {
+        closeSizeBar();
+      }
     }
 
     function setupStickerDropTarget() {
@@ -1928,6 +2016,7 @@
         resetDatePicker();
         resetTimePicker();
         clearStickers();
+        resetTextScales();
         applyThemeSelection(getActiveTheme());
         if (!premiumUnlocked) {
           resetPremiumStyles();
@@ -1939,12 +2028,17 @@
     clearStickersButton.addEventListener("click", clearStickers);
 
     stickerSizeRange.addEventListener("input", () => {
-      if (!selectedSticker) {
+      const value = Number.parseFloat(stickerSizeRange.value);
+      if (selectedSticker) {
+        const scale = setStickerScale(selectedSticker, value);
+        stickerSizeValue.textContent = `${Math.round(scale * 100)}%`;
         return;
       }
 
-      const scale = setStickerScale(selectedSticker, Number.parseFloat(stickerSizeRange.value));
-      stickerSizeValue.textContent = `${Math.round(scale * 100)}%`;
+      if (selectedText) {
+        const scale = setTextScale(selectedText, value);
+        stickerSizeValue.textContent = `${Math.round(scale * 100)}%`;
+      }
     });
 
     stickerSizeBar.addEventListener("pointerdown", (event) => {
@@ -1952,16 +2046,20 @@
     });
 
     document.addEventListener("pointerdown", (event) => {
-      if (!selectedSticker) {
+      if (!selectedSticker && !selectedText) {
         return;
       }
 
       const target = event.target;
-      if (selectedSticker.contains(target) || stickerSizeBar.contains(target)) {
+      if (
+        (selectedSticker && selectedSticker.contains(target)) ||
+        (selectedText && selectedText.contains(target)) ||
+        stickerSizeBar.contains(target)
+      ) {
         return;
       }
 
-      deselectSticker();
+      deselectAll();
     });
 
     [headerLine, inviteMessage].forEach((input) => {
@@ -1999,10 +2097,10 @@
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-|-$/g, "") || `${prefix}-wedding-invitation`;
 
-      deselectSticker();
+      deselectAll();
       const exportCard = invitationCard.cloneNode(true);
-      exportCard.querySelectorAll(".placed-sticker.is-selected").forEach((sticker) => {
-        sticker.classList.remove("is-selected");
+      exportCard.querySelectorAll(".placed-sticker.is-selected, .resizable-text.is-selected").forEach((node) => {
+        node.classList.remove("is-selected");
       });
       if (!premium) {
         exportCard.style.removeProperty("--invite-bg");
@@ -2086,6 +2184,7 @@
     renderFontList();
     renderStickerTray();
     setupStickerDropTarget();
+    setupTextResizers();
     applyThemeSelection(getActiveTheme());
     setPremiumUnlocked(premiumUnlocked);
     syncPreview();
