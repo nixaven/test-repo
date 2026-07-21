@@ -1467,17 +1467,58 @@
       return Number.isFinite(raw) ? raw : 1;
     }
 
+    function applyTextScaleValue(el, scale) {
+      el.dataset.textScale = String(scale);
+      el.style.fontSize = `${Number.parseFloat(el.dataset.baseFontSize) * scale}px`;
+    }
+
+    function invitationContentFits() {
+      const pad = 2;
+      return invitationCard.scrollHeight <= invitationCard.clientHeight + pad
+        && invitationCard.scrollWidth <= invitationCard.clientWidth + pad;
+    }
+
+    function textFitsInInvitation(el) {
+      const card = invitationCard.getBoundingClientRect();
+      const box = el.getBoundingClientRect();
+      const inset = 30;
+      return box.left >= card.left + inset - 1
+        && box.right <= card.right - inset + 1
+        && box.top >= card.top + inset - 1
+        && box.bottom <= card.bottom - inset + 1;
+    }
+
     function setTextScale(el, scale) {
-      const next = Math.min(2.4, Math.max(0.6, scale));
+      const requested = Math.min(2.4, Math.max(0.6, scale));
       if (!el.dataset.baseFontSize) {
         const current = Number.parseFloat(window.getComputedStyle(el).fontSize);
         const currentScale = getTextScale(el);
         el.dataset.baseFontSize = String(current / currentScale);
       }
 
-      el.dataset.textScale = String(next);
-      el.style.fontSize = `${Number.parseFloat(el.dataset.baseFontSize) * next}px`;
-      return next;
+      applyTextScaleValue(el, requested);
+      if (invitationContentFits() && textFitsInInvitation(el)) {
+        return requested;
+      }
+
+      let low = 0.6;
+      let high = requested;
+      let best = 0.6;
+      applyTextScaleValue(el, best);
+
+      for (let i = 0; i < 14; i += 1) {
+        const mid = (low + high) / 2;
+        applyTextScaleValue(el, mid);
+        if (invitationContentFits() && textFitsInInvitation(el)) {
+          best = mid;
+          low = mid;
+        } else {
+          high = mid;
+        }
+      }
+
+      applyTextScaleValue(el, best);
+      return Math.round(best * 100) / 100;
     }
 
     function deselectText() {
@@ -2037,6 +2078,7 @@
 
       if (selectedText) {
         const scale = setTextScale(selectedText, value);
+        stickerSizeRange.value = String(scale);
         stickerSizeValue.textContent = `${Math.round(scale * 100)}%`;
       }
     });
