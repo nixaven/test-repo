@@ -888,20 +888,58 @@
     }
 
     @media (max-width: 900px) {
-      .page,
-      .top-nav {
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100dvh;
+        overflow: hidden;
+      }
+
+      .top-nav,
+      .page {
         padding-left: 1rem;
         padding-right: 1rem;
       }
 
+      .top-nav {
+        flex-shrink: 0;
+        padding-bottom: 0.5rem;
+      }
+
       .page {
-        grid-template-columns: 1fr;
+        flex: 1;
+        min-height: 0;
+        width: 100%;
+        margin: 0;
+        padding-top: 0;
+        padding-bottom: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        overflow: hidden;
       }
 
       .preview-shell {
+        order: -1;
+        flex-shrink: 0;
         position: static;
-        max-height: none;
-        overflow: visible;
+        align-self: stretch;
+        max-height: min(52dvh, 520px);
+        overflow: auto;
+        padding: 1rem;
+      }
+
+      .panel {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
       }
 
       .invitation {
