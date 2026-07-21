@@ -1866,8 +1866,8 @@
       const exportCard = invitationCard.cloneNode(true);
       exportCard.removeAttribute("id");
       exportCard.querySelectorAll("[id]").forEach((node) => node.removeAttribute("id"));
-      exportCard.querySelectorAll(".placed-sticker.is-selected").forEach((sticker) => {
-        sticker.classList.remove("is-selected");
+      exportCard.querySelectorAll(".placed-sticker.is-selected, .resizable-text.is-selected").forEach((node) => {
+        node.classList.remove("is-selected");
       });
 
       if (!premium) {
