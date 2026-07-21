@@ -1102,7 +1102,7 @@
     <div class="payment-dialog" role="dialog" aria-labelledby="paymentTitle" aria-modal="true">
       <h3 id="paymentTitle" data-i18n="paymentTitle">Unlock premium extras</h3>
       <p data-i18n="paymentBody">Get access to color moods, fonts, stickers, and premium PDF download for your baby shower invitation.</p>
-      <div class="payment-amount">€1.00</div>
+      <div class="payment-amount" id="paymentAmount">€2.99</div>
       <div class="payment-actions">
         <button class="primary" type="button" id="confirmPayment" data-i18n="payButton">Pay €1 (Test)</button>
         <button class="secondary" type="button" id="cancelPayment" data-i18n="cancel">Cancel</button>
@@ -1335,9 +1335,9 @@
         downloadPremium: "Download Premium PDF",
         reset: "Reset",
         premiumTitle: "Premium extras",
-        lockedBadge: "Locked · €1",
+        lockedBadge: "Locked · {price}",
         unlockedBadge: "Unlocked",
-        unlockButton: "Unlock for €1 (Test)",
+        unlockButton: "Unlock for {price} (Test)",
         premiumCopy: "Unlock color moods, fonts, stickers, and premium PDF download. This is a test flow with no real payment.",
         colorMood: "Color mood",
         moodCream: "Soft cream",
@@ -1359,7 +1359,7 @@
         selectedTime: "Selected time:",
         paymentTitle: "Unlock premium extras",
         paymentBody: "Get access to color moods, fonts, stickers, and premium PDF download for your baby shower invitation.",
-        payButton: "Pay €1 (Test)",
+        payButton: "Pay {price} (Test)",
         cancel: "Cancel",
         paymentTestNote: "Test mode only. No real payment will be processed.",
         processing: "Processing...",
@@ -1395,9 +1395,9 @@
         downloadPremium: "Pobierz premium PDF",
         reset: "Resetuj",
         premiumTitle: "Dodatki premium",
-        lockedBadge: "Zablokowane · 1 €",
+        lockedBadge: "Zablokowane · {price}",
         unlockedBadge: "Odblokowane",
-        unlockButton: "Odblokuj za 1 € (test)",
+        unlockButton: "Odblokuj za {price} (test)",
         premiumCopy: "Odblokuj palety kolorów, czcionki, naklejki i pobieranie premium PDF. To jest testowy przepływ bez prawdziwej płatności.",
         colorMood: "Paleta kolorów",
         moodCream: "Delikatna kremowa",
@@ -1419,7 +1419,7 @@
         selectedTime: "Wybrana godzina:",
         paymentTitle: "Odblokuj dodatki premium",
         paymentBody: "Uzyskaj dostęp do palet kolorów, czcionek, naklejek i pobierania premium PDF dla zaproszenia na baby shower.",
-        payButton: "Zapłać 1 € (test)",
+        payButton: "Zapłać {price} (test)",
         cancel: "Anuluj",
         paymentTestNote: "Tylko tryb testowy. Żadna prawdziwa płatność nie zostanie przetworzona.",
         processing: "Przetwarzanie...",
@@ -1436,6 +1436,72 @@
 
     function t(key) {
       return (copy[currentLang] && copy[currentLang][key]) || copy.en[key] || "";
+    }
+
+    function formatTemplate(template, values) {
+      return template.replace(/\{(\w+)\}/g, (_, key) => values[key] ?? "");
+    }
+
+    function detectRegion() {
+      const localeSources = [
+        ...(navigator.languages || []),
+        navigator.language,
+        Intl.DateTimeFormat().resolvedOptions().locale
+      ].filter(Boolean);
+
+      for (const locale of localeSources) {
+        const normalized = locale.replace(/_/g, "-");
+        const parts = normalized.split("-");
+        const regionPart = parts.find((part) => /^[A-Z]{2}$/.test(part.toUpperCase()));
+        if (regionPart) {
+          return regionPart.toUpperCase();
+        }
+      }
+
+      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+      if (timeZone === "Europe/Warsaw") {
+        return "PL";
+      }
+      if (timeZone === "Europe/London") {
+        return "GB";
+      }
+      if (timeZone.startsWith("America/")) {
+        return "US";
+      }
+
+      return "";
+    }
+
+    function getCurrentPrice() {
+      const region = detectRegion();
+      if (region === "US") {
+        return "$3.99";
+      }
+      if (region === "GB" || region === "UK") {
+        return "£2.99";
+      }
+      if (currentLang === "pl" || region === "PL") {
+        return "14.99 zl";
+      }
+      return "€2.99";
+    }
+
+    function updatePricingUI() {
+      const price = getCurrentPrice();
+      if (paymentAmount) {
+        paymentAmount.textContent = price;
+      }
+      if (premiumBadge) {
+        premiumBadge.textContent = premiumUnlocked
+          ? t("unlockedBadge")
+          : formatTemplate(t("lockedBadge"), { price });
+      }
+      if (unlockPremiumButton) {
+        unlockPremiumButton.textContent = formatTemplate(t("unlockButton"), { price });
+      }
+      if (confirmPaymentButton && !confirmPaymentButton.disabled) {
+        confirmPaymentButton.textContent = formatTemplate(t("payButton"), { price });
+      }
     }
 
     function getCalendarLabels() {
@@ -1522,7 +1588,7 @@
       swapDefaultValue(fields.babyName, copy.en.defaultBabyName, copy.pl.defaultBabyName);
       swapDefaultValue(fields.note, copy.en.defaultNote, copy.pl.defaultNote);
 
-      premiumBadge.textContent = premiumUnlocked ? strings.unlockedBadge : strings.lockedBadge;
+      updatePricingUI();
       refreshMonthColumn();
       syncPreview();
     }
@@ -1540,6 +1606,7 @@
     const langEnButton = document.getElementById("langEn");
     const langPlButton = document.getElementById("langPl");
     const langSwitch = document.querySelector(".lang-switch");
+    const paymentAmount = document.getElementById("paymentAmount");
 
     let selectedDate = { day: 12, month: 8, year: 2027 };
     let selectedTime = { hour: 2, minute: 0, period: "PM" };
@@ -1867,7 +1934,7 @@
       premiumFields.classList.toggle("is-locked", !unlocked);
       unlockPremiumButton.hidden = unlocked;
       downloadPremiumButton.disabled = !unlocked;
-      premiumBadge.textContent = unlocked ? t("unlockedBadge") : t("lockedBadge");
+      updatePricingUI();
       premiumBadge.classList.toggle("unlocked", unlocked);
 
       if (!unlocked) {
@@ -2133,7 +2200,7 @@
         setPremiumUnlocked(true);
         closePaymentModal();
         confirmPaymentButton.disabled = false;
-        confirmPaymentButton.textContent = t("payButton");
+        confirmPaymentButton.textContent = formatTemplate(t("payButton"), { price: getCurrentPrice() });
       }, 900);
     });
 
