@@ -34,13 +34,55 @@
       color: var(--ink);
     }
 
-    .top-nav {
+    .site-header {
       width: min(1200px, 100%);
       margin: 0 auto;
       padding: 1.25rem 2rem 0;
       display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .top-nav {
+      display: flex;
       gap: 0.75rem;
       flex-wrap: wrap;
+    }
+
+    .lang-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.3rem;
+      border: 1px solid rgba(157, 107, 83, 0.22);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow: 0 8px 24px rgba(67, 49, 40, 0.06);
+      flex-shrink: 0;
+    }
+
+    .lang-btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 0.45rem 0.85rem;
+      font: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #6b5144;
+      background: transparent;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .lang-btn.is-active {
+      background: var(--accent);
+      color: #fffaf7;
+    }
+
+    .lang-btn:hover:not(.is-active) {
+      color: var(--ink);
     }
 
     .top-nav a {
@@ -900,13 +942,13 @@
         overflow: hidden;
       }
 
-      .top-nav,
+      .site-header,
       .page {
         padding-left: 1rem;
         padding-right: 1rem;
       }
 
-      .top-nav {
+      .site-header {
         flex-shrink: 0;
         padding-bottom: 0.5rem;
       }
@@ -952,7 +994,7 @@
         background: #ffffff;
       }
 
-      .top-nav,
+      .site-header,
       .panel {
         display: none;
       }
@@ -978,31 +1020,37 @@
   </style>
 </head>
 <body>
-  <nav class="top-nav">
-    <a href="/test-repo/index.html">Home</a>
-    <a class="active" href="/test-repo/wedding.html">Wedding Invitation</a>
-  </nav>
+  <header class="site-header">
+    <nav class="top-nav">
+      <a href="/test-repo/index.html" data-i18n="navHome">Home</a>
+      <a class="active" href="/test-repo/wedding.html" data-i18n="navWedding">Wedding Invitation</a>
+    </nav>
+    <div class="lang-switch" role="group" aria-label="Language">
+      <button class="lang-btn is-active" type="button" id="langEn">English</button>
+      <button class="lang-btn" type="button" id="langPl">Polski</button>
+    </div>
+  </header>
 
   <div class="page">
     <section class="panel">
-      <p class="eyebrow">Printable Invitation</p>
-      <h1>Wedding Invitation Generator</h1>
-      <p class="intro">Enter the event details, preview the design live, then download a polished PDF invitation ready to print or share.</p>
+      <p class="eyebrow" data-i18n="eyebrow">Printable Invitation</p>
+      <h1 data-i18n="pageTitle">Wedding Invitation Generator</h1>
+      <p class="intro" data-i18n="intro">Enter the event details, preview the design live, then download a polished PDF invitation ready to print or share.</p>
 
       <form class="form-grid" id="invitationForm">
         <label>
-          Partner one
+          <span data-i18n="partnerOne">Partner one</span>
           <input id="partnerOne" type="text" value="Olivia Grace" autocomplete="off">
         </label>
 
         <label>
-          Partner two
+          <span data-i18n="partnerTwo">Partner two</span>
           <input id="partnerTwo" type="text" value="Ethan James" autocomplete="off">
         </label>
 
         <label>
-          Wedding date
-          <div class="date-picker" id="datePicker" aria-label="Wedding date picker">
+          <span data-i18n="weddingDate">Wedding date</span>
+          <div class="date-picker" id="datePicker" data-i18n-aria="weddingDatePicker" aria-label="Wedding date picker">
             <div class="date-column" id="dayColumn" data-type="day"></div>
             <div class="date-column" id="monthColumn" data-type="month"></div>
             <div class="date-column" id="yearColumn" data-type="year"></div>
@@ -1011,8 +1059,8 @@
         </label>
 
         <label>
-          Time
-          <div class="date-picker time-picker" id="timePicker" aria-label="Wedding time picker">
+          <span data-i18n="time">Time</span>
+          <div class="date-picker time-picker" id="timePicker" data-i18n-aria="timePicker" aria-label="Wedding time picker">
             <div class="date-column" id="hourColumn" data-type="hour"></div>
             <div class="date-column" id="minuteColumn" data-type="minute"></div>
             <div class="date-column" id="periodColumn" data-type="period"></div>
@@ -1021,129 +1069,129 @@
         </label>
 
         <label>
-          Venue
+          <span data-i18n="venue">Venue</span>
           <input id="venue" type="text" value="Rosewood Garden Estate" autocomplete="off">
         </label>
 
         <label>
-          Location
+          <span data-i18n="location">Location</span>
           <input id="location" type="text" value="Florence, Italy" autocomplete="off">
         </label>
 
         <label>
-          Additional note
+          <span data-i18n="additionalNote">Additional note</span>
           <textarea id="note">Dinner and dancing to follow. Formal attire requested.</textarea>
         </label>
 
         <div class="actions">
-          <button class="primary" type="button" id="downloadPdf">Download Basic PDF</button>
-          <button class="premium-download" type="button" id="downloadPremiumPdf" disabled>Download Premium PDF</button>
-          <button class="secondary" type="reset">Reset</button>
+          <button class="primary" type="button" id="downloadPdf" data-i18n="downloadBasic">Download Basic PDF</button>
+          <button class="premium-download" type="button" id="downloadPremiumPdf" disabled data-i18n="downloadPremium">Download Premium PDF</button>
+          <button class="secondary" type="reset" data-i18n="reset">Reset</button>
         </div>
 
         <section class="premium" id="premiumSection">
           <div class="premium-header">
-            <h2>Premium customization</h2>
+            <h2 data-i18n="premiumTitle">Premium customization</h2>
             <div class="premium-lock">
               <span class="badge" id="premiumBadge">Locked · €1</span>
-              <button class="unlock-button" type="button" id="unlockPremium">Unlock for €1 (Test)</button>
+              <button class="unlock-button" type="button" id="unlockPremium" data-i18n="unlockButton">Unlock for €1 (Test)</button>
             </div>
           </div>
-          <p class="premium-copy">Unlock themes, fonts, custom wording, wedding stickers, and premium PDF downloads. This is a test flow with no real payment.</p>
+          <p class="premium-copy" data-i18n="premiumCopy">Unlock themes, fonts, custom wording, wedding stickers, and premium PDF downloads. This is a test flow with no real payment.</p>
 
           <div class="premium-fields is-locked" id="premiumFields">
             <label>
-              Color theme
-              <div class="theme-list" id="themeList" role="listbox" aria-label="Color theme"></div>
+              <span data-i18n="colorTheme">Color theme</span>
+              <div class="theme-list" id="themeList" role="listbox" data-i18n-aria="colorTheme" aria-label="Color theme"></div>
             </label>
 
             <label>
-              Text color
+              <span data-i18n="textColor">Text color</span>
               <div class="theme-picker" data-color-picker="text">
                 <button class="theme-trigger" type="button" data-picker-trigger aria-expanded="false">
                   <span class="theme-trigger-preview" data-picker-preview aria-hidden="true">
                     <span style="background:#5d473d"></span>
                   </span>
-                  <span class="theme-trigger-label">Color grid</span>
+                  <span class="theme-trigger-label" data-i18n="colorGrid">Color grid</span>
                 </button>
                 <div class="theme-popup" data-picker-popup>
-                  <canvas class="theme-canvas" data-picker-canvas width="320" height="180" aria-label="Text color grid"></canvas>
+                  <canvas class="theme-canvas" data-picker-canvas width="320" height="180" data-i18n-aria="textColorGrid" aria-label="Text color grid"></canvas>
                   <div class="theme-popup-footer">
                     <div class="theme-selected">
                       <span class="theme-selected-swatch" data-picker-swatch></span>
                       <span data-picker-value>#5D473D</span>
                     </div>
-                    <button class="secondary" type="button" data-picker-confirm>Confirm</button>
+                    <button class="secondary" type="button" data-picker-confirm data-i18n="confirm">Confirm</button>
                   </div>
                 </div>
               </div>
             </label>
 
             <label>
-              Background color
+              <span data-i18n="backgroundColor">Background color</span>
               <div class="theme-picker" data-color-picker="background">
                 <button class="theme-trigger" type="button" data-picker-trigger aria-expanded="false">
                   <span class="theme-trigger-preview" data-picker-preview aria-hidden="true">
                     <span style="background:#fffdf9"></span>
                   </span>
-                  <span class="theme-trigger-label">Color grid</span>
+                  <span class="theme-trigger-label" data-i18n="colorGrid">Color grid</span>
                 </button>
                 <div class="theme-popup" data-picker-popup>
-                  <canvas class="theme-canvas" data-picker-canvas width="320" height="180" aria-label="Background color grid"></canvas>
+                  <canvas class="theme-canvas" data-picker-canvas width="320" height="180" data-i18n-aria="backgroundColorGrid" aria-label="Background color grid"></canvas>
                   <div class="theme-popup-footer">
                     <div class="theme-selected">
                       <span class="theme-selected-swatch" data-picker-swatch></span>
                       <span data-picker-value>#FFFDF9</span>
                     </div>
-                    <button class="secondary" type="button" data-picker-confirm>Confirm</button>
+                    <button class="secondary" type="button" data-picker-confirm data-i18n="confirm">Confirm</button>
                   </div>
                 </div>
               </div>
             </label>
 
             <label>
-              Border color
+              <span data-i18n="borderColor">Border color</span>
               <div class="theme-picker" data-color-picker="border">
                 <button class="theme-trigger" type="button" data-picker-trigger aria-expanded="false">
                   <span class="theme-trigger-preview" data-picker-preview aria-hidden="true">
                     <span style="background:#f3e6db"></span>
                   </span>
-                  <span class="theme-trigger-label">Color grid</span>
+                  <span class="theme-trigger-label" data-i18n="colorGrid">Color grid</span>
                 </button>
                 <div class="theme-popup" data-picker-popup>
-                  <canvas class="theme-canvas" data-picker-canvas width="320" height="180" aria-label="Border color grid"></canvas>
+                  <canvas class="theme-canvas" data-picker-canvas width="320" height="180" data-i18n-aria="borderColorGrid" aria-label="Border color grid"></canvas>
                   <div class="theme-popup-footer">
                     <div class="theme-selected">
                       <span class="theme-selected-swatch" data-picker-swatch></span>
                       <span data-picker-value>#F3E6DB</span>
                     </div>
-                    <button class="secondary" type="button" data-picker-confirm>Confirm</button>
+                    <button class="secondary" type="button" data-picker-confirm data-i18n="confirm">Confirm</button>
                   </div>
                 </div>
               </div>
             </label>
 
             <label>
-              Font style
-              <div class="font-list" id="fontList" role="listbox" aria-label="Font style"></div>
+              <span data-i18n="fontStyle">Font style</span>
+              <div class="font-list" id="fontList" role="listbox" data-i18n-aria="fontStyle" aria-label="Font style"></div>
             </label>
 
             <label>
-              Header line
+              <span data-i18n="headerLine">Header line</span>
               <input id="headerLine" type="text" value="Together With Their Families" autocomplete="off">
             </label>
 
             <label>
-              Invitation message
+              <span data-i18n="invitationMessage">Invitation message</span>
               <textarea id="inviteMessage">Request the honor of your presence at the celebration of their marriage</textarea>
             </label>
 
             <div class="form-grid" style="gap: 0.55rem;">
-              <span style="font-size: 0.95rem; font-weight: 700;">Wedding stickers</span>
-              <p class="sticker-hint">Unlock premium to use stickers. Click a sticker to add it, or drag it onto the invitation.</p>
-              <div class="sticker-tray" id="stickerTray" aria-label="Wedding stickers"></div>
+              <span style="font-size: 0.95rem; font-weight: 700;" data-i18n="weddingStickers">Wedding stickers</span>
+              <p class="sticker-hint" data-i18n="stickerHint">Unlock premium to use stickers. Click a sticker to add it, or drag it onto the invitation.</p>
+              <div class="sticker-tray" id="stickerTray" data-i18n-aria="weddingStickers" aria-label="Wedding stickers"></div>
               <div class="sticker-actions">
-                <button class="secondary" type="button" id="clearStickers">Clear stickers</button>
+                <button class="secondary" type="button" id="clearStickers" data-i18n="clearStickers">Clear stickers</button>
               </div>
             </div>
           </div>
@@ -1163,8 +1211,8 @@
           <span class="resizable-text" id="previewPartnerTwo" title="Tap to resize">Ethan James</span>
         </div>
         <div class="invite-text">
-          <span class="resizable-text" id="previewDate" title="Tap to resize">Saturday, 14 June 2027</span><br>
-          at <span class="resizable-text" id="previewTime" title="Tap to resize">4:00 PM</span>
+          <span class="resizable-text" id="previewDate" data-i18n-title="tapToResize" title="Tap to resize">Saturday, 14 June 2027</span><br>
+          <span id="previewAtPrefix" data-i18n="at">at</span> <span class="resizable-text" id="previewTime" data-i18n-title="tapToResize" title="Tap to resize">4:00 PM</span>
         </div>
         <div class="details">
           <strong class="resizable-text" id="previewVenue" title="Tap to resize">Rosewood Garden Estate</strong><br>
@@ -1175,7 +1223,7 @@
       </article>
 
       <div class="sticker-size-bar" id="stickerSizeBar" aria-hidden="true">
-        <label for="stickerSizeRange">Size</label>
+        <label for="stickerSizeRange" data-i18n="size">Size</label>
         <input id="stickerSizeRange" type="range" min="0.6" max="2.4" step="0.05" value="1">
         <span class="size-value" id="stickerSizeValue">100%</span>
       </div>
@@ -1186,19 +1234,259 @@
 
   <div class="payment-modal" id="paymentModal" aria-hidden="true">
     <div class="payment-dialog" role="dialog" aria-labelledby="paymentTitle" aria-modal="true">
-      <h3 id="paymentTitle">Unlock premium customization</h3>
-      <p>Get access to themes, fonts, custom wording, wedding stickers, and premium PDF downloads.</p>
+      <h3 id="paymentTitle" data-i18n="paymentTitle">Unlock premium customization</h3>
+      <p data-i18n="paymentBody">Get access to themes, fonts, custom wording, wedding stickers, and premium PDF downloads.</p>
       <div class="payment-amount">€1.00</div>
       <div class="payment-actions">
-        <button class="primary" type="button" id="confirmPayment">Pay €1 (Test)</button>
-        <button class="secondary" type="button" id="cancelPayment">Cancel</button>
+        <button class="primary" type="button" id="confirmPayment" data-i18n="payButton">Pay €1 (Test)</button>
+        <button class="secondary" type="button" id="cancelPayment" data-i18n="cancel">Cancel</button>
       </div>
-      <p class="payment-test-note">Test mode only. No real payment will be processed.</p>
+      <p class="payment-test-note" data-i18n="paymentTestNote">Test mode only. No real payment will be processed.</p>
     </div>
   </div>
 
   <script>
     const PREMIUM_STORAGE_KEY = "wedding-invite-premium-unlocked";
+    const LANG_STORAGE_KEY = "atelier-invites-lang";
+
+    const calendarLabels = {
+      en: {
+        months: [
+          "January", "February", "March", "April", "May", "June",
+          "July", "August", "September", "October", "November", "December"
+        ],
+        weekdays: [
+          "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
+        ]
+      },
+      pl: {
+        months: [
+          "styczeń", "luty", "marzec", "kwiecień", "maj", "czerwiec",
+          "lipiec", "sierpień", "wrzesień", "październik", "listopad", "grudzień"
+        ],
+        monthsGenitive: [
+          "stycznia", "lutego", "marca", "kwietnia", "maja", "czerwca",
+          "lipca", "sierpnia", "września", "października", "listopada", "grudnia"
+        ],
+        weekdays: [
+          "niedziela", "poniedziałek", "wtorek", "środa", "czwartek", "piątek", "sobota"
+        ]
+      }
+    };
+
+    const copy = {
+      en: {
+        documentTitle: "Wedding Invitation Generator",
+        langLabel: "Language",
+        navHome: "Home",
+        navWedding: "Wedding Invitation",
+        eyebrow: "Printable Invitation",
+        pageTitle: "Wedding Invitation Generator",
+        intro: "Enter the event details, preview the design live, then download a polished PDF invitation ready to print or share.",
+        partnerOne: "Partner one",
+        partnerTwo: "Partner two",
+        weddingDate: "Wedding date",
+        weddingDatePicker: "Wedding date picker",
+        time: "Time",
+        timePicker: "Wedding time picker",
+        venue: "Venue",
+        location: "Location",
+        additionalNote: "Additional note",
+        downloadBasic: "Download Basic PDF",
+        downloadPremium: "Download Premium PDF",
+        reset: "Reset",
+        premiumTitle: "Premium customization",
+        lockedBadge: "Locked · €1",
+        unlockedBadge: "Unlocked",
+        unlockButton: "Unlock for €1 (Test)",
+        premiumCopy: "Unlock themes, fonts, custom wording, wedding stickers, and premium PDF downloads. This is a test flow with no real payment.",
+        colorTheme: "Color theme",
+        textColor: "Text color",
+        backgroundColor: "Background color",
+        borderColor: "Border color",
+        textColorGrid: "Text color grid",
+        backgroundColorGrid: "Background color grid",
+        borderColorGrid: "Border color grid",
+        fontStyle: "Font style",
+        headerLine: "Header line",
+        invitationMessage: "Invitation message",
+        weddingStickers: "Wedding stickers",
+        stickerHint: "Unlock premium to use stickers. Click a sticker to add it, or drag it onto the invitation.",
+        clearStickers: "Clear stickers",
+        colorGrid: "Color grid",
+        confirm: "Confirm",
+        size: "Size",
+        tapToResize: "Tap to resize",
+        stickerTitle: "Tap to resize · Drag to move · Double-click to remove",
+        at: "at",
+        paymentTitle: "Unlock premium customization",
+        paymentBody: "Get access to themes, fonts, custom wording, wedding stickers, and premium PDF downloads.",
+        payButton: "Pay €1 (Test)",
+        cancel: "Cancel",
+        paymentTestNote: "Test mode only. No real payment will be processed.",
+        processing: "Processing...",
+        generatingPdf: "Generating PDF...",
+        pdfError: "Sorry, the PDF could not be generated. Please try again.",
+        defaultHeader: "Together With Their Families",
+        defaultMessage: "Request the honor of your presence at the celebration of their marriage",
+        defaultNote: "Dinner and dancing to follow. Formal attire requested."
+      },
+      pl: {
+        documentTitle: "Generator zaproszeń ślubnych",
+        langLabel: "Język",
+        navHome: "Strona główna",
+        navWedding: "Zaproszenie ślubne",
+        eyebrow: "Zaproszenie do druku",
+        pageTitle: "Generator zaproszeń ślubnych",
+        intro: "Wprowadź szczegóły wydarzenia, podejrzyj projekt na żywo, a następnie pobierz eleganckie zaproszenie PDF gotowe do druku lub udostępnienia.",
+        partnerOne: "Pierwsza osoba",
+        partnerTwo: "Druga osoba",
+        weddingDate: "Data ślubu",
+        weddingDatePicker: "Wybór daty ślubu",
+        time: "Godzina",
+        timePicker: "Wybór godziny",
+        venue: "Miejsce",
+        location: "Lokalizacja",
+        additionalNote: "Dodatkowa informacja",
+        downloadBasic: "Pobierz podstawowe PDF",
+        downloadPremium: "Pobierz premium PDF",
+        reset: "Resetuj",
+        premiumTitle: "Personalizacja premium",
+        lockedBadge: "Zablokowane · 1 €",
+        unlockedBadge: "Odblokowane",
+        unlockButton: "Odblokuj za 1 € (test)",
+        premiumCopy: "Odblokuj motywy, czcionki, własne treści, naklejki ślubne i pobieranie premium PDF. To jest testowy przepływ bez prawdziwej płatności.",
+        colorTheme: "Motyw kolorystyczny",
+        textColor: "Kolor tekstu",
+        backgroundColor: "Kolor tła",
+        borderColor: "Kolor obramowania",
+        textColorGrid: "Paleta koloru tekstu",
+        backgroundColorGrid: "Paleta koloru tła",
+        borderColorGrid: "Paleta koloru obramowania",
+        fontStyle: "Styl czcionki",
+        headerLine: "Nagłówek",
+        invitationMessage: "Treść zaproszenia",
+        weddingStickers: "Naklejki ślubne",
+        stickerHint: "Odblokuj premium, aby używać naklejek. Kliknij naklejkę, aby dodać, lub przeciągnij ją na zaproszenie.",
+        clearStickers: "Usuń naklejki",
+        colorGrid: "Paleta kolorów",
+        confirm: "Potwierdź",
+        size: "Rozmiar",
+        tapToResize: "Dotknij, aby zmienić rozmiar",
+        stickerTitle: "Dotknij, aby zmienić rozmiar · Przeciągnij, aby przesunąć · Kliknij dwukrotnie, aby usunąć",
+        at: "o",
+        paymentTitle: "Odblokuj personalizację premium",
+        paymentBody: "Uzyskaj dostęp do motywów, czcionek, własnych treści, naklejek ślubnych i pobierania premium PDF.",
+        payButton: "Zapłać 1 € (test)",
+        cancel: "Anuluj",
+        paymentTestNote: "Tylko tryb testowy. Żadna prawdziwa płatność nie zostanie przetworzona.",
+        processing: "Przetwarzanie...",
+        generatingPdf: "Generowanie PDF...",
+        pdfError: "Przepraszamy, nie udało się wygenerować pliku PDF. Spróbuj ponownie.",
+        defaultHeader: "Wraz z rodzinami",
+        defaultMessage: "Mają zaszczyt zaprosić na uroczystość zaślubin",
+        defaultNote: "Po uroczystości zapraszamy na kolację i zabawę. Prosimy o strój formalny."
+      }
+    };
+
+    let currentLang = "en";
+
+    function t(key) {
+      return (copy[currentLang] && copy[currentLang][key]) || copy.en[key] || "";
+    }
+
+    function getCalendarLabels() {
+      return calendarLabels[currentLang] || calendarLabels.en;
+    }
+
+    function getMonthPickerNames() {
+      return getCalendarLabels().months;
+    }
+
+    function capitalizeWord(value) {
+      if (!value) {
+        return value;
+      }
+
+      return value.charAt(0).toUpperCase() + value.slice(1);
+    }
+
+    function swapDefaultValue(input, enValue, plValue) {
+      if (!input) {
+        return;
+      }
+
+      const trimmed = input.value.trim();
+      if (currentLang === "pl" && trimmed === enValue) {
+        input.value = plValue;
+      } else if (currentLang === "en" && trimmed === plValue) {
+        input.value = enValue;
+      }
+    }
+
+    function applyLocalizedDefaults() {
+      headerLine.value = t("defaultHeader");
+      inviteMessage.value = t("defaultMessage");
+      fields.note.value = t("defaultNote");
+    }
+
+    function refreshMonthColumn() {
+      const monthNames = getMonthPickerNames();
+      createDateOptions(monthColumn, monthNames.map((_, index) => index), (value) => monthNames[value]);
+      updateActiveOptions(monthColumn, selectedDate.month);
+      scrollColumnToValue(monthColumn, selectedDate.month);
+    }
+
+    function setLanguage(lang) {
+      currentLang = lang === "pl" ? "pl" : "en";
+      const strings = copy[currentLang];
+      document.documentElement.lang = currentLang;
+      document.title = strings.documentTitle;
+      langSwitch.setAttribute("aria-label", strings.langLabel);
+
+      document.querySelectorAll("[data-i18n]").forEach((node) => {
+        const key = node.dataset.i18n;
+        if (strings[key]) {
+          node.textContent = strings[key];
+        }
+      });
+
+      document.querySelectorAll("[data-i18n-aria]").forEach((node) => {
+        const key = node.dataset.i18nAria;
+        if (strings[key]) {
+          node.setAttribute("aria-label", strings[key]);
+        }
+      });
+
+      document.querySelectorAll("[data-i18n-title]").forEach((node) => {
+        const key = node.dataset.i18nTitle;
+        if (strings[key]) {
+          node.setAttribute("title", strings[key]);
+        }
+      });
+
+      document.querySelectorAll(".resizable-text[title]").forEach((node) => {
+        if (!node.dataset.i18nTitle) {
+          node.setAttribute("title", strings.tapToResize);
+        }
+      });
+
+      langEnButton.classList.toggle("is-active", currentLang === "en");
+      langPlButton.classList.toggle("is-active", currentLang === "pl");
+      localStorage.setItem(LANG_STORAGE_KEY, currentLang);
+
+      swapDefaultValue(headerLine, copy.en.defaultHeader, copy.pl.defaultHeader);
+      swapDefaultValue(inviteMessage, copy.en.defaultMessage, copy.pl.defaultMessage);
+      swapDefaultValue(fields.note, copy.en.defaultNote, copy.pl.defaultNote);
+
+      premiumBadge.textContent = premiumUnlocked ? strings.unlockedBadge : strings.lockedBadge;
+      refreshMonthColumn();
+      syncPreview();
+
+      if (!premiumUnlocked) {
+        resetPremiumStyles();
+      }
+    }
 
     const fonts = [
       { id: "caveat", name: "Caveat", stack: '"Caveat", cursive' },
@@ -1293,14 +1581,10 @@
     const minuteColumn = document.getElementById("minuteColumn");
     const periodColumn = document.getElementById("periodColumn");
     const timeDisplay = document.getElementById("timeDisplay");
-
-    const monthNames = [
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"
-    ];
-    const weekdayNames = [
-      "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
-    ];
+    const previewAtPrefix = document.getElementById("previewAtPrefix");
+    const langEnButton = document.getElementById("langEn");
+    const langPlButton = document.getElementById("langPl");
+    const langSwitch = document.querySelector(".lang-switch");
 
     let selectedDate = { day: 14, month: 5, year: 2027 };
     let selectedTime = { hour: 4, minute: 0, period: "PM" };
@@ -1596,7 +1880,7 @@
       sticker.style.left = `${xPercent}%`;
       sticker.style.top = `${yPercent}%`;
       setStickerScale(sticker, 1);
-      sticker.title = "Tap to resize · Drag to move · Double-click to remove";
+      sticker.title = t("stickerTitle");
       stickerLayer.appendChild(sticker);
       enablePlacedSticker(sticker);
       selectSticker(sticker);
@@ -1814,8 +2098,13 @@
     }
 
     function formatSelectedDate() {
+      const labels = getCalendarLabels();
       const date = new Date(selectedDate.year, selectedDate.month, selectedDate.day);
-      return `${weekdayNames[date.getDay()]}, ${selectedDate.day} ${monthNames[selectedDate.month]} ${selectedDate.year}`;
+      const weekday = capitalizeWord(labels.weekdays[date.getDay()]);
+      const month = currentLang === "pl"
+        ? labels.monthsGenitive[selectedDate.month]
+        : labels.months[selectedDate.month];
+      return `${weekday}, ${selectedDate.day} ${month} ${selectedDate.year}`;
     }
 
     function formatSelectedTime() {
@@ -1908,6 +2197,7 @@
     }
 
     function initDatePicker() {
+      const monthNames = getMonthPickerNames();
       createDateOptions(monthColumn, monthNames.map((_, index) => index), (value) => monthNames[value]);
       createDateOptions(
         yearColumn,
@@ -2014,8 +2304,8 @@
       invitationCard.style.removeProperty("--invite-accent-soft");
       invitationCard.style.removeProperty("--invite-text");
       invitationCard.style.removeProperty("--invite-font");
-      previewHeader.textContent = "Together With Their Families";
-      previewMessage.textContent = "Request the honor of your presence at the celebration of their marriage";
+      previewHeader.textContent = t("defaultHeader");
+      previewMessage.textContent = t("defaultMessage");
     }
 
     function setPremiumUnlocked(unlocked) {
@@ -2024,7 +2314,7 @@
       premiumFields.classList.toggle("is-locked", !unlocked);
       unlockPremiumButton.hidden = unlocked;
       downloadPremiumButton.disabled = !unlocked;
-      premiumBadge.textContent = unlocked ? "Unlocked" : "Locked · €1";
+      premiumBadge.textContent = unlocked ? t("unlockedBadge") : t("lockedBadge");
       premiumBadge.classList.toggle("unlocked", unlocked);
 
       if (unlocked) {
@@ -2056,6 +2346,7 @@
         clearStickers();
         resetTextScales();
         applyThemeSelection(getActiveTheme());
+        applyLocalizedDefaults();
         if (!premiumUnlocked) {
           resetPremiumStyles();
         }
@@ -2115,13 +2406,13 @@
 
     confirmPaymentButton.addEventListener("click", () => {
       confirmPaymentButton.disabled = true;
-      confirmPaymentButton.textContent = "Processing...";
+      confirmPaymentButton.textContent = t("processing");
 
       window.setTimeout(() => {
         setPremiumUnlocked(true);
         closePaymentModal();
         confirmPaymentButton.disabled = false;
-        confirmPaymentButton.textContent = "Pay €1 (Test)";
+        confirmPaymentButton.textContent = t("payButton");
       }, 900);
     });
 
@@ -2148,8 +2439,8 @@
         exportCard.style.removeProperty("--invite-accent-soft");
         exportCard.style.removeProperty("--invite-text");
         exportCard.style.removeProperty("--invite-font");
-        exportCard.querySelector("#previewHeader").textContent = "Together With Their Families";
-        exportCard.querySelector("#previewMessage").textContent = "Request the honor of your presence at the celebration of their marriage";
+        exportCard.querySelector("#previewHeader").textContent = t("defaultHeader");
+        exportCard.querySelector("#previewMessage").textContent = t("defaultMessage");
       }
 
       pdfStage.replaceChildren(exportCard);
@@ -2189,13 +2480,13 @@
     async function handleDownload(button, options) {
       const originalLabel = button.textContent;
       button.disabled = true;
-      button.textContent = "Generating PDF...";
+      button.textContent = t("generatingPdf");
 
       try {
         await downloadInvitationPdf(options);
       } catch (error) {
         console.error(error);
-        window.alert("Sorry, the PDF could not be generated. Please try again.");
+        window.alert(t("pdfError"));
       } finally {
         button.disabled = options.premium ? !premiumUnlocked : false;
         button.textContent = originalLabel;
@@ -2225,6 +2516,9 @@
     setupTextResizers();
     applyThemeSelection(getActiveTheme());
     setPremiumUnlocked(premiumUnlocked);
+    langEnButton.addEventListener("click", () => setLanguage("en"));
+    langPlButton.addEventListener("click", () => setLanguage("pl"));
+    setLanguage(localStorage.getItem(LANG_STORAGE_KEY) === "pl" ? "pl" : "en");
     syncPreview();
   </script>
 </body>

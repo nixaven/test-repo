@@ -41,13 +41,55 @@
         linear-gradient(145deg, #fff7fa, #eef6f4 55%, #f7f1ea);
     }
 
-    .top-nav {
+    .site-header {
       width: min(1200px, 100%);
       margin: 0 auto;
       padding: 1.25rem 2rem 0;
       display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .top-nav {
+      display: flex;
       gap: 0.75rem;
       flex-wrap: wrap;
+    }
+
+    .lang-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.3rem;
+      border: 1px solid rgba(196, 138, 156, 0.25);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow: 0 8px 24px rgba(74, 55, 63, 0.06);
+      flex-shrink: 0;
+    }
+
+    .lang-btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 0.45rem 0.85rem;
+      font: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #7a5f68;
+      background: transparent;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .lang-btn.is-active {
+      background: var(--accent);
+      color: #fffafb;
+    }
+
+    .lang-btn:hover:not(.is-active) {
+      color: var(--ink);
     }
 
     .top-nav a {
@@ -822,13 +864,13 @@
         overflow: hidden;
       }
 
-      .top-nav,
+      .site-header,
       .page {
         padding-left: 1rem;
         padding-right: 1rem;
       }
 
-      .top-nav {
+      .site-header {
         flex-shrink: 0;
         padding-bottom: 0.5rem;
       }
@@ -870,7 +912,7 @@
     }
 
     @media print {
-      .top-nav,
+      .site-header,
       .panel {
         display: none;
       }
@@ -896,36 +938,42 @@
   </style>
 </head>
 <body>
-  <nav class="top-nav">
-    <a href="/test-repo/index.html">Home</a>
-    <a class="active" href="/test-repo/baby-shower.html">Baby Shower Invitation</a>
-  </nav>
+  <header class="site-header">
+    <nav class="top-nav">
+      <a href="/test-repo/index.html" data-i18n="navHome">Home</a>
+      <a class="active" href="/test-repo/baby-shower.html" data-i18n="navBaby">Baby Shower Invitation</a>
+    </nav>
+    <div class="lang-switch" role="group" aria-label="Language">
+      <button class="lang-btn is-active" type="button" id="langEn">English</button>
+      <button class="lang-btn" type="button" id="langPl">Polski</button>
+    </div>
+  </header>
 
   <div class="page">
     <section class="panel">
-      <p class="eyebrow">Printable Invitation</p>
-      <h1>Baby Shower Invitation</h1>
-      <p class="intro">Enter the celebration details, preview the design live, then download an elegant PDF ready to print or share.</p>
+      <p class="eyebrow" data-i18n="eyebrow">Printable Invitation</p>
+      <h1 data-i18n="pageTitle">Baby Shower Invitation</h1>
+      <p class="intro" data-i18n="intro">Enter the celebration details, preview the design live, then download an elegant PDF ready to print or share.</p>
 
       <form class="form-grid" id="invitationForm">
         <label>
-          Invitation title
+          <span data-i18n="invitationTitle">Invitation title</span>
           <input id="inviteTitle" type="text" value="Baby Shower" autocomplete="off">
         </label>
 
         <label>
-          Honoring
+          <span data-i18n="honoring">Honoring</span>
           <input id="honoree" type="text" value="Emma &amp; James" autocomplete="off">
         </label>
 
         <label>
-          Baby name / theme
+          <span data-i18n="babyNameTheme">Baby name / theme</span>
           <input id="babyName" type="text" value="Little One" autocomplete="off">
         </label>
 
         <label>
-          Date
-          <div class="date-picker" id="datePicker" aria-label="Event date picker">
+          <span data-i18n="date">Date</span>
+          <div class="date-picker" id="datePicker" data-i18n-aria="datePicker" aria-label="Event date picker">
             <div class="date-column" id="dayColumn" data-type="day"></div>
             <div class="date-column" id="monthColumn" data-type="month"></div>
             <div class="date-column" id="yearColumn" data-type="year"></div>
@@ -934,18 +982,18 @@
         </label>
 
         <label>
-          Time
-          <div class="date-picker time-picker" id="timePicker" aria-label="Event time picker">
+          <span data-i18n="time">Time</span>
+          <div class="date-picker time-picker" id="timePicker" data-i18n-aria="timePicker" aria-label="Event time picker">
             <div class="time-column-wrap">
-              <div class="time-column-label">Hour</div>
+              <div class="time-column-label" data-i18n="hour">Hour</div>
               <div class="date-column" id="hourColumn" data-type="hour"></div>
             </div>
             <div class="time-column-wrap">
-              <div class="time-column-label">Min</div>
+              <div class="time-column-label" data-i18n="minute">Min</div>
               <div class="date-column" id="minuteColumn" data-type="minute"></div>
             </div>
             <div class="time-column-wrap">
-              <div class="time-column-label">AM/PM</div>
+              <div class="time-column-label" data-i18n="ampm">AM/PM</div>
               <div class="date-column" id="periodColumn" data-type="period"></div>
             </div>
           </div>
@@ -953,60 +1001,60 @@
         </label>
 
         <label>
-          Venue
+          <span data-i18n="venue">Venue</span>
           <input id="venue" type="text" value="Willow Garden House" autocomplete="off">
         </label>
 
         <label>
-          Location
+          <span data-i18n="location">Location</span>
           <input id="location" type="text" value="12 Meadow Lane, Florence" autocomplete="off">
         </label>
 
         <label>
-          RSVP / note
+          <span data-i18n="rsvpNote">RSVP / note</span>
           <textarea id="note">Please join us for cake, gifts, and celebration. RSVP by 1 September.</textarea>
         </label>
 
         <div class="actions">
-          <button class="primary" type="button" id="downloadPdf">Download Basic PDF</button>
-          <button class="premium-download" type="button" id="downloadPremiumPdf" disabled>Download Premium PDF</button>
-          <button class="secondary" type="reset">Reset</button>
+          <button class="primary" type="button" id="downloadPdf" data-i18n="downloadBasic">Download Basic PDF</button>
+          <button class="premium-download" type="button" id="downloadPremiumPdf" disabled data-i18n="downloadPremium">Download Premium PDF</button>
+          <button class="secondary" type="reset" data-i18n="reset">Reset</button>
         </div>
 
         <section class="premium" id="premiumSection">
           <div class="premium-header">
-            <h2>Premium extras</h2>
+            <h2 data-i18n="premiumTitle">Premium extras</h2>
             <div class="premium-lock">
               <span class="badge" id="premiumBadge">Locked · €1</span>
-              <button class="unlock-button" type="button" id="unlockPremium">Unlock for €1 (Test)</button>
+              <button class="unlock-button" type="button" id="unlockPremium" data-i18n="unlockButton">Unlock for €1 (Test)</button>
             </div>
           </div>
-          <p class="premium-copy">Unlock color moods, fonts, stickers, and premium PDF download. This is a test flow with no real payment.</p>
+          <p class="premium-copy" data-i18n="premiumCopy">Unlock color moods, fonts, stickers, and premium PDF download. This is a test flow with no real payment.</p>
 
           <div class="premium-fields is-locked" id="premiumFields">
             <label>
-              Color mood
+              <span data-i18n="colorMood">Color mood</span>
               <select id="colorMood">
-                <option value="cream">Soft cream</option>
-                <option value="butter">Butter yellow</option>
-                <option value="sage">Sage green</option>
-                <option value="peach">Warm peach</option>
-                <option value="bluePink">Blue and pink</option>
-                <option value="pinkBlue">Pink and blue (swapped)</option>
+                <option value="cream" data-i18n="moodCream">Soft cream</option>
+                <option value="butter" data-i18n="moodButter">Butter yellow</option>
+                <option value="sage" data-i18n="moodSage">Sage green</option>
+                <option value="peach" data-i18n="moodPeach">Warm peach</option>
+                <option value="bluePink" data-i18n="moodBluePink">Blue and pink</option>
+                <option value="pinkBlue" data-i18n="moodPinkBlue">Pink and blue (swapped)</option>
               </select>
             </label>
 
             <label>
-              Font style
-              <div class="font-list" id="fontList" role="listbox" aria-label="Font style"></div>
+              <span data-i18n="fontStyle">Font style</span>
+              <div class="font-list" id="fontList" role="listbox" data-i18n-aria="fontStyle" aria-label="Font style"></div>
             </label>
 
             <div class="form-grid" style="gap: 0.55rem;">
-              <span style="font-size: 0.95rem; font-weight: 700;">Stickers</span>
-              <p class="sticker-hint">Click a sticker to add it, or drag it onto the invitation. Tap to resize, double-click to remove.</p>
-              <div class="sticker-tray" id="stickerTray" aria-label="Theme stickers"></div>
+              <span style="font-size: 0.95rem; font-weight: 700;" data-i18n="stickers">Stickers</span>
+              <p class="sticker-hint" data-i18n="stickerHint">Click a sticker to add it, or drag it onto the invitation. Tap to resize, double-click to remove.</p>
+              <div class="sticker-tray" id="stickerTray" data-i18n-aria="stickers" aria-label="Theme stickers"></div>
               <div class="sticker-actions">
-                <button class="secondary" type="button" id="clearStickers">Clear stickers</button>
+                <button class="secondary" type="button" id="clearStickers" data-i18n="clearStickers">Clear stickers</button>
               </div>
             </div>
           </div>
@@ -1019,7 +1067,7 @@
         <div class="sticker-layer" id="stickerLayer"></div>
         <div class="invite-top resizable-text" id="previewTitle" title="Tap to resize">Baby Shower</div>
         <div class="divider"></div>
-        <div class="invite-text resizable-text" id="previewLead" title="Tap to resize">Please celebrate with us as we welcome</div>
+        <div class="invite-text resizable-text" id="previewLead" data-i18n="previewLead" data-i18n-title="tapToResize" title="Tap to resize">Please celebrate with us as we welcome</div>
         <div class="baby-name resizable-text" id="previewBabyName" title="Tap to resize">Little One</div>
         <div class="motif">
           <span class="pink-part">✿</span>
@@ -1027,10 +1075,10 @@
           <span class="pink-part">✿</span>
           <span class="blue-part">✿</span>
         </div>
-        <div class="honoree resizable-text" id="previewHonoreeLine" title="Tap to resize">in honor of <span id="previewHonoree">Emma &amp; James</span></div>
+        <div class="honoree resizable-text" id="previewHonoreeLine" data-i18n-title="tapToResize" title="Tap to resize"><span id="honoreePrefix" data-i18n="honoreePrefix">in honor of</span> <span id="previewHonoree">Emma &amp; James</span></div>
         <div class="invite-text" style="margin-top: 1.4rem;">
-          <span class="tone-blue resizable-text" id="previewDate" title="Tap to resize">Sunday, 12 September 2027</span><br>
-          at <span class="tone-pink resizable-text" id="previewTime" title="Tap to resize">2:00 PM</span>
+          <span class="tone-blue resizable-text" id="previewDate" data-i18n-title="tapToResize" title="Tap to resize">Sunday, 12 September 2027</span><br>
+          <span id="previewAtPrefix" data-i18n="at">at</span> <span class="tone-pink resizable-text" id="previewTime" data-i18n-title="tapToResize" title="Tap to resize">2:00 PM</span>
         </div>
         <div class="details">
           <strong class="tone-pink resizable-text" id="previewVenue" title="Tap to resize">Willow Garden House</strong><br>
@@ -1041,7 +1089,7 @@
       </article>
 
       <div class="sticker-size-bar" id="stickerSizeBar" aria-hidden="true">
-        <label for="stickerSizeRange">Size</label>
+        <label for="stickerSizeRange" data-i18n="size">Size</label>
         <input id="stickerSizeRange" type="range" min="0.6" max="2.4" step="0.05" value="1">
         <span class="size-value" id="stickerSizeValue">100%</span>
       </div>
@@ -1052,14 +1100,14 @@
 
   <div class="payment-modal" id="paymentModal" aria-hidden="true">
     <div class="payment-dialog" role="dialog" aria-labelledby="paymentTitle" aria-modal="true">
-      <h3 id="paymentTitle">Unlock premium extras</h3>
-      <p>Get access to color moods, fonts, stickers, and premium PDF download for your baby shower invitation.</p>
+      <h3 id="paymentTitle" data-i18n="paymentTitle">Unlock premium extras</h3>
+      <p data-i18n="paymentBody">Get access to color moods, fonts, stickers, and premium PDF download for your baby shower invitation.</p>
       <div class="payment-amount">€1.00</div>
       <div class="payment-actions">
-        <button class="primary" type="button" id="confirmPayment">Pay €1 (Test)</button>
-        <button class="secondary" type="button" id="cancelPayment">Cancel</button>
+        <button class="primary" type="button" id="confirmPayment" data-i18n="payButton">Pay €1 (Test)</button>
+        <button class="secondary" type="button" id="cancelPayment" data-i18n="cancel">Cancel</button>
       </div>
-      <p class="payment-test-note">Test mode only. No real payment will be processed.</p>
+      <p class="payment-test-note" data-i18n="paymentTestNote">Test mode only. No real payment will be processed.</p>
     </div>
   </div>
 
@@ -1234,6 +1282,251 @@
     let selectedText = null;
 
     const PREMIUM_STORAGE_KEY = "baby-shower-premium-unlocked";
+    const LANG_STORAGE_KEY = "atelier-invites-lang";
+
+    const calendarLabels = {
+      en: {
+        months: [
+          "January", "February", "March", "April", "May", "June",
+          "July", "August", "September", "October", "November", "December"
+        ],
+        weekdays: [
+          "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
+        ]
+      },
+      pl: {
+        months: [
+          "styczeń", "luty", "marzec", "kwiecień", "maj", "czerwiec",
+          "lipiec", "sierpień", "wrzesień", "październik", "listopad", "grudzień"
+        ],
+        monthsGenitive: [
+          "stycznia", "lutego", "marca", "kwietnia", "maja", "czerwca",
+          "lipca", "sierpnia", "września", "października", "listopada", "grudnia"
+        ],
+        weekdays: [
+          "niedziela", "poniedziałek", "wtorek", "środa", "czwartek", "piątek", "sobota"
+        ]
+      }
+    };
+
+    const copy = {
+      en: {
+        documentTitle: "Baby Shower Invitation",
+        langLabel: "Language",
+        navHome: "Home",
+        navBaby: "Baby Shower Invitation",
+        eyebrow: "Printable Invitation",
+        pageTitle: "Baby Shower Invitation",
+        intro: "Enter the celebration details, preview the design live, then download an elegant PDF ready to print or share.",
+        invitationTitle: "Invitation title",
+        honoring: "Honoring",
+        babyNameTheme: "Baby name / theme",
+        date: "Date",
+        datePicker: "Event date picker",
+        time: "Time",
+        timePicker: "Event time picker",
+        hour: "Hour",
+        minute: "Min",
+        ampm: "AM/PM",
+        venue: "Venue",
+        location: "Location",
+        rsvpNote: "RSVP / note",
+        downloadBasic: "Download Basic PDF",
+        downloadPremium: "Download Premium PDF",
+        reset: "Reset",
+        premiumTitle: "Premium extras",
+        lockedBadge: "Locked · €1",
+        unlockedBadge: "Unlocked",
+        unlockButton: "Unlock for €1 (Test)",
+        premiumCopy: "Unlock color moods, fonts, stickers, and premium PDF download. This is a test flow with no real payment.",
+        colorMood: "Color mood",
+        moodCream: "Soft cream",
+        moodButter: "Butter yellow",
+        moodSage: "Sage green",
+        moodPeach: "Warm peach",
+        moodBluePink: "Blue and pink",
+        moodPinkBlue: "Pink and blue (swapped)",
+        fontStyle: "Font style",
+        stickers: "Stickers",
+        stickerHint: "Click a sticker to add it, or drag it onto the invitation. Tap to resize, double-click to remove.",
+        clearStickers: "Clear stickers",
+        size: "Size",
+        tapToResize: "Tap to resize",
+        stickerTitle: "Tap to resize · Drag to move · Double-click to remove",
+        previewLead: "Please celebrate with us as we welcome",
+        honoreePrefix: "in honor of",
+        at: "at",
+        selectedTime: "Selected time:",
+        paymentTitle: "Unlock premium extras",
+        paymentBody: "Get access to color moods, fonts, stickers, and premium PDF download for your baby shower invitation.",
+        payButton: "Pay €1 (Test)",
+        cancel: "Cancel",
+        paymentTestNote: "Test mode only. No real payment will be processed.",
+        processing: "Processing...",
+        generatingPdf: "Generating PDF...",
+        pdfError: "Sorry, the PDF could not be generated. Please try again.",
+        pdfLibraryError: "PDF library failed to load. Please refresh the page and try again.",
+        defaultInviteTitle: "Baby Shower",
+        defaultBabyName: "Little One",
+        defaultNote: "Please join us for cake, gifts, and celebration. RSVP by 1 September."
+      },
+      pl: {
+        documentTitle: "Zaproszenie na baby shower",
+        langLabel: "Język",
+        navHome: "Strona główna",
+        navBaby: "Zaproszenie na baby shower",
+        eyebrow: "Zaproszenie do druku",
+        pageTitle: "Zaproszenie na baby shower",
+        intro: "Wprowadź szczegóły uroczystości, podejrzyj projekt na żywo, a następnie pobierz eleganckie zaproszenie PDF gotowe do druku lub udostępnienia.",
+        invitationTitle: "Tytuł zaproszenia",
+        honoring: "Na cześć",
+        babyNameTheme: "Imię dziecka / motyw",
+        date: "Data",
+        datePicker: "Wybór daty wydarzenia",
+        time: "Godzina",
+        timePicker: "Wybór godziny",
+        hour: "Godz.",
+        minute: "Min",
+        ampm: "AM/PM",
+        venue: "Miejsce",
+        location: "Lokalizacja",
+        rsvpNote: "RSVP / notatka",
+        downloadBasic: "Pobierz podstawowe PDF",
+        downloadPremium: "Pobierz premium PDF",
+        reset: "Resetuj",
+        premiumTitle: "Dodatki premium",
+        lockedBadge: "Zablokowane · 1 €",
+        unlockedBadge: "Odblokowane",
+        unlockButton: "Odblokuj za 1 € (test)",
+        premiumCopy: "Odblokuj palety kolorów, czcionki, naklejki i pobieranie premium PDF. To jest testowy przepływ bez prawdziwej płatności.",
+        colorMood: "Paleta kolorów",
+        moodCream: "Delikatna kremowa",
+        moodButter: "Masłowe żółty",
+        moodSage: "Szałwiowa zieleń",
+        moodPeach: "Ciepły brzoskwiniowy",
+        moodBluePink: "Niebieski i różowy",
+        moodPinkBlue: "Różowy i niebieski (zamienione)",
+        fontStyle: "Styl czcionki",
+        stickers: "Naklejki",
+        stickerHint: "Kliknij naklejkę, aby dodać, lub przeciągnij ją na zaproszenie. Dotknij, aby zmienić rozmiar, kliknij dwukrotnie, aby usunąć.",
+        clearStickers: "Usuń naklejki",
+        size: "Rozmiar",
+        tapToResize: "Dotknij, aby zmienić rozmiar",
+        stickerTitle: "Dotknij, aby zmienić rozmiar · Przeciągnij, aby przesunąć · Kliknij dwukrotnie, aby usunąć",
+        previewLead: "Prosimy o wspólne świętowanie z okazji narodzin",
+        honoreePrefix: "na cześć",
+        at: "o",
+        selectedTime: "Wybrana godzina:",
+        paymentTitle: "Odblokuj dodatki premium",
+        paymentBody: "Uzyskaj dostęp do palet kolorów, czcionek, naklejek i pobierania premium PDF dla zaproszenia na baby shower.",
+        payButton: "Zapłać 1 € (test)",
+        cancel: "Anuluj",
+        paymentTestNote: "Tylko tryb testowy. Żadna prawdziwa płatność nie zostanie przetworzona.",
+        processing: "Przetwarzanie...",
+        generatingPdf: "Generowanie PDF...",
+        pdfError: "Przepraszamy, nie udało się wygenerować pliku PDF. Spróbuj ponownie.",
+        pdfLibraryError: "Nie udało się załadować biblioteki PDF. Odśwież stronę i spróbuj ponownie.",
+        defaultInviteTitle: "Baby Shower",
+        defaultBabyName: "Maluszek",
+        defaultNote: "Zapraszamy na tort, prezenty i dobrą zabawę. Prosimy o potwierdzenie do 1 września."
+      }
+    };
+
+    let currentLang = "en";
+
+    function t(key) {
+      return (copy[currentLang] && copy[currentLang][key]) || copy.en[key] || "";
+    }
+
+    function getCalendarLabels() {
+      return calendarLabels[currentLang] || calendarLabels.en;
+    }
+
+    function getMonthPickerNames() {
+      return getCalendarLabels().months;
+    }
+
+    function capitalizeWord(value) {
+      if (!value) {
+        return value;
+      }
+
+      return value.charAt(0).toUpperCase() + value.slice(1);
+    }
+
+    function swapDefaultValue(input, enValue, plValue) {
+      if (!input) {
+        return;
+      }
+
+      const trimmed = input.value.trim();
+      if (currentLang === "pl" && trimmed === enValue) {
+        input.value = plValue;
+      } else if (currentLang === "en" && trimmed === plValue) {
+        input.value = enValue;
+      }
+    }
+
+    function applyLocalizedDefaults() {
+      fields.inviteTitle.value = t("defaultInviteTitle");
+      fields.babyName.value = t("defaultBabyName");
+      fields.note.value = t("defaultNote");
+    }
+
+    function refreshMonthColumn() {
+      const monthNames = getMonthPickerNames();
+      createDateOptions(monthColumn, monthNames.map((_, index) => index), (value) => monthNames[value]);
+      updateActiveOptions(monthColumn, selectedDate.month);
+      scrollColumnToValue(monthColumn, selectedDate.month);
+    }
+
+    function setLanguage(lang) {
+      currentLang = lang === "pl" ? "pl" : "en";
+      const strings = copy[currentLang];
+      document.documentElement.lang = currentLang;
+      document.title = strings.documentTitle;
+      langSwitch.setAttribute("aria-label", strings.langLabel);
+
+      document.querySelectorAll("[data-i18n]").forEach((node) => {
+        const key = node.dataset.i18n;
+        if (strings[key]) {
+          node.textContent = strings[key];
+        }
+      });
+
+      document.querySelectorAll("[data-i18n-aria]").forEach((node) => {
+        const key = node.dataset.i18nAria;
+        if (strings[key]) {
+          node.setAttribute("aria-label", strings[key]);
+        }
+      });
+
+      document.querySelectorAll("[data-i18n-title]").forEach((node) => {
+        const key = node.dataset.i18nTitle;
+        if (strings[key]) {
+          node.setAttribute("title", strings[key]);
+        }
+      });
+
+      document.querySelectorAll(".resizable-text[title]").forEach((node) => {
+        if (!node.dataset.i18nTitle) {
+          node.setAttribute("title", strings.tapToResize);
+        }
+      });
+
+      langEnButton.classList.toggle("is-active", currentLang === "en");
+      langPlButton.classList.toggle("is-active", currentLang === "pl");
+      localStorage.setItem(LANG_STORAGE_KEY, currentLang);
+
+      swapDefaultValue(fields.inviteTitle, copy.en.defaultInviteTitle, copy.pl.defaultInviteTitle);
+      swapDefaultValue(fields.babyName, copy.en.defaultBabyName, copy.pl.defaultBabyName);
+      swapDefaultValue(fields.note, copy.en.defaultNote, copy.pl.defaultNote);
+
+      premiumBadge.textContent = premiumUnlocked ? strings.unlockedBadge : strings.lockedBadge;
+      refreshMonthColumn();
+      syncPreview();
+    }
+
     let premiumUnlocked = localStorage.getItem(PREMIUM_STORAGE_KEY) === "true";
     const dayColumn = document.getElementById("dayColumn");
     const monthColumn = document.getElementById("monthColumn");
@@ -1243,14 +1536,10 @@
     const minuteColumn = document.getElementById("minuteColumn");
     const periodColumn = document.getElementById("periodColumn");
     const timeDisplay = document.getElementById("timeDisplay");
-
-    const monthNames = [
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"
-    ];
-    const weekdayNames = [
-      "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
-    ];
+    const previewLead = document.getElementById("previewLead");
+    const langEnButton = document.getElementById("langEn");
+    const langPlButton = document.getElementById("langPl");
+    const langSwitch = document.querySelector(".lang-switch");
 
     let selectedDate = { day: 12, month: 8, year: 2027 };
     let selectedTime = { hour: 2, minute: 0, period: "PM" };
@@ -1467,7 +1756,7 @@
       sticker.style.left = `${xPercent}%`;
       sticker.style.top = `${yPercent}%`;
       setStickerScale(sticker, 1);
-      sticker.title = "Tap to resize · Drag to move · Double-click to remove";
+      sticker.title = t("stickerTitle");
       stickerLayer.appendChild(sticker);
       enablePlacedSticker(sticker);
       selectSticker(sticker);
@@ -1578,7 +1867,7 @@
       premiumFields.classList.toggle("is-locked", !unlocked);
       unlockPremiumButton.hidden = unlocked;
       downloadPremiumButton.disabled = !unlocked;
-      premiumBadge.textContent = unlocked ? "Unlocked" : "Locked · €1";
+      premiumBadge.textContent = unlocked ? t("unlockedBadge") : t("lockedBadge");
       premiumBadge.classList.toggle("unlocked", unlocked);
 
       if (!unlocked) {
@@ -1602,8 +1891,13 @@
     }
 
     function formatSelectedDate() {
+      const labels = getCalendarLabels();
       const date = new Date(selectedDate.year, selectedDate.month, selectedDate.day);
-      return `${weekdayNames[date.getDay()]}, ${selectedDate.day} ${monthNames[selectedDate.month]} ${selectedDate.year}`;
+      const weekday = capitalizeWord(labels.weekdays[date.getDay()]);
+      const month = currentLang === "pl"
+        ? labels.monthsGenitive[selectedDate.month]
+        : labels.months[selectedDate.month];
+      return `${weekday}, ${selectedDate.day} ${month} ${selectedDate.year}`;
     }
 
     function formatSelectedTime() {
@@ -1611,7 +1905,7 @@
     }
 
     function formatSelectedTimeLabel() {
-      return `Selected time: ${formatSelectedTime()}`;
+      return `${t("selectedTime")} ${formatSelectedTime()}`;
     }
 
     function daysInMonth(year, monthIndex) {
@@ -1704,6 +1998,7 @@
     }
 
     function initDatePicker() {
+      const monthNames = getMonthPickerNames();
       createDateOptions(monthColumn, monthNames.map((_, index) => index), (value) => monthNames[value]);
       createDateOptions(yearColumn, Array.from({ length: 31 }, (_, index) => 2020 + index));
       rebuildDayOptions();
@@ -1794,6 +2089,8 @@
         preview[key].textContent = input.value.trim() || " ";
       });
 
+      previewLead.textContent = t("previewLead");
+
       const formattedDate = formatSelectedDate();
       const formattedTime = formatSelectedTime();
       preview.eventDate.textContent = formattedDate;
@@ -1830,13 +2127,13 @@
 
     confirmPaymentButton.addEventListener("click", () => {
       confirmPaymentButton.disabled = true;
-      confirmPaymentButton.textContent = "Processing...";
+      confirmPaymentButton.textContent = t("processing");
 
       window.setTimeout(() => {
         setPremiumUnlocked(true);
         closePaymentModal();
         confirmPaymentButton.disabled = false;
-        confirmPaymentButton.textContent = "Pay €1 (Test)";
+        confirmPaymentButton.textContent = t("payButton");
       }, 900);
     });
 
@@ -1885,13 +2182,14 @@
         resetTimePicker();
         clearStickers();
         resetTextScales();
+        applyLocalizedDefaults();
         syncPreview();
       });
     });
 
     async function downloadInvitationPdf({ premium = false } = {}) {
       if (typeof html2pdf !== "function") {
-        throw new Error("PDF library failed to load. Please refresh the page and try again.");
+        throw new Error(t("pdfLibraryError"));
       }
 
       const prefix = premium ? "premium" : "basic";
@@ -1981,15 +2279,15 @@
 
       const originalLabel = button.textContent;
       button.disabled = true;
-      button.textContent = "Generating PDF...";
+      button.textContent = t("generatingPdf");
 
       try {
         await downloadInvitationPdf(options);
       } catch (error) {
         console.error(error);
         window.alert(error && error.message
-          ? `Sorry, the PDF could not be generated: ${error.message}`
-          : "Sorry, the PDF could not be generated. Please try again.");
+          ? `${t("pdfError")} ${error.message}`
+          : t("pdfError"));
       } finally {
         button.disabled = options.premium ? !premiumUnlocked : false;
         button.textContent = originalLabel;
@@ -2034,6 +2332,9 @@
     setupStickerDropTarget();
     setupTextResizers();
     setPremiumUnlocked(premiumUnlocked);
+    langEnButton.addEventListener("click", () => setLanguage("en"));
+    langPlButton.addEventListener("click", () => setLanguage("pl"));
+    setLanguage(localStorage.getItem(LANG_STORAGE_KEY) === "pl" ? "pl" : "en");
     syncPreview();
   </script>
 </body>
