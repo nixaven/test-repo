@@ -119,84 +119,165 @@
     }
 
     .choice-wedding {
-      background: #f5f8fb;
-      border: 3px solid #d0dceb;
-      box-shadow:
-        inset 0 0 0 1px #a7bacf,
-        0 10px 30px rgba(59, 76, 97, 0.08);
+      background: #f5f9ff;
+      border: 2px solid #e3ecfb;
+      box-shadow: 0 10px 30px rgba(91, 115, 145, 0.06);
       animation-delay: 0.12s;
     }
 
     .choice-wedding::before,
     .choice-wedding::after {
-      border-color: rgba(167, 186, 207, 0.55);
+      display: none;
     }
 
     .choice-wedding:hover,
     .choice-wedding:focus-visible {
       transform: translateY(-4px);
-      border-color: #a7bacf;
-      box-shadow:
-        inset 0 0 0 1px #96a5bf,
-        0 18px 40px rgba(59, 76, 97, 0.14);
+      border-color: #d5e3f8;
+      box-shadow: 0 18px 40px rgba(91, 115, 145, 0.1);
       outline: none;
     }
 
     .choice-wedding .choice-watermark {
-      color: rgba(91, 115, 145, 0.38);
+      color: rgba(91, 115, 145, 0.28);
     }
 
     .choice-wedding .choice-icon {
-      background: rgba(201, 210, 225, 0.55);
-      color: #5b7391;
+      background: rgba(227, 236, 251, 0.9);
+      color: #6b84a8;
     }
 
     .choice-wedding .choice-title {
-      color: #3b4c61;
+      color: #44566f;
     }
 
     .choice-wedding .choice-copy {
-      color: #5b7391;
+      color: #6b84a8;
     }
 
     .choice-wedding .choice-cta {
-      color: #3f5477;
+      color: #4f6f95;
     }
 
     .choice-baby {
-      background: #fcfafc;
-      border: 3px solid #e8b7c6;
-      box-shadow:
-        inset 0 0 0 1px #9fc0d8,
-        0 10px 30px rgba(127, 173, 208, 0.12);
+      background-color: #fefcfd;
+      background-image:
+        radial-gradient(circle at 14% 18%, rgba(159, 192, 216, 0.34) 0%, rgba(159, 192, 216, 0) 46%),
+        radial-gradient(circle at 86% 16%, rgba(232, 183, 198, 0.36) 0%, rgba(232, 183, 198, 0) 44%),
+        radial-gradient(circle at 84% 82%, rgba(159, 192, 216, 0.32) 0%, rgba(159, 192, 216, 0) 42%),
+        radial-gradient(circle at 16% 84%, rgba(232, 183, 198, 0.34) 0%, rgba(232, 183, 198, 0) 44%),
+        radial-gradient(circle at 50% 48%, rgba(127, 173, 208, 0.18) 0%, rgba(127, 173, 208, 0) 38%),
+        radial-gradient(circle at 68% 42%, rgba(217, 160, 178, 0.2) 0%, rgba(217, 160, 178, 0) 34%),
+        radial-gradient(circle at 32% 58%, rgba(127, 173, 208, 0.18) 0%, rgba(127, 173, 208, 0) 34%),
+        radial-gradient(circle at 52% 22%, rgba(232, 183, 198, 0.22) 0%, rgba(232, 183, 198, 0) 32%);
+      border: 2px solid #efd5df;
+      box-shadow: 0 10px 30px rgba(127, 173, 208, 0.1);
       animation-delay: 0.2s;
     }
 
+    .choice-orbs {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .choice-orbs span {
+      position: absolute;
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      border: 1.5px solid;
+    }
+
+    .choice-orbs span:nth-child(1) {
+      top: 10%;
+      left: 8%;
+      border-color: rgba(127, 173, 208, 0.42);
+      background: rgba(159, 192, 216, 0.12);
+    }
+
+    .choice-orbs span:nth-child(2) {
+      top: 12%;
+      right: 10%;
+      border-color: rgba(217, 160, 178, 0.42);
+      background: rgba(232, 183, 198, 0.12);
+    }
+
+    .choice-orbs span:nth-child(3) {
+      bottom: 14%;
+      left: 14%;
+      border-color: rgba(217, 160, 178, 0.4);
+      background: rgba(232, 183, 198, 0.1);
+    }
+
+    .choice-orbs span:nth-child(4) {
+      right: 12%;
+      bottom: 12%;
+      border-color: rgba(127, 173, 208, 0.4);
+      background: rgba(159, 192, 216, 0.1);
+    }
+
+    .choice-orbs span:nth-child(5) {
+      top: 46%;
+      left: 44%;
+      width: 56px;
+      height: 56px;
+      border-color: rgba(127, 173, 208, 0.35);
+      background: rgba(159, 192, 216, 0.08);
+    }
+
+    .choice-orbs span:nth-child(6) {
+      top: 38%;
+      right: 28%;
+      width: 48px;
+      height: 48px;
+      border-color: rgba(217, 160, 178, 0.35);
+      background: rgba(232, 183, 198, 0.08);
+    }
+
     .choice-baby::before {
-      border-color: rgba(232, 183, 198, 0.55);
+      top: 28%;
+      left: 62%;
+      width: 54px;
+      height: 54px;
+      border-color: rgba(127, 173, 208, 0.38);
+      background: rgba(159, 192, 216, 0.08);
+      opacity: 1;
     }
 
     .choice-baby::after {
-      border-color: rgba(159, 192, 216, 0.55);
+      right: auto;
+      left: 24%;
+      bottom: 34%;
+      width: 60px;
+      height: 60px;
+      border-color: rgba(217, 160, 178, 0.38);
+      background: rgba(232, 183, 198, 0.08);
+      opacity: 1;
+    }
+
+    .choice-baby > :not(.choice-orbs) {
+      position: relative;
+      z-index: 1;
     }
 
     .choice-baby:hover,
     .choice-baby:focus-visible {
       transform: translateY(-4px);
-      border-color: #d9a0b2;
-      box-shadow:
-        inset 0 0 0 1px #7fadd0,
-        0 18px 40px rgba(127, 173, 208, 0.18);
+      border-color: #e8b7c6;
+      box-shadow: 0 18px 40px rgba(127, 173, 208, 0.16);
       outline: none;
     }
 
     .choice-baby .choice-watermark {
-      color: rgba(217, 160, 178, 0.42);
+      color: rgba(217, 160, 178, 0.38);
     }
 
     .choice-baby .choice-icon {
-      background: rgba(232, 183, 198, 0.35);
+      background: rgba(255, 255, 255, 0.55);
       color: #d9a0b2;
+      border: 1px solid rgba(232, 183, 198, 0.35);
     }
 
     .choice-baby .choice-title {
@@ -209,6 +290,11 @@
 
     .choice-baby .choice-cta {
       color: #7fadd0;
+    }
+
+    .choice-wedding > * {
+      position: relative;
+      z-index: 1;
     }
 
     .choice:hover,
@@ -339,6 +425,14 @@
       </a>
 
       <a class="choice choice-baby" href="/test-repo/baby-shower.html">
+        <span class="choice-orbs" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
         <p class="choice-watermark">Baby shower</p>
         <span class="choice-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24">
