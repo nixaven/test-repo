@@ -45,6 +45,43 @@
       flex-direction: column;
       justify-content: center;
       padding: clamp(1.5rem, 4vw, 3rem);
+      position: relative;
+    }
+
+    .lang-switch {
+      position: absolute;
+      top: clamp(1rem, 3vw, 1.5rem);
+      right: clamp(1rem, 3vw, 1.5rem);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.3rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow: 0 8px 24px rgba(42, 41, 38, 0.06);
+    }
+
+    .lang-btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 0.45rem 0.85rem;
+      font: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--muted);
+      background: transparent;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .lang-btn.is-active {
+      background: var(--ink);
+      color: #fffdf8;
+    }
+
+    .lang-btn:hover:not(.is-active) {
+      color: var(--ink);
     }
 
     .brand-bar {
@@ -380,8 +417,13 @@
     @media (max-width: 800px) {
       .chooser {
         justify-content: flex-start;
-        padding-top: 2rem;
+        padding-top: 3.5rem;
         padding-bottom: 2rem;
+      }
+
+      .lang-switch {
+        top: 1rem;
+        right: 1rem;
       }
 
       .choices {
@@ -405,23 +447,28 @@
 </head>
 <body>
   <main class="chooser">
+    <div class="lang-switch" role="group" aria-label="Language">
+      <button class="lang-btn is-active" type="button" data-lang="en" id="langEn">English</button>
+      <button class="lang-btn" type="button" data-lang="pl" id="langPl">Polski</button>
+    </div>
+
     <header class="brand-bar">
       <h1 class="brand">Atelier Invites</h1>
-      <p class="tagline">Choose your celebration and open a full-screen invitation studio.</p>
+      <p class="tagline" data-i18n="tagline">Choose your celebration and open a full-screen invitation studio.</p>
     </header>
 
     <div class="choices">
       <a class="choice choice-wedding" href="/test-repo/wedding.html">
-        <p class="choice-watermark">Wedding</p>
+        <p class="choice-watermark" data-i18n="weddingWatermark">Wedding</p>
         <span class="choice-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24">
             <circle cx="9" cy="12" r="3.2"></circle>
             <circle cx="15" cy="12" r="3.2"></circle>
           </svg>
         </span>
-        <h2 class="choice-title">Wedding invitation</h2>
-        <p class="choice-copy">Create a formal invite with themes, fonts, stickers, and premium PDF export for your big day.</p>
-        <span class="choice-cta">Open studio <span aria-hidden="true">→</span></span>
+        <h2 class="choice-title" data-i18n="weddingTitle">Wedding invitation</h2>
+        <p class="choice-copy" data-i18n="weddingCopy">Create a formal invite with themes, fonts, stickers, and premium PDF export for your big day.</p>
+        <span class="choice-cta"><span data-i18n="openStudio">Open studio</span> <span aria-hidden="true">→</span></span>
       </a>
 
       <a class="choice choice-baby" href="/test-repo/baby-shower.html">
@@ -433,18 +480,77 @@
           <span></span>
           <span></span>
         </span>
-        <p class="choice-watermark">Baby shower</p>
+        <p class="choice-watermark" data-i18n="babyWatermark">Baby shower</p>
         <span class="choice-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24">
             <path d="M12 4.5c1.8 0 3.2 1.4 3.2 3.1S13.8 10.7 12 10.7 8.8 9.3 8.8 7.6 10.2 4.5 12 4.5Z"></path>
             <path d="M5.5 19.2c.8-3.2 3.3-5 6.5-5s5.7 1.8 6.5 5"></path>
           </svg>
         </span>
-        <h2 class="choice-title">Baby shower invitation</h2>
-        <p class="choice-copy">Design a soft celebration card with color moods, fonts, stickers, and a ready-to-share PDF.</p>
-        <span class="choice-cta">Open studio <span aria-hidden="true">→</span></span>
+        <h2 class="choice-title" data-i18n="babyTitle">Baby shower invitation</h2>
+        <p class="choice-copy" data-i18n="babyCopy">Design a soft celebration card with color moods, fonts, stickers, and a ready-to-share PDF.</p>
+        <span class="choice-cta"><span data-i18n="openStudio">Open studio</span> <span aria-hidden="true">→</span></span>
       </a>
     </div>
   </main>
+
+  <script>
+    const LANG_STORAGE_KEY = "atelier-invites-lang";
+
+    const copy = {
+      en: {
+        pageTitle: "Atelier Invites",
+        langLabel: "Language",
+        tagline: "Choose your celebration and open a full-screen invitation studio.",
+        weddingWatermark: "Wedding",
+        weddingTitle: "Wedding invitation",
+        weddingCopy: "Create a formal invite with themes, fonts, stickers, and premium PDF export for your big day.",
+        babyWatermark: "Baby shower",
+        babyTitle: "Baby shower invitation",
+        babyCopy: "Design a soft celebration card with color moods, fonts, stickers, and a ready-to-share PDF.",
+        openStudio: "Open studio"
+      },
+      pl: {
+        pageTitle: "Atelier Invites",
+        langLabel: "Język",
+        tagline: "Wybierz uroczystość i otwórz pełnoekranowe studio zaproszeń.",
+        weddingWatermark: "Ślub",
+        weddingTitle: "Zaproszenie ślubne",
+        weddingCopy: "Stwórz eleganckie zaproszenie z motywami, czcionkami, naklejkami i eksportem PDF premium na swój wielki dzień.",
+        babyWatermark: "Baby shower",
+        babyTitle: "Zaproszenie na baby shower",
+        babyCopy: "Zaprojektuj delikatną kartę z kolorami, czcionkami, naklejkami i gotowym plikiem PDF do udostępnienia.",
+        openStudio: "Otwórz studio"
+      }
+    };
+
+    const langEnButton = document.getElementById("langEn");
+    const langPlButton = document.getElementById("langPl");
+    const langSwitch = document.querySelector(".lang-switch");
+
+    function setLanguage(lang) {
+      const strings = copy[lang] || copy.en;
+      document.documentElement.lang = lang;
+      document.title = strings.pageTitle;
+      langSwitch.setAttribute("aria-label", strings.langLabel);
+
+      document.querySelectorAll("[data-i18n]").forEach((node) => {
+        const key = node.dataset.i18n;
+        if (strings[key]) {
+          node.textContent = strings[key];
+        }
+      });
+
+      langEnButton.classList.toggle("is-active", lang === "en");
+      langPlButton.classList.toggle("is-active", lang === "pl");
+      localStorage.setItem(LANG_STORAGE_KEY, lang);
+    }
+
+    langEnButton.addEventListener("click", () => setLanguage("en"));
+    langPlButton.addEventListener("click", () => setLanguage("pl"));
+
+    const savedLang = localStorage.getItem(LANG_STORAGE_KEY);
+    setLanguage(savedLang === "pl" ? "pl" : "en");
+  </script>
 </body>
 </html>
